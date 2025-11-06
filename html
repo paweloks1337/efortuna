@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mistrzostwa Typowania 2025</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; background: #f9fafb; color: #333; text-align: center; }
+table { margin: 20px auto; border-collapse: collapse; width: 90%; max-width: 600px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+th, td { padding: 12px; border-bottom: 1px solid #ddd; }
+th { background: #2563eb; color: white; text-transform: uppercase; letter-spacing: 0.05em; }
+tr:nth-child(even) { background: #f3f4f6; }
+h1 { margin-top: 20px; color: #2563eb; }
+</style>
+</head>
+<body>
+<h1>🏆 Mistrzostwa Typowania 2025</h1>
+<p>Ranking najlepszych typerów</p>
+
+<table id="ranking">
+<thead>
+<tr>
+<th>Miejsce</th>
+<th>Nick</th>
+<th>Kupony</th>
+<th>Punkty</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+
+async function loadRanking() {
+    const res = await fetch(sheetUrl);
+    const text = await res.text();
+    const rows = text.trim().split("\n").slice(1); // pomijamy nagłówek
+    const players = {};
+
+    // liczenie kuponów i sumy punktów
+    rows.forEach(row => {
+        const cols = row.split(",");
+        const nick = cols[1].trim();   // kolumna Nick
+        const punkty = parseInt(cols[2]); // kolumna Punkty
+
+        if (!players[nick]) {
+            players[nick] = { kupony: 0, punkty: 0 };
+        }
+
+        players[nick].kupony += 1;
+        players[nick].punkty += punkty;
+    });
+
+    // konwersja do tablicy i sortowanie po punktach malejąco
+    const ranking = Object.keys(players).map(nick => ({
+        nick,
+        kupony: players[nick].kupony,
+        punkty: players[nick].punkty
+    })).sort((a,b) => b.punkty - a.punkty);
+
+    // wstawianie do tabeli
+    const tbody = document.querySelector("#ranking tbody");
+    tbody.innerHTML = "";
+    ranking.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${i+1}</td><td>${row.nick}</td><td>${row.kupony}</td><td>${row.punkty}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+loadRanking();
+</script>
+</body>
+</html>
