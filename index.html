@@ -14,7 +14,6 @@ body {
     padding: 0;
 }
 
-/* Nagłówek */
 h1 {
     margin-top: 30px;
     font-size: 2.5em;
@@ -22,13 +21,11 @@ h1 {
     text-shadow: 1px 1px 5px #000;
 }
 
-/* Podtytuł */
 p {
     font-size: 1.2em;
     color: #fff;
 }
 
-/* Tabela */
 table { 
     margin: 30px auto; 
     border-collapse: collapse; 
@@ -40,7 +37,6 @@ table {
     box-shadow: 0 5px 20px rgba(0,0,0,0.5);
 }
 
-/* Nagłówek tabeli */
 th, td { 
     padding: 15px; 
     border-bottom: 1px solid #333; 
@@ -54,15 +50,16 @@ th {
     letter-spacing: 0.05em;
 }
 
-/* Wiersze tabeli */
 tr:nth-child(even) { background: #1a1a1a; }
 tr:nth-child(odd) { background: #222; }
 
-/* Hover */
 tr:hover { background: #333; transition: 0.3s; }
 
-/* Komórki */
-td { color: #FFD700; font-weight: 600; }
+/* Nicki na biało */
+td.nick { color: #FFFFFF; font-weight: 600; }
+
+/* Punkty na zielono */
+td.punkty { color: #00FF00; font-weight: bold; text-shadow: 0 0 5px #0F0; }
 
 /* Responsywność */
 @media (max-width: 600px) {
@@ -74,7 +71,7 @@ td { color: #FFD700; font-weight: 600; }
 </head>
 <body>
 
-<h1>🏆 Mistrzostwa Typowania 2025</h1>
+<h1>🏆 Mistrzostwa Typerów Listopad</h1>
 <p>Ranking najlepszych typerów</p>
 
 <table id="ranking">
@@ -122,21 +119,24 @@ async function loadRanking() {
 
     ranking.forEach((row, i) => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${i+1}</td><td>${row.nick}</td><td>${row.kupony}</td><td data-punkty="${row.punkty}">0</td>`;
+        tr.innerHTML = `
+            <td>${i+1}</td>
+            <td class="nick">${row.nick}</td>
+            <td>${row.kupony}</td>
+            <td class="punkty" data-punkty="${row.punkty}">0</td>`;
         tbody.appendChild(tr);
     });
 
-    // Animacja liczb punktów
     animatePoints();
 }
 
-// Funkcja animująca punkty
+// Animacja punktów
 function animatePoints() {
-    const cells = document.querySelectorAll("td[data-punkty]");
+    const cells = document.querySelectorAll("td.punkty");
     cells.forEach(cell => {
         const target = parseInt(cell.getAttribute("data-punkty"));
         let count = 0;
-        const step = Math.ceil(target / 50); // 50 kroków animacji
+        const step = Math.ceil(target / 50);
         const interval = setInterval(() => {
             count += step;
             if(count >= target) {
