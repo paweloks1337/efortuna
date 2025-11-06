@@ -55,7 +55,7 @@ label {
   margin: 15px 0 5px;
   text-align: left;
 }
-input, select {
+input {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
@@ -65,6 +65,35 @@ input, select {
   color: #FFD700;
   font-size: 1em;
 }
+
+/* Przyciski SOLO / AKO */
+.toggle-group {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.toggle-btn {
+  flex: 1;
+  margin: 0 5px;
+  padding: 12px;
+  background: #333;
+  color: #FFD700;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.toggle-btn.active {
+  background: #FFD700;
+  color: #111;
+  box-shadow: 0 0 10px #FFD700;
+}
+.toggle-btn:hover {
+  background: #e6c200;
+  color: #111;
+}
+
 button {
   background: #FFD700;
   border: none;
@@ -102,11 +131,11 @@ button:hover {
   <label for="stawka">Stawka (PLN):</label>
   <input type="number" id="stawka" placeholder="np. 100" step="1" min="1">
 
-  <label for="typ">Typ zakładu:</label>
-  <select id="typ">
-    <option value="SOLO">SOLO</option>
-    <option value="AKO">AKO</option>
-  </select>
+  <label>Typ zakładu:</label>
+  <div class="toggle-group">
+    <button id="soloBtn" class="toggle-btn active" onclick="setType('SOLO')">SOLO</button>
+    <button id="akoBtn" class="toggle-btn" onclick="setType('AKO')">AKO</button>
+  </div>
 
   <button onclick="oblicz()">OBLICZ</button>
 
@@ -114,10 +143,17 @@ button:hover {
 </div>
 
 <script>
+let typZakladu = "SOLO";
+
+function setType(type) {
+  typZakladu = type;
+  document.getElementById('soloBtn').classList.toggle('active', type === 'SOLO');
+  document.getElementById('akoBtn').classList.toggle('active', type === 'AKO');
+}
+
 function oblicz() {
   const kurs = parseFloat(document.getElementById('kurs').value);
   const stawka = parseFloat(document.getElementById('stawka').value);
-  const typ = document.getElementById('typ').value;
   const wynikDiv = document.getElementById('wynik');
 
   if (isNaN(kurs) || isNaN(stawka) || kurs <= 0 || stawka <= 0) {
@@ -129,22 +165,26 @@ function oblicz() {
   let mnoznik = 0;
 
   if (kurs < 1.5) mnoznik = 1;
-  else if (typ === "SOLO") {
+  else if (typZakladu === "SOLO") {
     if (kurs >= 1.5 && kurs <= 4.99) mnoznik = 3;
     else if (kurs > 5) mnoznik = 7.5;
-  } else if (typ === "AKO") {
+  } else if (typZakladu === "AKO") {
     if (kurs >= 1.5 && kurs <= 4.99) mnoznik = 2;
     else if (kurs >= 5 && kurs <= 10) mnoznik = 5;
     else if (kurs > 10) mnoznik = 8;
   }
 
-  const wygrana = stawka * kurs;
-  const punkty = wygrana * mnoznik;
+  // Bukmacher zabiera 12%
+  const wygranaBrutto = stawka * kurs;
+  const wygranaNetto = wygranaBrutto * 0.88;
+
+  const punkty = wygranaNetto * mnoznik;
 
   wynikDiv.style.color = "#00FF00";
   wynikDiv.innerHTML = `
     🧮 Kurs: <b>${kurs.toFixed(2)}</b><br>
-    💵 Wygrana: <b>${wygrana.toFixed(2)} PLN</b><br>
+    💵 Wygrana brutto: <b>${wygranaBrutto.toFixed(2)} PLN</b><br>
+    💸 Po prowizji (−12%): <b>${wygranaNetto.toFixed(2)} PLN</b><br>
     🏅 Punkty: <b>${punkty.toFixed(2)}</b>
   `;
 }
