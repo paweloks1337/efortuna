@@ -188,13 +188,26 @@ async function loadRanking() {
   try {
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    const rows = text.split("\n").slice(1).map(r => r.split(","));
-    tableBody.innerHTML = "";
 
-    let ranking = {};
-    rows.forEach(row => {
-      const nick = row[1]?.trim();
-      const punkty = parseFloat(row[3]);
+    // 🔧 automatyczne wykrywanie separatora ("," lub ";")
+    const separator = text.includes(";") ? ";" : ",";
+    const rows = text.trim().split("\n").map(r => r.split(separator));
+
+    // 🔥 znajdź indeksy kolumn
+    const header = rows[0].map(h => h.trim().toLowerCase());
+    const nickCol = header.findIndex(h => h.includes("nick"));
+    const punktyCol = header.findIndex(h => h.includes("punkt"));
+
+    if (nickCol === -1 || punktyCol === -1) {
+      loader.textContent = "Nie znaleziono kolumn Nick / Punkty 😕";
+      return;
+    }
+
+    const ranking = {};
+
+    rows.slice(1).forEach(row => {
+      const nick = row[nickCol]?.trim();
+      const punkty = parseFloat(row[punktyCol]?.replace(",", "."));
       if (!nick || isNaN(punkty)) return;
       if (!ranking[nick]) ranking[nick] = { kupony: 0, punkty: 0 };
       ranking[nick].kupony++;
@@ -203,6 +216,7 @@ async function loadRanking() {
 
     const sorted = Object.entries(ranking).sort((a, b) => b[1].punkty - a[1].punkty);
 
+    tableBody.innerHTML = "";
     sorted.forEach(([nick, data], i) => {
       const row = document.createElement("tr");
       row.innerHTML = `<td>${i + 1}</td><td>${nick}</td><td>${data.kupony}</td><td>${data.punkty.toFixed(0)}</td>`;
@@ -212,8 +226,9 @@ async function loadRanking() {
     loader.style.display = "none";
     box.style.display = "block";
     box.classList.add("show");
+
   } catch (err) {
-    loader.innerText = "Błąd wczytywania rankingu ❌";
+    loader.textContent = "❌ Błąd podczas ładowania danych: " + err.message;
   }
 }
 
