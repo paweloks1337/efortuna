@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏆 Mistrzostwa Typowania 2025</title>
+<title>🏆 Ranking Mistrzostw Discorda</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -18,19 +18,18 @@ body {
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(180deg, #000, #111 80%);
   color: var(--gold);
-  text-align: center;
   margin: 0;
   padding: 0;
+  text-align: center;
   transition: background 0.5s, color 0.5s;
 }
 
-/* Jasny tryb */
 body.light-mode {
   background: linear-gradient(180deg, #fff, #ddd);
   color: #222;
 }
 
-/* Pasek menu */
+/* Menu */
 nav {
   background: linear-gradient(90deg, #000, #222);
   padding: 15px 0;
@@ -49,7 +48,7 @@ nav a:hover {
   text-shadow: 0 0 10px var(--gold);
 }
 
-/* Tryb ciemny/jasny */
+/* Tryb jasny/ciemny */
 .theme-toggle {
   position: absolute;
   top: 20px;
@@ -69,99 +68,85 @@ nav a:hover {
   color: #000;
 }
 
-/* Loader */
-#loader {
-  margin: 100px auto;
-  border: 8px solid #333;
-  border-top: 8px solid var(--gold);
-  border-radius: 50%;
-  width: 80px;
-  height: 80px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Tabela */
-table {
-  margin: 30px auto;
-  border-collapse: collapse;
-  width: 90%;
-  max-width: 700px;
+/* Kontener */
+.container {
   background: var(--dark);
-  border-radius: 12px;
-  overflow: hidden;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 800px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 1s ease, transform 1s ease;
 }
-body.light-mode table {
-  background: white;
-  color: #000;
-}
-th, td {
-  padding: 14px;
-  border-bottom: 1px solid #333;
-}
-th {
-  background: #000;
-  color: var(--gold);
-  font-size: 1.1em;
-}
-body.light-mode th {
-  background: #f0f0f0;
-  color: #444;
-}
-td {
-  color: white;
-  transition: color 0.3s;
-}
-td:last-child {
-  color: var(--green);
-}
-tr:hover {
-  background: #333;
-  transition: 0.3s;
-}
-
-/* Wyszukiwarka */
-#search {
-  margin-top: 20px;
-  padding: 10px 15px;
-  width: 80%;
-  max-width: 400px;
-  border-radius: 8px;
-  border: 2px solid var(--gold);
-  background: #000;
-  color: var(--gold);
-  font-size: 1em;
-  transition: 0.3s;
-}
-#search:focus {
-  outline: none;
-  box-shadow: 0 0 10px var(--gold);
-}
-body.light-mode #search {
-  background: #fff;
-  color: #000;
-  border: 2px solid #444;
-}
-
-/* Stopka */
-footer {
-  margin-top: 50px;
-  padding: 15px;
-  font-size: 0.9em;
-  color: #aaa;
-}
-
-/* Efekt fade-in tabeli */
 .show {
   opacity: 1 !important;
   transform: translateY(0) !important;
+}
+body.light-mode .container {
+  background: white;
+  color: #000;
+}
+
+/* Loader */
+.loader {
+  border: 6px solid #333;
+  border-top: 6px solid var(--gold);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Tabela */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #444;
+}
+th {
+  background: #222;
+  color: var(--gold);
+}
+body.light-mode th {
+  background: #eee;
+  color: #000;
+}
+td:nth-child(2) { color: white; } /* Nick */
+td:nth-child(4) { color: #00ff00; font-weight: 600; } /* Punkty */
+
+/* Wyszukiwarka */
+.search-box {
+  margin-top: 15px;
+  padding: 10px;
+  width: 80%;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  background: #000;
+  color: var(--gold);
+  font-size: 1em;
+}
+body.light-mode .search-box {
+  background: #fff;
+  color: #000;
+  border-color: #444;
+}
+
+footer {
+  margin-top: 40px;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #aaa;
 }
 </style>
 </head>
@@ -174,71 +159,61 @@ footer {
 
 <button class="theme-toggle" onclick="toggleTheme()">☀️</button>
 
-<h1>🏆 Mistrzostwa Typowania 2025</h1>
-<p>Ranking najlepszych typerów</p>
+<h1>🏆 Mistrzostwa Typowania Discorda 2025</h1>
+<input type="text" id="search" class="search-box" placeholder="🔍 Szukaj nicku...">
 
-<input type="text" id="search" placeholder="🔍 Szukaj nicku...">
+<div class="loader" id="loader"></div>
 
-<div id="loader"></div>
-
-<table id="ranking" style="display:none;">
-  <thead>
-    <tr>
-      <th>Miejsce</th>
-      <th>Nick</th>
-      <th>Kupony</th>
-      <th>Punkty</th>
-    </tr>
-  </thead>
-  <tbody id="ranking-body"></tbody>
-</table>
+<div class="container" id="ranking-box" style="display:none;">
+  <table id="rankingTable">
+    <thead>
+      <tr><th>Miejsce</th><th>Nick</th><th>Kupony</th><th>Punkty</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
 
 <footer>
   © 2025 Mistrzostwa Discorda | Stworzone przez Pawła ⚽
 </footer>
 
 <script>
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
 
 async function loadRanking() {
+  const loader = document.getElementById("loader");
+  const box = document.getElementById("ranking-box");
+  const tableBody = document.querySelector("#rankingTable tbody");
+
   try {
-    const response = await fetch(sheetUrl);
-    const data = await response.text();
-    const rows = data.split("\n").slice(1);
-    const players = {};
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const rows = text.split("\n").slice(1).map(r => r.split(","));
+    tableBody.innerHTML = "";
 
+    let ranking = {};
     rows.forEach(row => {
-      const [nick, kupony, punkty] = row.split(",");
-      if (!nick || !punkty) return;
-      if (!players[nick]) players[nick] = { kupony: 0, punkty: 0 };
-      players[nick].kupony++;
-      players[nick].punkty += parseFloat(punkty) || 0;
+      const nick = row[1]?.trim();
+      const punkty = parseFloat(row[3]);
+      if (!nick || isNaN(punkty)) return;
+      if (!ranking[nick]) ranking[nick] = { kupony: 0, punkty: 0 };
+      ranking[nick].kupony++;
+      ranking[nick].punkty += punkty;
     });
 
-    const ranking = Object.entries(players)
-      .map(([nick, v]) => ({ nick, ...v }))
-      .sort((a, b) => b.punkty - a.punkty);
+    const sorted = Object.entries(ranking).sort((a, b) => b[1].punkty - a[1].punkty);
 
-    const tbody = document.getElementById("ranking-body");
-    tbody.innerHTML = "";
-
-    ranking.forEach((p, i) => {
-      const row = `<tr>
-        <td>${i + 1}</td>
-        <td>${p.nick}</td>
-        <td>${p.kupony}</td>
-        <td>${p.punkty.toFixed(2)}</td>
-      </tr>`;
-      tbody.innerHTML += row;
+    sorted.forEach(([nick, data], i) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${i + 1}</td><td>${nick}</td><td>${data.kupony}</td><td>${data.punkty.toFixed(0)}</td>`;
+      tableBody.appendChild(row);
     });
 
-    document.getElementById("loader").style.display = "none";
-    const table = document.getElementById("ranking");
-    table.style.display = "table";
-    setTimeout(() => table.classList.add("show"), 100);
-  } catch {
-    document.getElementById("loader").style.display = "none";
-    document.body.innerHTML += "<p style='color:red;'>❌ Błąd ładowania danych!</p>";
+    loader.style.display = "none";
+    box.style.display = "block";
+    box.classList.add("show");
+  } catch (err) {
+    loader.innerText = "Błąd wczytywania rankingu ❌";
   }
 }
 
@@ -248,17 +223,15 @@ function toggleTheme() {
   btn.textContent = document.body.classList.contains("light-mode") ? "🌙" : "☀️";
 }
 
-// Wyszukiwarka
+// Filtr wyszukiwania
 document.getElementById("search").addEventListener("input", function() {
-  const filter = this.value.toLowerCase();
-  const rows = document.querySelectorAll("#ranking-body tr");
-  rows.forEach(row => {
-    const nick = row.cells[1].textContent.toLowerCase();
-    row.style.display = nick.includes(filter) ? "" : "none";
+  const value = this.value.toLowerCase();
+  document.querySelectorAll("#rankingTable tbody tr").forEach(tr => {
+    tr.style.display = tr.children[1].textContent.toLowerCase().includes(value) ? "" : "none";
   });
 });
 
-loadRanking();
+window.addEventListener("load", loadRanking);
 </script>
 </body>
 </html>
