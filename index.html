@@ -3,75 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mistrzostwa Typowania 2025</title>
+<title>Mistrzostwa Typowania 2025 - Ranking</title>
 <style>
 body { 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    background: #111; 
-    color: #FFD700; 
-    text-align: center; 
-    margin: 0; 
-    padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  background: #111; 
+  color: #FFD700; 
+  text-align: center; 
+  margin: 0; 
+  padding: 0;
 }
 
+/* Pasek menu */
+nav {
+  background: #000;
+  padding: 15px 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+nav a {
+  color: #FFD700;
+  text-decoration: none;
+  margin: 0 20px;
+  font-weight: bold;
+  font-size: 1.1em;
+  transition: 0.3s;
+}
+nav a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px #FFD700;
+}
+
+/* Nagłówek */
 h1 {
-    margin-top: 30px;
-    font-size: 2.5em;
-    color: #FFD700;
-    text-shadow: 1px 1px 5px #000;
+  margin-top: 30px;
+  font-size: 2.5em;
+  color: #FFD700;
+  text-shadow: 1px 1px 5px #000;
 }
-
 p {
-    font-size: 1.2em;
-    color: #fff;
+  font-size: 1.2em;
+  color: #fff;
 }
 
+/* Tabela */
 table { 
-    margin: 30px auto; 
-    border-collapse: collapse; 
-    width: 90%; 
-    max-width: 700px; 
-    background: #222; 
-    border-radius: 15px; 
-    overflow: hidden; 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+  margin: 30px auto; 
+  border-collapse: collapse; 
+  width: 90%; 
+  max-width: 700px; 
+  background: #222; 
+  border-radius: 15px; 
+  overflow: hidden; 
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
 }
-
 th, td { 
-    padding: 15px; 
-    border-bottom: 1px solid #333; 
+  padding: 15px; 
+  border-bottom: 1px solid #333; 
 }
-
 th { 
-    background: #FFD700; 
-    color: #111; 
-    text-transform: uppercase; 
-    font-weight: bold; 
-    letter-spacing: 0.05em;
+  background: #FFD700; 
+  color: #111; 
+  text-transform: uppercase; 
+  font-weight: bold; 
+  letter-spacing: 0.05em;
 }
-
 tr:nth-child(even) { background: #1a1a1a; }
 tr:nth-child(odd) { background: #222; }
-
 tr:hover { background: #333; transition: 0.3s; }
 
-/* Nicki na biało */
+/* Kolory kolumn */
 td.nick { color: #FFFFFF; font-weight: 600; }
-
-/* Punkty na zielono */
 td.punkty { color: #00FF00; font-weight: bold; text-shadow: 0 0 5px #0F0; }
 
 /* Responsywność */
 @media (max-width: 600px) {
-    th, td { padding: 10px; font-size: 0.9em; }
-    h1 { font-size: 2em; }
-    p { font-size: 1em; }
+  th, td { padding: 10px; font-size: 0.9em; }
+  h1 { font-size: 2em; }
+  p { font-size: 1em; }
 }
 </style>
 </head>
 <body>
 
-<h1>🏆 Mistrzostwa Typerów Listopad</h1>
+<nav>
+  <a href="index.html">🏆 Ranking</a>
+  <a href="kalkulator.html">📊 Kalkulator</a>
+</nav>
+
+<h1>Mistrzostwa Typowania 2025</h1>
 <p>Ranking najlepszych typerów</p>
 
 <table id="ranking">
@@ -90,63 +110,59 @@ td.punkty { color: #00FF00; font-weight: bold; text-shadow: 0 0 5px #0F0; }
 const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
 
 async function loadRanking() {
-    const res = await fetch(sheetUrl);
-    const text = await res.text();
-    const rows = text.trim().split("\n").slice(1);
-    const players = {};
+  const res = await fetch(sheetUrl);
+  const text = await res.text();
+  const rows = text.trim().split("\n").slice(1);
+  const players = {};
 
-    rows.forEach(row => {
-        const cols = row.split(",");
-        const nick = cols[0].trim();
-        const punkty = parseInt(cols[1]) || 0;
+  rows.forEach(row => {
+    const cols = row.split(",");
+    const nick = cols[0].trim();
+    const punkty = parseFloat(cols[1]) || 0;
 
-        if (!players[nick]) {
-            players[nick] = { kupony: 0, punkty: 0 };
-        }
+    if (!players[nick]) players[nick] = { kupony: 0, punkty: 0 };
+    players[nick].kupony += 1;
+    players[nick].punkty += punkty;
+  });
 
-        players[nick].kupony += 1;
-        players[nick].punkty += punkty;
-    });
+  const ranking = Object.keys(players).map(nick => ({
+    nick,
+    kupony: players[nick].kupony,
+    punkty: players[nick].punkty
+  })).sort((a,b) => b.punkty - a.punkty);
 
-    const ranking = Object.keys(players).map(nick => ({
-        nick,
-        kupony: players[nick].kupony,
-        punkty: players[nick].punkty
-    })).sort((a,b) => b.punkty - a.punkty);
+  const tbody = document.querySelector("#ranking tbody");
+  tbody.innerHTML = "";
 
-    const tbody = document.querySelector("#ranking tbody");
-    tbody.innerHTML = "";
+  ranking.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td class="nick">${row.nick}</td>
+      <td>${row.kupony}</td>
+      <td class="punkty" data-punkty="${row.punkty}">0</td>`;
+    tbody.appendChild(tr);
+  });
 
-    ranking.forEach((row, i) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${i+1}</td>
-            <td class="nick">${row.nick}</td>
-            <td>${row.kupony}</td>
-            <td class="punkty" data-punkty="${row.punkty}">0</td>`;
-        tbody.appendChild(tr);
-    });
-
-    animatePoints();
+  animatePoints();
 }
 
-// Animacja punktów
 function animatePoints() {
-    const cells = document.querySelectorAll("td.punkty");
-    cells.forEach(cell => {
-        const target = parseInt(cell.getAttribute("data-punkty"));
-        let count = 0;
-        const step = Math.ceil(target / 50);
-        const interval = setInterval(() => {
-            count += step;
-            if(count >= target) {
-                cell.textContent = target;
-                clearInterval(interval);
-            } else {
-                cell.textContent = count;
-            }
-        }, 20);
-    });
+  const cells = document.querySelectorAll("td.punkty");
+  cells.forEach(cell => {
+    const target = parseInt(cell.getAttribute("data-punkty"));
+    let count = 0;
+    const step = Math.ceil(target / 50);
+    const interval = setInterval(() => {
+      count += step;
+      if (count >= target) {
+        cell.textContent = target;
+        clearInterval(interval);
+      } else {
+        cell.textContent = count;
+      }
+    }, 20);
+  });
 }
 
 loadRanking();
