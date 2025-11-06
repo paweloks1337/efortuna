@@ -38,28 +38,25 @@ async function loadRanking() {
     const rows = text.trim().split("\n").slice(1); // pomijamy nagłówek
     const players = {};
 
-    // liczenie kuponów i sumy punktów
     rows.forEach(row => {
-        const cols = row.split(",");
-        const nick = cols[1].trim();   // kolumna Nick
-        const punkty = parseInt(cols[2]); // kolumna Punkty
+        const cols = row.split(","); // kolumny oddzielone przecinkiem
+        const nick = cols[0].trim(); // kolumna Nick
+        const punkty = parseInt(cols[1]) || 0; // kolumna Punkty
 
         if (!players[nick]) {
             players[nick] = { kupony: 0, punkty: 0 };
         }
 
-        players[nick].kupony += 1;
-        players[nick].punkty += punkty;
+        players[nick].kupony += 1;       // liczba kuponów
+        players[nick].punkty += punkty;  // suma punktów
     });
 
-    // konwersja do tablicy i sortowanie po punktach malejąco
     const ranking = Object.keys(players).map(nick => ({
         nick,
         kupony: players[nick].kupony,
         punkty: players[nick].punkty
     })).sort((a,b) => b.punkty - a.punkty);
 
-    // wstawianie do tabeli
     const tbody = document.querySelector("#ranking tbody");
     tbody.innerHTML = "";
     ranking.forEach((row, i) => {
