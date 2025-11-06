@@ -3,84 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mistrzostwa Typowania 2025 - Ranking</title>
+<title>🏆 Mistrzostwa Typowania 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body { 
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-  background: #111; 
-  color: #FFD700; 
-  text-align: center; 
-  margin: 0; 
+:root {
+  --gold: #FFD700;
+  --black: #111;
+  --dark: #1a1a1a;
+  --light: #f4f4f4;
+  --green: #00FF88;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #000, #111 80%);
+  color: var(--gold);
+  text-align: center;
+  margin: 0;
   padding: 0;
+  transition: background 0.5s, color 0.5s;
+}
+
+/* Jasny tryb */
+body.light-mode {
+  background: linear-gradient(180deg, #fff, #ddd);
+  color: #222;
 }
 
 /* Pasek menu */
 nav {
-  background: #000;
+  background: linear-gradient(90deg, #000, #222);
   padding: 15px 0;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
 }
 nav a {
-  color: #FFD700;
+  color: var(--gold);
   text-decoration: none;
   margin: 0 20px;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 1.1em;
   transition: 0.3s;
 }
 nav a:hover {
-  color: #fff;
-  text-shadow: 0 0 10px #FFD700;
+  color: white;
+  text-shadow: 0 0 10px var(--gold);
 }
 
-/* Nagłówek */
-h1 {
-  margin-top: 30px;
-  font-size: 2.5em;
-  color: #FFD700;
-  text-shadow: 1px 1px 5px #000;
-}
-p {
+/* Tryb ciemny/jasny */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
   font-size: 1.2em;
-  color: #fff;
+  transition: 0.3s;
+}
+.theme-toggle:hover {
+  background: var(--gold);
+  color: #000;
+}
+
+/* Loader */
+#loader {
+  margin: 100px auto;
+  border: 8px solid #333;
+  border-top: 8px solid var(--gold);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Tabela */
-table { 
-  margin: 30px auto; 
-  border-collapse: collapse; 
-  width: 90%; 
-  max-width: 700px; 
-  background: #222; 
-  border-radius: 15px; 
-  overflow: hidden; 
-  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+table {
+  margin: 30px auto;
+  border-collapse: collapse;
+  width: 90%;
+  max-width: 700px;
+  background: var(--dark);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
 }
-th, td { 
-  padding: 15px; 
-  border-bottom: 1px solid #333; 
+body.light-mode table {
+  background: white;
+  color: #000;
 }
-th { 
-  background: #FFD700; 
-  color: #111; 
-  text-transform: uppercase; 
-  font-weight: bold; 
-  letter-spacing: 0.05em;
+th, td {
+  padding: 14px;
+  border-bottom: 1px solid #333;
 }
-tr:nth-child(even) { background: #1a1a1a; }
-tr:nth-child(odd) { background: #222; }
-tr:hover { background: #333; transition: 0.3s; }
+th {
+  background: #000;
+  color: var(--gold);
+  font-size: 1.1em;
+}
+body.light-mode th {
+  background: #f0f0f0;
+  color: #444;
+}
+td {
+  color: white;
+  transition: color 0.3s;
+}
+td:last-child {
+  color: var(--green);
+}
+tr:hover {
+  background: #333;
+  transition: 0.3s;
+}
 
-/* Kolory kolumn */
-td.nick { color: #FFFFFF; font-weight: 600; }
-td.punkty { color: #00FF00; font-weight: bold; text-shadow: 0 0 5px #0F0; }
+/* Wyszukiwarka */
+#search {
+  margin-top: 20px;
+  padding: 10px 15px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  border: 2px solid var(--gold);
+  background: #000;
+  color: var(--gold);
+  font-size: 1em;
+  transition: 0.3s;
+}
+#search:focus {
+  outline: none;
+  box-shadow: 0 0 10px var(--gold);
+}
+body.light-mode #search {
+  background: #fff;
+  color: #000;
+  border: 2px solid #444;
+}
 
-/* Responsywność */
-@media (max-width: 600px) {
-  th, td { padding: 10px; font-size: 0.9em; }
-  h1 { font-size: 2em; }
-  p { font-size: 1em; }
+/* Stopka */
+footer {
+  margin-top: 50px;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+/* Efekt fade-in tabeli */
+.show {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
 }
 </style>
 </head>
@@ -91,79 +172,91 @@ td.punkty { color: #00FF00; font-weight: bold; text-shadow: 0 0 5px #0F0; }
   <a href="kalkulator.html">📊 Kalkulator</a>
 </nav>
 
-<h1>Mistrzostwa Typowania 2025</h1>
+<button class="theme-toggle" onclick="toggleTheme()">☀️</button>
+
+<h1>🏆 Mistrzostwa Typowania 2025</h1>
 <p>Ranking najlepszych typerów</p>
 
-<table id="ranking">
-<thead>
-<tr>
-<th>Miejsce</th>
-<th>Nick</th>
-<th>Kupony</th>
-<th>Punkty</th>
-</tr>
-</thead>
-<tbody></tbody>
+<input type="text" id="search" placeholder="🔍 Szukaj nicku...">
+
+<div id="loader"></div>
+
+<table id="ranking" style="display:none;">
+  <thead>
+    <tr>
+      <th>Miejsce</th>
+      <th>Nick</th>
+      <th>Kupony</th>
+      <th>Punkty</th>
+    </tr>
+  </thead>
+  <tbody id="ranking-body"></tbody>
 </table>
+
+<footer>
+  © 2025 Mistrzostwa Discorda | Stworzone przez Pawła ⚽
+</footer>
 
 <script>
 const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
 
 async function loadRanking() {
-  const res = await fetch(sheetUrl);
-  const text = await res.text();
-  const rows = text.trim().split("\n").slice(1);
-  const players = {};
+  try {
+    const response = await fetch(sheetUrl);
+    const data = await response.text();
+    const rows = data.split("\n").slice(1);
+    const players = {};
 
+    rows.forEach(row => {
+      const [nick, kupony, punkty] = row.split(",");
+      if (!nick || !punkty) return;
+      if (!players[nick]) players[nick] = { kupony: 0, punkty: 0 };
+      players[nick].kupony++;
+      players[nick].punkty += parseFloat(punkty) || 0;
+    });
+
+    const ranking = Object.entries(players)
+      .map(([nick, v]) => ({ nick, ...v }))
+      .sort((a, b) => b.punkty - a.punkty);
+
+    const tbody = document.getElementById("ranking-body");
+    tbody.innerHTML = "";
+
+    ranking.forEach((p, i) => {
+      const row = `<tr>
+        <td>${i + 1}</td>
+        <td>${p.nick}</td>
+        <td>${p.kupony}</td>
+        <td>${p.punkty.toFixed(2)}</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+
+    document.getElementById("loader").style.display = "none";
+    const table = document.getElementById("ranking");
+    table.style.display = "table";
+    setTimeout(() => table.classList.add("show"), 100);
+  } catch {
+    document.getElementById("loader").style.display = "none";
+    document.body.innerHTML += "<p style='color:red;'>❌ Błąd ładowania danych!</p>";
+  }
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("light-mode");
+  const btn = document.querySelector(".theme-toggle");
+  btn.textContent = document.body.classList.contains("light-mode") ? "🌙" : "☀️";
+}
+
+// Wyszukiwarka
+document.getElementById("search").addEventListener("input", function() {
+  const filter = this.value.toLowerCase();
+  const rows = document.querySelectorAll("#ranking-body tr");
   rows.forEach(row => {
-    const cols = row.split(",");
-    const nick = cols[0].trim();
-    const punkty = parseFloat(cols[1]) || 0;
-
-    if (!players[nick]) players[nick] = { kupony: 0, punkty: 0 };
-    players[nick].kupony += 1;
-    players[nick].punkty += punkty;
+    const nick = row.cells[1].textContent.toLowerCase();
+    row.style.display = nick.includes(filter) ? "" : "none";
   });
-
-  const ranking = Object.keys(players).map(nick => ({
-    nick,
-    kupony: players[nick].kupony,
-    punkty: players[nick].punkty
-  })).sort((a,b) => b.punkty - a.punkty);
-
-  const tbody = document.querySelector("#ranking tbody");
-  tbody.innerHTML = "";
-
-  ranking.forEach((row, i) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${i+1}</td>
-      <td class="nick">${row.nick}</td>
-      <td>${row.kupony}</td>
-      <td class="punkty" data-punkty="${row.punkty}">0</td>`;
-    tbody.appendChild(tr);
-  });
-
-  animatePoints();
-}
-
-function animatePoints() {
-  const cells = document.querySelectorAll("td.punkty");
-  cells.forEach(cell => {
-    const target = parseInt(cell.getAttribute("data-punkty"));
-    let count = 0;
-    const step = Math.ceil(target / 50);
-    const interval = setInterval(() => {
-      count += step;
-      if (count >= target) {
-        cell.textContent = target;
-        clearInterval(interval);
-      } else {
-        cell.textContent = count;
-      }
-    }, 20);
-  });
-}
+});
 
 loadRanking();
 </script>
