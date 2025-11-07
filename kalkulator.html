@@ -13,7 +13,7 @@
   --green: #00FF88;
 }
 
-/* Ogólny styl jak w rankingu */
+/* Tło i tekst */
 body {
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(180deg, #000, #111 80%);
@@ -168,6 +168,7 @@ button.calc:hover {
   font-size: 1.3em;
   color: var(--green);
   text-shadow: 0 0 10px #0F0;
+  min-height: 60px;
 }
 
 /* Stopka */
@@ -176,6 +177,20 @@ footer {
   padding: 15px;
   font-size: 0.9em;
   color: #aaa;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  nav a {
+    margin: 0 10px;
+    font-size: 0.9em;
+  }
+  .container {
+    padding: 15px;
+  }
+  h1 {
+    font-size: 1.5em;
+  }
 }
 </style>
 </head>
@@ -220,6 +235,20 @@ function setType(type) {
   document.getElementById('akoBtn').classList.toggle('active', type === 'AKO');
 }
 
+// animacja rosnącej liczby
+function animateValue(element, start, end, duration, suffix = "") {
+  const range = end - start;
+  let startTime = null;
+  function step(currentTime) {
+    if (!startTime) startTime = currentTime;
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+    const value = Math.floor(progress * range + start);
+    element.innerHTML = value.toLocaleString("pl-PL") + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 function oblicz() {
   const kurs = parseFloat(document.getElementById('kurs').value);
   const stawka = parseFloat(document.getElementById('stawka').value);
@@ -243,16 +272,20 @@ function oblicz() {
   }
 
   const wygranaBrutto = stawka * kurs;
-  const wygranaNetto = wygranaBrutto * 0.88; // -12% prowizji
-  const punkty = wygranaNetto * mnoznik;
+  const wygranaNetto = wygranaBrutto * 0.88; // -12%
+  const punkty = Math.round(wygranaNetto * mnoznik);
 
   wynikDiv.style.color = "#00FF00";
   wynikDiv.innerHTML = `
     🧮 Kurs: <b>${kurs.toFixed(2)}</b><br>
-    💵 Wygrana brutto: <b>${wygranaBrutto.toFixed(2)} PLN</b><br>
-    💸 Po prowizji (−12%): <b>${wygranaNetto.toFixed(2)} PLN</b><br>
-    🏅 Punkty: <b>${punkty.toFixed(2)}</b>
+    💵 Wygrana brutto: <b id="brutto">0</b> PLN<br>
+    💸 Po prowizji (−12%): <b id="netto">0</b> PLN<br>
+    🏅 Punkty: <b id="punkty">0</b>
   `;
+
+  animateValue(document.getElementById("brutto"), 0, wygranaBrutto, 1000);
+  animateValue(document.getElementById("netto"), 0, wygranaNetto, 1000);
+  animateValue(document.getElementById("punkty"), 0, punkty, 1000);
 }
 
 function toggleTheme() {
@@ -261,7 +294,7 @@ function toggleTheme() {
   btn.textContent = document.body.classList.contains("light-mode") ? "🌙" : "☀️";
 }
 
-/* Animacja wejścia */
+/* Efekt wejścia */
 window.addEventListener("load", () => {
   document.getElementById("calc-box").classList.add("show");
 });
