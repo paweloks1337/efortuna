@@ -56,10 +56,11 @@ button.calc{
 }
 button.calc:hover{box-shadow:0 0 18px var(--gold)}
 
-#result{
-  margin-top:24px;font-size:1.5rem;font-weight:700;
-  color:var(--green);min-height:36px;
+.result-box{
+  margin-top:28px;text-align:center;animation:fadeUp .5s;
 }
+.result-label{font-weight:600;color:#ccc;font-size:1rem;margin-top:6px}
+.result-value{font-size:1.6rem;font-weight:700;color:var(--green);min-height:36px;}
 
 .toast{
   position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);
@@ -98,7 +99,12 @@ button.calc:hover{box-shadow:0 0 18px var(--gold)}
   
   <button class="calc" onclick="oblicz()">OBLICZ</button>
   
-  <div id="result"></div>
+  <div class="result-box">
+    <div class="result-label">💰 Wygrana (po odliczeniu 12% podatku):</div>
+    <div id="wygrana" class="result-value">0.00</div>
+    <div class="result-label">🏅 Punkty:</div>
+    <div id="punkty" class="result-value">0.00</div>
+  </div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -110,12 +116,12 @@ function showToast(msg, ms=2500){
   clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove("show"),ms);
 }
 
-function animateNumber(el,start,end,ms){
+function animateNumber(el,start,end,ms,dec=2){
   const st=performance.now();
   const step=(now)=>{
     const t=Math.min(1,(now-st)/ms);
     const val=start+(end-start)*t;
-    el.textContent=val.toFixed(2);
+    el.textContent=val.toFixed(dec);
     if(t<1)requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -133,10 +139,12 @@ function setActive(id){
 function oblicz(){
   const kurs=parseFloat(document.getElementById("kurs").value);
   const stawka=parseFloat(document.getElementById("stawka").value);
-  const out=document.getElementById("result");
+  const outWygr=document.getElementById("wygrana");
+  const outPkt=document.getElementById("punkty");
+  
   if(!kurs||!stawka){showToast("⚠️ Uzupełnij wszystkie pola!");return;}
 
-  const wygrana=stawka*kurs*0.88; // -12% bukmacher
+  const wygrana=stawka*kurs*0.88; // -12% podatek
   let mnoznik=1;
   
   if(typ==="SOLO"){
@@ -151,8 +159,9 @@ function oblicz(){
   }
 
   const punkty=wygrana*mnoznik;
-  out.style.animation="fadeUp .5s";
-  animateNumber(out,0,punkty,800);
+
+  animateNumber(outWygr,0,wygrana,800,2);
+  animateNumber(outPkt,0,punkty,1000,2);
   showToast("✅ Wynik obliczony!");
 }
 
