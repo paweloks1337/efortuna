@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏆 Ranking Mistrzostw Discorda Listopad</title>
+<title>🏆 Mistrzostwa Typowania 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --gold: #FFD700;
   --black: #111;
   --dark: #1a1a1a;
-  --light: #f4f4f4;
   --green: #00FF88;
 }
 
@@ -29,12 +28,12 @@ body.light-mode {
   color: #222;
 }
 
-/* Menu */
 nav {
   background: linear-gradient(90deg, #000, #222);
   padding: 15px 0;
   box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
 }
+
 nav a {
   color: var(--gold);
   text-decoration: none;
@@ -43,12 +42,12 @@ nav a {
   font-size: 1.1em;
   transition: 0.3s;
 }
+
 nav a:hover {
   color: white;
   text-shadow: 0 0 10px var(--gold);
 }
 
-/* Tryb jasny/ciemny */
 .theme-toggle {
   position: absolute;
   top: 20px;
@@ -68,11 +67,20 @@ nav a:hover {
   color: #000;
 }
 
-/* Kontener */
+h1 {
+  margin-top: 30px;
+  font-size: 1.8em;
+}
+
+#loader {
+  margin: 40px auto;
+  font-size: 1.2em;
+}
+
 .container {
   background: var(--dark);
-  margin: 40px auto;
-  padding: 25px;
+  margin: 30px auto;
+  padding: 20px;
   border-radius: 15px;
   width: 90%;
   max-width: 800px;
@@ -90,56 +98,50 @@ body.light-mode .container {
   color: #000;
 }
 
-/* Loader */
-.loader {
-  border: 6px solid #333;
-  border-top: 6px solid var(--gold);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 40px auto;
-}
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-/* Tabela */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
+  margin-top: 20px;
+  font-size: 1em;
 }
 th, td {
   padding: 10px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
 }
 th {
-  background: #222;
   color: var(--gold);
+  font-weight: 600;
+  text-transform: uppercase;
 }
-body.light-mode th {
-  background: #eee;
-  color: #000;
+td {
+  color: white;
 }
-td:nth-child(2) { color: white; } /* Nick */
-td:nth-child(4) { color: #00ff00; font-weight: 600; } /* Punkty */
+td:nth-child(4) {
+  color: var(--green);
+  font-weight: bold;
+}
+body.light-mode td:nth-child(4) {
+  color: green;
+}
 
-/* Wyszukiwarka */
-.search-box {
-  margin-top: 15px;
+input {
   padding: 10px;
-  width: 80%;
-  border: 2px solid var(--gold);
+  margin: 15px auto;
   border-radius: 8px;
+  border: 2px solid var(--gold);
   background: #000;
   color: var(--gold);
   font-size: 1em;
+  width: 80%;
+  max-width: 300px;
 }
-body.light-mode .search-box {
+input:focus {
+  outline: none;
+  box-shadow: 0 0 10px var(--gold);
+}
+body.light-mode input {
   background: #fff;
   color: #000;
-  border-color: #444;
 }
 
 footer {
@@ -147,6 +149,16 @@ footer {
   padding: 15px;
   font-size: 0.9em;
   color: #aaa;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  th, td {
+    padding: 6px;
+    font-size: 0.9em;
+  }
+  h1 { font-size: 1.4em; }
+  nav a { margin: 0 10px; font-size: 0.9em; }
 }
 </style>
 </head>
@@ -159,10 +171,9 @@ footer {
 
 <button class="theme-toggle" onclick="toggleTheme()">☀️</button>
 
-<h1>🏆 Mistrzostwa Typowania Discorda 2025</h1>
-<input type="text" id="search" class="search-box" placeholder="🔍 Szukaj nicku...">
-
-<div class="loader" id="loader"></div>
+<h1>🏆 Mistrzostwa Typowania 2025</h1>
+<input type="text" id="search" placeholder="🔍 Szukaj nicku...">
+<div id="loader">⏳ Wczytywanie danych...</div>
 
 <div class="container" id="ranking-box" style="display:none;">
   <table id="rankingTable">
@@ -173,12 +184,22 @@ footer {
   </table>
 </div>
 
-<footer>
-  © 2025 Mistrzostwa Discorda | Stworzone przez paweloks 💵
-</footer>
+<footer>© 2025 Mistrzostwa Discorda | Stworzone przez Pawła ⚽</footer>
 
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+
+function animateValue(element, start, end, duration) {
+  const range = end - start;
+  let startTime = null;
+  function step(currentTime) {
+    if (!startTime) startTime = currentTime;
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+    element.textContent = Math.floor(progress * range + start);
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 async function loadRanking() {
   const loader = document.getElementById("loader");
@@ -188,23 +209,14 @@ async function loadRanking() {
   try {
     const res = await fetch(CSV_URL);
     const text = await res.text();
-
-    // 🔧 automatyczne wykrywanie separatora ("," lub ";")
     const separator = text.includes(";") ? ";" : ",";
     const rows = text.trim().split("\n").map(r => r.split(separator));
 
-    // 🔥 znajdź indeksy kolumn
     const header = rows[0].map(h => h.trim().toLowerCase());
     const nickCol = header.findIndex(h => h.includes("nick"));
     const punktyCol = header.findIndex(h => h.includes("punkt"));
 
-    if (nickCol === -1 || punktyCol === -1) {
-      loader.textContent = "Nie znaleziono kolumn Nick / Punkty 😕";
-      return;
-    }
-
     const ranking = {};
-
     rows.slice(1).forEach(row => {
       const nick = row[nickCol]?.trim();
       const punkty = parseFloat(row[punktyCol]?.replace(",", "."));
@@ -219,8 +231,18 @@ async function loadRanking() {
     tableBody.innerHTML = "";
     sorted.forEach(([nick, data], i) => {
       const row = document.createElement("tr");
-      row.innerHTML = `<td>${i + 1}</td><td>${nick}</td><td>${data.kupony}</td><td>${data.punkty.toFixed(0)}</td>`;
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${nick}</td>
+        <td>${data.kupony}</td>
+        <td class="animated">${0}</td>`;
       tableBody.appendChild(row);
+
+      // animacja punktów
+      setTimeout(() => {
+        const td = row.querySelector(".animated");
+        animateValue(td, 0, Math.round(data.punkty), 1200);
+      }, i * 100);
     });
 
     loader.style.display = "none";
@@ -228,7 +250,7 @@ async function loadRanking() {
     box.classList.add("show");
 
   } catch (err) {
-    loader.textContent = "❌ Błąd podczas ładowania danych: " + err.message;
+    loader.textContent = "❌ Błąd podczas ładowania danych";
   }
 }
 
@@ -238,11 +260,11 @@ function toggleTheme() {
   btn.textContent = document.body.classList.contains("light-mode") ? "🌙" : "☀️";
 }
 
-// Filtr wyszukiwania
-document.getElementById("search").addEventListener("input", function() {
-  const value = this.value.toLowerCase();
+document.getElementById("search").addEventListener("input", (e) => {
+  const term = e.target.value.toLowerCase();
   document.querySelectorAll("#rankingTable tbody tr").forEach(tr => {
-    tr.style.display = tr.children[1].textContent.toLowerCase().includes(value) ? "" : "none";
+    const nick = tr.children[1].textContent.toLowerCase();
+    tr.style.display = nick.includes(term) ? "" : "none";
   });
 });
 
