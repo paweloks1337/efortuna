@@ -4,157 +4,92 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🏆 Mistrzostwa Typowania 2025</title>
-
 <style>
-/* 🌟 Globalne style */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(120deg, #000000, #111111, #000000);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
+  font-family: Arial, sans-serif;
+  background-color: #000;
   color: #FFD700;
   margin: 0;
   padding: 0;
+  text-align: center;
 }
 
-/* 🏆 Tabela ranking */
+h1 {
+  margin: 20px 0;
+}
+
 table {
   width: 90%;
+  margin: 0 auto 20px auto;
   border-collapse: collapse;
-  margin: 20px auto;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeIn 1s forwards;
 }
 
 th, td {
+  border: 1px solid #FFD700;
   padding: 10px;
   text-align: center;
 }
 
 th {
-  background: linear-gradient(to right, #FFD700, #FFA500);
+  background-color: #FFD700;
   color: #000;
-  cursor: pointer;
-  text-transform: uppercase;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255,255,255,0.05);
 }
 
-tr:hover {
-  background: rgba(255, 255, 0, 0.2);
-  transform: scale(1.02);
-  transition: all 0.3s;
-}
-
-/* Glow efekt dla punktów */
 .points {
   color: #00FF00;
-  text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00;
 }
 
-/* Top 3 miejsca */
-.top1 { background: #FFD700; color: #000; font-weight: bold; }
-.top2 { background: #C0C0C0; color: #000; font-weight: bold; }
-.top3 { background: #CD7F32; color: #000; font-weight: bold; }
+.top1 { font-weight: bold; }
+.top2 { font-weight: bold; }
+.top3 { font-weight: bold; }
 
-/* Fade-in animacja tabeli */
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Animowane tło */
-@keyframes gradientBG {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-
-/* Wyszukiwarka */
-#searchContainer {
-  text-align: center;
-  margin: 15px;
-}
-
-#searchNick {
+input {
   padding: 8px;
-  width: 200px;
+  margin: 10px;
   border-radius: 6px;
   border: none;
   outline: none;
+  width: 200px;
 }
 </style>
 </head>
 <body>
 
-<h1 style="text-align:center;">🏆 Mistrzostwa Typowania 2025</h1>
-<div id="searchContainer">
-  <input type="text" id="searchNick" placeholder="Wyszukaj nick..." onkeyup="filterNick('rankingTable','searchNick')">
-</div>
+<h1>🏆 Mistrzostwa Typowania 2025</h1>
+
+<input type="text" id="searchNick" placeholder="Wyszukaj nick..." onkeyup="filterNick('rankingTable','searchNick')">
 
 <table id="rankingTable">
-  <thead>
-    <tr>
-      <th onclick="sortTable('rankingTable',0)">Miejsce</th>
-      <th onclick="sortTable('rankingTable',1)">Nick</th>
-      <th onclick="sortTable('rankingTable',2)">Kupony</th>
-      <th onclick="sortTable('rankingTable',3)">Punkty</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr class="top1">
-      <td>1</td><td>Maciek</td><td>3</td><td class="points" id="points1">0</td>
-    </tr>
-    <tr class="top2">
-      <td>2</td><td>Zdzichu</td><td>1</td><td class="points" id="points2">0</td>
-    </tr>
-    <tr class="top3">
-      <td>3</td><td>Piotr</td><td>2</td><td class="points" id="points3">0</td>
-    </tr>
-    <tr>
-      <td>4</td><td>Ania</td><td>1</td><td class="points" id="points4">0</td>
-    </tr>
-  </tbody>
+<thead>
+<tr>
+  <th>Miejsce</th>
+  <th>Nick</th>
+  <th>Kupony</th>
+  <th>Punkty</th>
+</tr>
+</thead>
+<tbody>
+<tr class="top1">
+  <td>1</td><td>Maciek</td><td>3</td><td class="points" id="points1">0</td>
+</tr>
+<tr class="top2">
+  <td>2</td><td>Zdzichu</td><td>1</td><td class="points" id="points2">0</td>
+</tr>
+<tr class="top3">
+  <td>3</td><td>Piotr</td><td>2</td><td class="points" id="points3">0</td>
+</tr>
+<tr>
+  <td>4</td><td>Ania</td><td>1</td><td class="points" id="points4">0</td>
+</tr>
+</tbody>
 </table>
 
 <script>
-// Sortowanie tabeli
-function sortTable(tableId, colIndex) {
-  const table = document.getElementById(tableId);
-  let switching = true;
-  let dir = "desc";
-
-  while(switching){
-    switching = false;
-    let rows = table.rows;
-    for(let i=1; i<rows.length-1; i++){
-      let shouldSwitch = false;
-      let x = rows[i].getElementsByTagName("TD")[colIndex];
-      let y = rows[i+1].getElementsByTagName("TD")[colIndex];
-      if(dir === "asc" && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()){
-        shouldSwitch=true; break;
-      }
-      if(dir === "desc" && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()){
-        shouldSwitch=true; break;
-      }
-    }
-    if(shouldSwitch){
-      rows[i].parentNode.insertBefore(rows[i+1], rows[i]);
-      switching = true;
-    } else if(dir === "desc"){
-      dir="asc";
-      switching = true;
-    }
-  }
-}
-
-// Filtr nicków
+// Wyszukiwarka nicków
 function filterNick(tableId, inputId){
   const input = document.getElementById(inputId).value.toUpperCase();
   const table = document.getElementById(tableId);
@@ -165,7 +100,7 @@ function filterNick(tableId, inputId){
   }
 }
 
-// Animacja liczb rosnących
+// Liczby rosnące
 function animateNumber(element, endValue){
   let current = 0;
   const increment = endValue / 50;
@@ -178,7 +113,7 @@ function animateNumber(element, endValue){
   }, 20);
 }
 
-// Uruchom animacje punktów
+// Uruchom animację punktów
 animateNumber(document.getElementById('points1'), 565);
 animateNumber(document.getElementById('points2'), 126);
 animateNumber(document.getElementById('points3'), 273);
