@@ -1,174 +1,65 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>🏆 Ranking Mistrzostw Discorda 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold: #FFD700;
-  --dark: #111;
-  --green: #00FF88;
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88}
+*{box-sizing:border-box}
+body{
+  margin:0;padding:0;font-family:'Poppins',sans-serif;
+  background:linear-gradient(180deg,#000,#111);color:var(--gold);
+  text-align:center;overflow-x:hidden
 }
-body {
-  background: linear-gradient(180deg, #000, #111);
-  color: var(--gold);
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  overflow-x: hidden;
+nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
+nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
+nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
+h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
+/* loader */
+#loader{
+  position:fixed;left:50%;top:48%;width:76px;height:76px;border-radius:50%;
+  border:8px solid rgba(255,215,0,0.18);border-top:8px solid var(--gold);
+  transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999
 }
+@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
+#loader.hidden{display:none}
 
-/* Nawigacja */
-nav {
-  background: linear-gradient(90deg, #000, #222);
-  padding: 15px 0;
-  box-shadow: 0 2px 10px rgba(255,215,0,0.3);
-}
-nav a {
-  color: var(--gold);
-  text-decoration: none;
-  margin: 0 20px;
-  font-weight: 600;
-  transition: 0.3s;
-}
-nav a:hover {
-  color: white;
-  text-shadow: 0 0 10px var(--gold);
-}
+/* container */
+.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
+.container.show{opacity:1;transform:translateY(0)}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04);text-align:left}
+th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
+td.nick{color:#fff;font-weight:600}
+td.points{color:var(--green);font-weight:700;text-align:right}
 
-/* Kontener */
-.container {
-  margin: 40px auto;
-  width: 90%;
-  max-width: 800px;
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 15px rgba(255,215,0,0.1);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: 1s ease;
-}
-.container.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-h1 {
-  text-shadow: 0 0 15px var(--gold);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-th {
-  color: var(--gold);
-  text-transform: uppercase;
-}
-td.nick {
-  color: white;
-  font-weight: 600;
-}
-td.points {
-  color: var(--green);
-  font-weight: 600;
-}
+/* progress */
+.progress-row td{padding:8px 6px;background:transparent}
+.progress-bar{background:#222;border-radius:8px;overflow:hidden;height:10px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#ffb700);transition:width 1s cubic-bezier(.2,.9,.3,1)}
 
-/* Pasek progresu */
-.progress-bar {
-  background: #333;
-  border-radius: 10px;
-  overflow: hidden;
-  height: 10px;
-  margin-top: 5px;
-}
-.progress-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, var(--gold), #ffb700);
-  transition: width 1s ease-out;
-}
+/* stats & toast */
+.stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
+.stat-box{display:inline-block;margin:6px 18px}
+.toast{position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001}
+.toast.show{opacity:1;transform:translateY(0)}
+/* search input */
+#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
+#search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
 
-/* Statystyki globalne */
-.stats {
-  margin-top: 25px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(255,255,255,0.2);
-  color: #ccc;
-  font-size: 1em;
-}
-.stat-box {
-  display: inline-block;
-  margin: 10px 20px;
-}
-
-/* Powiadomienia */
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(0,0,0,0.85);
-  color: var(--gold);
-  padding: 12px 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px var(--gold);
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.5s ease;
-  z-index: 9999;
-}
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Loader */
-#loader {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 70px;
-  height: 70px;
-  border: 6px solid rgba(255,215,0,0.2);
-  border-top: 6px solid var(--gold);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  transform: translate(-50%, -50%);
-  z-index: 10000;
-}
-@keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-#loader.hidden {
-  display: none;
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  nav a {
-    margin: 0 10px;
-    font-size: 0.9em;
-  }
-  .container {
-    padding: 15px;
-  }
-  h1 {
-    font-size: 1.5em;
-  }
+/* responsive */
+@media (max-width:600px){
+  nav a{margin:0 8px;font-size:.95rem}
+  th,td{padding:8px;font-size:.9rem}
+  .stat-box{display:block;margin:6px 0}
 }
 </style>
 </head>
 <body>
 
-<div id="loader"></div>
+<div id="loader" aria-hidden="true"></div>
 
 <nav>
   <a href="index.html">🏆 Ranking</a>
@@ -177,89 +68,238 @@ td.points {
 
 <h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
 
-<div class="container" id="ranking-container">
+<input id="search" placeholder="🔍 Szukaj nicku..." />
+
+<div class="container" id="ranking-container" aria-live="polite" style="display:none;">
   <table id="ranking">
     <thead>
-      <tr><th>Miejsce</th><th>Nick</th><th>Punkty</th></tr>
+      <tr><th style="width:56px">Miejsce</th><th>Nick</th><th style="width:120px;text-align:right">Punkty</th></tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <div class="stats" id="stats">
+  <div class="stats" id="stats" aria-hidden="false">
     <div class="stat-box">👥 Typerzy: <b id="count">0</b></div>
-    <div class="stat-box">💰 Sale punktów: <b id="sum">0</b></div>
+    <div class="stat-box">💰 Suma punktów: <b id="sum">0</b></div>
     <div class="stat-box">📊 Średnia: <b id="avg">0</b></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+/* ========== KONFIG ========== */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+/* ========== KOŃCZ KONFIG ========== */
 
-function showToast(msg, time = 2500) {
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), time);
+/* Utility: toast */
+function showToast(msg, ms = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=> t.classList.remove('show'), ms);
 }
 
-async function loadRanking() {
-  const loader = document.getElementById("loader");
-  try {
-    const res = await fetch(sheetUrl);
+/* Robustny parser CSV obsługujący separator i cudzysłowy */
+function parseCSV(text, sepHint) {
+  // detect separator using header line
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const commaCount = (firstLine.match(/,/g)||[]).length;
+  const semiCount = (firstLine.match(/;/g)||[]).length;
+  const sep = sepHint || (semiCount > commaCount ? ';' : ',');
+  const rows = [];
+  let cur = '';
+  let row = [];
+  let inQuotes = false;
+  for (let i=0;i<text.length;i++){
+    const ch = text[i];
+    if (inQuotes){
+      if (ch === '"'){
+        if (text[i+1] === '"'){ cur += '"'; i++; } else { inQuotes = false; }
+      } else cur += ch;
+    } else {
+      if (ch === '"'){ inQuotes = true; }
+      else if (ch === sep){
+        row.push(cur); cur = '';
+      } else if (ch === '\r') {
+        // ignore
+      } else if (ch === '\n'){
+        row.push(cur); cur = '';
+        rows.push(row); row = [];
+      } else {
+        cur += ch;
+      }
+    }
+  }
+  // last
+  if (inQuotes){
+    // malformed but try to close
+    row.push(cur); rows.push(row);
+  } else if (cur !== '' || row.length){
+    row.push(cur); rows.push(row);
+  }
+  // filter empty trailing lines
+  return rows.filter(r => r.length > 1 || (r.length===1 && r[0].trim()!==''));
+}
+
+/* animate progress fill */
+function setProgress(fillEl, pct){
+  // clamp
+  pct = Math.max(0, Math.min(100, pct));
+  // staggered for nice effect
+  requestAnimationFrame(()=> fillEl.style.width = pct + '%');
+}
+
+/* animate numeric increment */
+function animateNumber(el, start, end, ms){
+  const startTime = performance.now();
+  const step = (now) => {
+    const t = Math.min(1, (now - startTime)/ms);
+    const v = Math.round(start + (end - start) * t);
+    el.textContent = v.toLocaleString('pl-PL');
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/* Main loader */
+async function loadRanking(){
+  const loader = document.getElementById('loader');
+  const container = document.getElementById('ranking-container');
+  const tbody = document.querySelector('#ranking tbody');
+  try{
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error('HTTP '+res.status);
     const text = await res.text();
-    const rows = text.trim().split("\n").map(r => r.split(","));
-    const tbody = document.querySelector("#ranking tbody");
-    tbody.innerHTML = "";
+    if (!text || !text.trim()) throw new Error('Pusty plik CSV');
 
-    const data = rows.slice(1).map(r => ({
-      nick: r[1],
-      points: parseFloat(r[3]) || 0
-    }));
+    const rows = parseCSV(text);
+    if (!rows.length) throw new Error('Nie udało się sparsować CSV');
 
-    data.sort((a,b) => b.points - a.points);
-    const maxPoints = data[0]?.points || 1;
-    let total = 0;
+    // header detection (case-insensitive)
+    const header = rows[0].map(h => String(h||'').trim().toLowerCase());
+    const nickIdxCandidates = ['nick','nickname','user','user name','nazwa','nazwa uzytkownika','link'];
+    const pointsIdxCandidates = ['punk','punkt','punkty','points','score','wynik','value'];
 
-    data.forEach((p, i) => {
-      total += p.points;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${i+1}</td>
-        <td class="nick">${p.nick}</td>
-        <td class="points">${p.points}</td>
-      `;
-      const bar = document.createElement("div");
-      bar.className = "progress-bar";
-      const fill = document.createElement("div");
-      fill.className = "progress-fill";
-      bar.appendChild(fill);
-      const td = document.createElement("td");
-      td.colSpan = 3;
-      td.appendChild(bar);
-      tbody.appendChild(tr);
-      tbody.appendChild(td);
-      setTimeout(() => fill.style.width = (p.points / maxPoints * 100) + "%", 400);
+    const findIndexByCandidates = (cands) => {
+      for (let i=0;i<header.length;i++){
+        for (const c of cands) if (header[i].includes(c)) return i;
+      }
+      return -1;
+    };
+
+    let nickCol = findIndexByCandidates(nickIdxCandidates);
+    let pointsCol = findIndexByCandidates(pointsIdxCandidates);
+
+    // fallback heuristics: if not found, try common positions
+    if (nickCol === -1) nickCol = 0;
+    if (pointsCol === -1) {
+      // try last column as points
+      pointsCol = header.length - 1;
+    }
+
+    const data = [];
+    for (let i=1;i<rows.length;i++){
+      const r = rows[i];
+      // guard
+      if (!r) continue;
+      const nick = (r[nickCol]||'').toString().trim();
+      let punkStr = (r[pointsCol]||'').toString().trim();
+      if (!nick) continue;
+      punkStr = punkStr.replace(',', '.').replace(/\s/g,'');
+      const points = parseFloat(punkStr);
+      if (isNaN(points)) continue;
+      data.push({nick, points});
+    }
+
+    if (!data.length) throw new Error('Brak prawidłowych wierszy z punktami');
+
+    // aggregate same nicks (count kuponów)
+    const agg = {};
+    data.forEach(d => {
+      if (!agg[d.nick]) agg[d.nick] = { punkty: 0, kupony: 0 };
+      agg[d.nick].punkty += d.points;
+      agg[d.nick].kupony += 1;
     });
 
-    // statystyki globalne
-    const avg = total / data.length || 0;
-    document.getElementById("count").textContent = data.length;
-    document.getElementById("sum").textContent = total.toFixed(0);
-    document.getElementById("avg").textContent = avg.toFixed(1);
+    const list = Object.entries(agg).map(([nick, v]) => ({nick, punkty: v.punkty, kupony: v.kupony}));
+    list.sort((a,b) => b.punkty - a.punkty);
 
-    showToast("✅ Ranking zaktualizowany!");
-    document.getElementById("ranking-container").classList.add("show");
-  } catch (e) {
-    showToast("❌ Błąd wczytywania danych!", 4000);
-    console.error(e);
+    // render table
+    tbody.innerHTML = '';
+    const maxPoints = Math.max(1, ...list.map(x=>x.punkty));
+    let total = 0;
+    list.forEach((p, index) => {
+      total += p.punkty;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="width:56px">${index+1}</td><td class="nick">${escapeHtml(p.nick)}</td><td class="points" style="text-align:right">0</td>`;
+      tbody.appendChild(tr);
+      // progress row
+      const pr = document.createElement('tr');
+      pr.className = 'progress-row';
+      const td = document.createElement('td');
+      td.colSpan = 3;
+      const pb = document.createElement('div');
+      pb.className = 'progress-bar';
+      const fill = document.createElement('div');
+      fill.className = 'progress-fill';
+      pb.appendChild(fill);
+      td.appendChild(pb);
+      pr.appendChild(td);
+      tbody.appendChild(pr);
+
+      // animate numbers and progress
+      const pointsCell = tr.querySelector('.points');
+      setTimeout(()=> animateNumber(pointsCell, 0, Math.round(p.punkty), 1000), index*80);
+      setTimeout(()=> setProgress(fill, (p.punkty/maxPoints)*100), 200 + index*80);
+    });
+
+    // stats
+    const count = list.length;
+    const sum = Math.round(total);
+    const avg = count ? (total/count) : 0;
+    document.getElementById('count').textContent = count;
+    document.getElementById('sum').textContent = sum.toLocaleString('pl-PL');
+    document.getElementById('avg').textContent = avg.toFixed(1);
+
+    // show container
+    container.style.display = 'block';
+    setTimeout(()=> container.classList.add('show'), 60);
+    showToast('✅ Ranking załadowany');
+
+    // search handler
+    document.getElementById('search').addEventListener('input', (e)=>{
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('#ranking tbody tr').forEach(tr=>{
+        // rows are pairs: row (data) then progress-row; skip progress rows by checking if first td has number
+        const firstTd = tr.children[0];
+        if (!firstTd) return;
+        if (tr.classList.contains('progress-row')) return;
+        const nick = (tr.querySelector('.nick')||{textContent:''}).textContent.toLowerCase();
+        tr.style.display = nick.includes(q) ? '' : 'none';
+        // find next sibling progress-row and hide/show it similarly
+        const next = tr.nextElementSibling;
+        if (next && next.classList.contains('progress-row')) next.style.display = tr.style.display;
+      });
+    });
+
+  } catch (err){
+    console.error(err);
+    showToast('❌ Błąd wczytywania: ' + (err.message || ''), 6000);
   } finally {
-    loader.classList.add("hidden");
+    // hide loader
+    const loader = document.getElementById('loader');
+    if (loader) loader.classList.add('hidden');
   }
 }
 
-window.addEventListener("load", loadRanking);
+/* helpers */
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+window.addEventListener('load', loadRanking);
 </script>
 </body>
 </html>
