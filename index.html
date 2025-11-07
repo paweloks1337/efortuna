@@ -3,76 +3,56 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>📊 Kalkulator Mistrzostw Discorda</title>
+<title>🏆 Ranking Mistrzostw Discorda 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88;}
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88}
 body{
   margin:0;padding:0;font-family:'Poppins',sans-serif;
-  background:linear-gradient(180deg,#000,#111);
-  color:var(--gold);text-align:center;overflow-x:hidden;
+  background:linear-gradient(180deg,#000,#111);color:var(--gold);
+  text-align:center;overflow-x:hidden
 }
 nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
 nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
 nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
 h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
 
+/* loader */
 #loader{
   position:fixed;left:50%;top:48%;width:76px;height:76px;border-radius:50%;
   border:8px solid rgba(255,215,0,0.18);border-top:8px solid var(--gold);
-  transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999;
+  transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999
 }
 @keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
 #loader.hidden{display:none}
 
-.container{
-  width:90%;max-width:480px;margin:36px auto;background:#1a1a1a;padding:20px;
-  border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
-  opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s;
-}
+/* container */
+.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
 .container.show{opacity:1;transform:translateY(0)}
 
-input{
-  width:80%;padding:10px;margin:8px 0;border-radius:8px;border:2px solid var(--gold);
-  background:#000;color:var(--gold);font-size:1rem;text-align:center;
-}
-input:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:left}
+th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
+td.nick{color:#fff;font-weight:600}
+td.points{color:var(--green);font-weight:700;text-align:right}
+td.coupons{color:#ccc;text-align:center}
 
-.toggle{
-  display:flex;justify-content:center;margin:14px 0;
-}
-.toggle button{
-  flex:1;margin:0 6px;padding:10px 0;border:none;border-radius:8px;
-  background:#000;color:var(--gold);font-weight:600;cursor:pointer;transition:0.3s;
-}
-.toggle button.active{
-  background:var(--gold);color:#000;box-shadow:0 0 10px var(--gold);
-}
-
-button.calc{
-  background:var(--gold);color:#000;border:none;border-radius:10px;
-  padding:12px 28px;font-weight:700;cursor:pointer;font-size:1.1rem;
-  transition:0.3s;margin-top:10px;
-}
-button.calc:hover{box-shadow:0 0 18px var(--gold)}
-
-#result{
-  margin-top:24px;font-size:1.5rem;font-weight:700;
-  color:var(--green);min-height:36px;
-}
-
-.toast{
-  position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);
+/* stats & toast */
+.stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
+.stat-box{display:inline-block;margin:6px 18px}
+.toast{position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);
   padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);
-  opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001
-}
+  opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001}
 .toast.show{opacity:1;transform:translateY(0)}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);
+  background:#000;color:var(--gold);margin:8px auto;display:block}
+#search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
 
 @media (max-width:600px){
   nav a{margin:0 8px;font-size:.95rem}
-  input{width:90%}
+  th,td{padding:8px;font-size:.9rem}
+  .stat-box{display:block;margin:6px 0}
 }
 </style>
 </head>
@@ -85,83 +65,118 @@ button.calc:hover{box-shadow:0 0 18px var(--gold)}
   <a href="kalkulator.html">📊 Kalkulator</a>
 </nav>
 
-<h1>📊 Kalkulator Mistrzostw Discorda</h1>
+<h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
+<input id="search" placeholder="🔍 Szukaj nicku..." />
 
-<div class="container" id="calc-container" style="display:none;">
-  <input type="number" id="kurs" placeholder="Całkowity kurs">
-  <input type="number" id="stawka" placeholder="Stawka (PLN)">
-  
-  <div class="toggle">
-    <button id="solo" class="active">SOLO</button>
-    <button id="ako">AKO</button>
+<div class="container" id="ranking-container" style="display:none;">
+  <table id="ranking">
+    <thead>
+      <tr>
+        <th style="width:60px;">Miejsce</th>
+        <th>Nick</th>
+        <th style="width:100px;text-align:center;">Kupony</th>
+        <th style="width:120px;text-align:right;">Punkty</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="stats">
+    <div class="stat-box">👥 Typerzy: <b id="count">0</b></div>
+    <div class="stat-box">💰 Suma punktów: <b id="sum">0</b></div>
+    <div class="stat-box">📊 Średnia: <b id="avg">0</b></div>
   </div>
-  
-  <button class="calc" onclick="oblicz()">OBLICZ</button>
-  
-  <div id="result"></div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+
 function showToast(msg, ms=2500){
   const t=document.getElementById("toast");
   t.textContent=msg;t.classList.add("show");
   clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove("show"),ms);
 }
 
+function parseCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  return lines.map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')));
+}
+
 function animateNumber(el,start,end,ms){
   const st=performance.now();
   const step=(now)=>{
     const t=Math.min(1,(now-st)/ms);
-    const val=start+(end-start)*t;
-    el.textContent=val.toFixed(2);
+    const val=Math.round(start+(end-start)*t);
+    el.textContent=val.toLocaleString('pl-PL');
     if(t<1)requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 }
 
-let typ="SOLO";
-document.getElementById("solo").onclick=()=>{typ="SOLO";setActive("solo")};
-document.getElementById("ako").onclick=()=>{typ="AKO";setActive("ako")};
-function setActive(id){
-  document.getElementById("solo").classList.remove("active");
-  document.getElementById("ako").classList.remove("active");
-  document.getElementById(id).classList.add("active");
-}
+async function loadRanking(){
+  try{
+    const res=await fetch(CSV_URL);
+    const txt=await res.text();
+    const rows=parseCSV(txt);
+    const header=rows[0].map(x=>x.toLowerCase());
+    const nickCol=header.findIndex(h=>h.includes("nick"));
+    const punktyCol=header.findIndex(h=>h.includes("punk"));
+    const data={};
 
-function oblicz(){
-  const kurs=parseFloat(document.getElementById("kurs").value);
-  const stawka=parseFloat(document.getElementById("stawka").value);
-  const out=document.getElementById("result");
-  if(!kurs||!stawka){showToast("⚠️ Uzupełnij wszystkie pola!");return;}
+    rows.slice(1).forEach(r=>{
+      const nick=(r[nickCol]||"").trim();
+      const pts=parseFloat((r[punktyCol]||"0").replace(",","."))||0;
+      if(!nick)return;
+      if(!data[nick])data[nick]={punkty:0,kupony:0};
+      data[nick].punkty+=pts;
+      data[nick].kupony++;
+    });
 
-  const wygrana=stawka*kurs*0.88; // -12% bukmacher
-  let mnoznik=1;
-  
-  if(typ==="SOLO"){
-    if(kurs<1.5)mnoznik=1;
-    else if(kurs<5)mnoznik=3;
-    else mnoznik=7.5;
-  }else{
-    if(kurs<1.5)mnoznik=1;
-    else if(kurs<5)mnoznik=2;
-    else if(kurs<=10)mnoznik=5;
-    else mnoznik=8;
+    const list=Object.entries(data).map(([nick,v])=>({nick,...v}));
+    list.sort((a,b)=>b.punkty-a.punkty);
+
+    const tbody=document.querySelector("#ranking tbody");
+    tbody.innerHTML="";
+    let total=0;
+    list.forEach((p,i)=>{
+      total+=p.punkty;
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${i+1}</td>
+        <td class="nick">${p.nick}</td>
+        <td class="coupons">${p.kupony}</td>
+        <td class="points">0</td>
+      `;
+      tbody.appendChild(tr);
+      const pointsCell=tr.querySelector(".points");
+      setTimeout(()=>animateNumber(pointsCell,0,Math.round(p.punkty),800),i*80);
+    });
+
+    document.getElementById("count").textContent=list.length;
+    document.getElementById("sum").textContent=total.toFixed(0);
+    document.getElementById("avg").textContent=(total/list.length).toFixed(1);
+    document.getElementById("ranking-container").style.display="block";
+    setTimeout(()=>document.querySelector(".container").classList.add("show"),60);
+    showToast("✅ Ranking załadowany!");
+  }catch(e){
+    console.error(e);
+    showToast("❌ Błąd wczytywania danych!",4000);
+  }finally{
+    document.getElementById("loader").classList.add("hidden");
   }
-
-  const punkty=wygrana*mnoznik;
-  out.style.animation="fadeUp .5s";
-  animateNumber(out,0,punkty,800);
-  showToast("✅ Wynik obliczony!");
 }
 
-window.addEventListener("load",()=>{
-  document.getElementById("loader").classList.add("hidden");
-  const cont=document.getElementById("calc-container");
-  cont.style.display="block";
-  setTimeout(()=>cont.classList.add("show"),100);
+document.getElementById("search").addEventListener("input",e=>{
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
+    const nick=tr.querySelector(".nick")?.textContent.toLowerCase()||"";
+    tr.style.display=nick.includes(q)?"":"none";
+  });
 });
+
+window.addEventListener("load",loadRanking);
 </script>
 </body>
 </html>
