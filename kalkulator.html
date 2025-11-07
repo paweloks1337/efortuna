@@ -1,302 +1,166 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>📊 Kalkulator Mistrzostw Discorda</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold: #FFD700;
-  --black: #111;
-  --dark: #1a1a1a;
-  --green: #00FF88;
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88;}
+body{
+  margin:0;padding:0;font-family:'Poppins',sans-serif;
+  background:linear-gradient(180deg,#000,#111);
+  color:var(--gold);text-align:center;overflow-x:hidden;
+}
+nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
+nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
+nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
+h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
+
+#loader{
+  position:fixed;left:50%;top:48%;width:76px;height:76px;border-radius:50%;
+  border:8px solid rgba(255,215,0,0.18);border-top:8px solid var(--gold);
+  transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999;
+}
+@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
+#loader.hidden{display:none}
+
+.container{
+  width:90%;max-width:480px;margin:36px auto;background:#1a1a1a;padding:20px;
+  border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s;
+}
+.container.show{opacity:1;transform:translateY(0)}
+
+input{
+  width:80%;padding:10px;margin:8px 0;border-radius:8px;border:2px solid var(--gold);
+  background:#000;color:var(--gold);font-size:1rem;text-align:center;
+}
+input:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
+
+.toggle{
+  display:flex;justify-content:center;margin:14px 0;
+}
+.toggle button{
+  flex:1;margin:0 6px;padding:10px 0;border:none;border-radius:8px;
+  background:#000;color:var(--gold);font-weight:600;cursor:pointer;transition:0.3s;
+}
+.toggle button.active{
+  background:var(--gold);color:#000;box-shadow:0 0 10px var(--gold);
 }
 
-/* Tło i tekst */
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(180deg, #000, #111 80%);
-  color: var(--gold);
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  transition: background 0.5s, color 0.5s;
+button.calc{
+  background:var(--gold);color:#000;border:none;border-radius:10px;
+  padding:12px 28px;font-weight:700;cursor:pointer;font-size:1.1rem;
+  transition:0.3s;margin-top:10px;
 }
-body.light-mode {
-  background: linear-gradient(180deg, #fff, #ddd);
-  color: #222;
+button.calc:hover{box-shadow:0 0 18px var(--gold)}
+
+#result{
+  margin-top:24px;font-size:1.5rem;font-weight:700;
+  color:var(--green);min-height:36px;
 }
 
-/* Menu */
-nav {
-  background: linear-gradient(90deg, #000, #222);
-  padding: 15px 0;
-  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+.toast{
+  position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);
+  padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);
+  opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001
 }
-nav a {
-  color: var(--gold);
-  text-decoration: none;
-  margin: 0 20px;
-  font-weight: 600;
-  font-size: 1.1em;
-  transition: 0.3s;
-}
-nav a:hover {
-  color: white;
-  text-shadow: 0 0 10px var(--gold);
-}
+.toast.show{opacity:1;transform:translateY(0)}
 
-/* Tryb jasny/ciemny */
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: transparent;
-  border: 2px solid var(--gold);
-  color: var(--gold);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  font-size: 1.2em;
-  transition: 0.3s;
-}
-.theme-toggle:hover {
-  background: var(--gold);
-  color: #000;
-}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Kontener */
-.container {
-  background: var(--dark);
-  margin: 40px auto;
-  padding: 25px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 1s ease, transform 1s ease;
-}
-.show {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-}
-body.light-mode .container {
-  background: white;
-  color: #000;
-}
-
-/* Pola i etykiety */
-label {
-  display: block;
-  margin: 15px 0 5px;
-  text-align: left;
-  color: white;
-}
-body.light-mode label {
-  color: #222;
-}
-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 2px solid var(--gold);
-  background: #000;
-  color: var(--gold);
-  font-size: 1em;
-  margin-bottom: 15px;
-}
-input:focus {
-  outline: none;
-  box-shadow: 0 0 10px var(--gold);
-}
-body.light-mode input {
-  background: #fff;
-  color: #000;
-  border-color: #444;
-}
-
-/* Przełącznik SOLO/AKO */
-.toggle-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.toggle-btn {
-  flex: 1;
-  margin: 0 5px;
-  padding: 12px;
-  background: #333;
-  color: var(--gold);
-  border: 2px solid var(--gold);
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.toggle-btn.active {
-  background: var(--gold);
-  color: #111;
-  box-shadow: 0 0 10px var(--gold);
-}
-.toggle-btn:hover {
-  background: #e6c200;
-  color: #111;
-}
-
-/* Przycisk oblicz */
-button.calc {
-  background: var(--gold);
-  border: none;
-  color: #111;
-  padding: 12px 25px;
-  font-size: 1.1em;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-button.calc:hover {
-  background: #e6c200;
-}
-
-/* Wynik */
-.result {
-  margin-top: 25px;
-  font-size: 1.3em;
-  color: var(--green);
-  text-shadow: 0 0 10px #0F0;
-  min-height: 60px;
-}
-
-/* Stopka */
-footer {
-  margin-top: 40px;
-  padding: 15px;
-  font-size: 0.9em;
-  color: #aaa;
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  nav a {
-    margin: 0 10px;
-    font-size: 0.9em;
-  }
-  .container {
-    padding: 15px;
-  }
-  h1 {
-    font-size: 1.5em;
-  }
+@media (max-width:600px){
+  nav a{margin:0 8px;font-size:.95rem}
+  input{width:90%}
 }
 </style>
 </head>
 <body>
+
+<div id="loader"></div>
 
 <nav>
   <a href="index.html">🏆 Ranking</a>
   <a href="kalkulator.html">📊 Kalkulator</a>
 </nav>
 
-<button class="theme-toggle" onclick="toggleTheme()">☀️</button>
+<h1>📊 Kalkulator Mistrzostw Discorda</h1>
 
-<h1>💰 Kalkulator Mistrzostw Discorda</h1>
-
-<div class="container" id="calc-box">
-  <label for="kurs">Całkowity kurs:</label>
-  <input type="number" id="kurs" placeholder="np. 3.25" step="0.01" min="1">
-
-  <label for="stawka">Stawka (PLN):</label>
-  <input type="number" id="stawka" placeholder="np. 100" step="1" min="1">
-
-  <label>Typ zakładu:</label>
-  <div class="toggle-group">
-    <button id="soloBtn" class="toggle-btn active" onclick="setType('SOLO')">SOLO</button>
-    <button id="akoBtn" class="toggle-btn" onclick="setType('AKO')">AKO</button>
+<div class="container" id="calc-container" style="display:none;">
+  <input type="number" id="kurs" placeholder="Całkowity kurs">
+  <input type="number" id="stawka" placeholder="Stawka (PLN)">
+  
+  <div class="toggle">
+    <button id="solo" class="active">SOLO</button>
+    <button id="ako">AKO</button>
   </div>
-
+  
   <button class="calc" onclick="oblicz()">OBLICZ</button>
-  <div class="result" id="wynik"></div>
+  
+  <div id="result"></div>
 </div>
 
-<footer>
-  © 2025 Kalkulator | Stworzone przez paweloks 🔢
-</footer>
+<div id="toast" class="toast"></div>
 
 <script>
-let typZakladu = "SOLO";
-
-function setType(type) {
-  typZakladu = type;
-  document.getElementById('soloBtn').classList.toggle('active', type === 'SOLO');
-  document.getElementById('akoBtn').classList.toggle('active', type === 'AKO');
+function showToast(msg, ms=2500){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove("show"),ms);
 }
 
-// animacja rosnącej liczby
-function animateValue(element, start, end, duration, suffix = "") {
-  const range = end - start;
-  let startTime = null;
-  function step(currentTime) {
-    if (!startTime) startTime = currentTime;
-    const progress = Math.min((currentTime - startTime) / duration, 1);
-    const value = Math.floor(progress * range + start);
-    element.innerHTML = value.toLocaleString("pl-PL") + suffix;
-    if (progress < 1) requestAnimationFrame(step);
-  }
+function animateNumber(el,start,end,ms){
+  const st=performance.now();
+  const step=(now)=>{
+    const t=Math.min(1,(now-st)/ms);
+    const val=start+(end-start)*t;
+    el.textContent=val.toFixed(2);
+    if(t<1)requestAnimationFrame(step);
+  };
   requestAnimationFrame(step);
 }
 
-function oblicz() {
-  const kurs = parseFloat(document.getElementById('kurs').value);
-  const stawka = parseFloat(document.getElementById('stawka').value);
-  const wynikDiv = document.getElementById('wynik');
-
-  if (isNaN(kurs) || isNaN(stawka) || kurs <= 0 || stawka <= 0) {
-    wynikDiv.textContent = "⚠️ Podaj poprawne wartości!";
-    wynikDiv.style.color = "red";
-    return;
-  }
-
-  let mnoznik = 0;
-  if (kurs < 1.5) mnoznik = 1;
-  else if (typZakladu === "SOLO") {
-    if (kurs >= 1.5 && kurs <= 4.99) mnoznik = 3;
-    else if (kurs > 5) mnoznik = 7.5;
-  } else if (typZakladu === "AKO") {
-    if (kurs >= 1.5 && kurs <= 4.99) mnoznik = 2;
-    else if (kurs >= 5 && kurs <= 10) mnoznik = 5;
-    else if (kurs > 10) mnoznik = 8;
-  }
-
-  const wygranaBrutto = stawka * kurs;
-  const wygranaNetto = wygranaBrutto * 0.88; // -12%
-  const punkty = Math.round(wygranaNetto * mnoznik);
-
-  wynikDiv.style.color = "#00FF00";
-  wynikDiv.innerHTML = `
-    🧮 Kurs: <b>${kurs.toFixed(2)}</b><br>
-    💵 Wygrana brutto: <b id="brutto">0</b> PLN<br>
-    💸 Po prowizji (−12%): <b id="netto">0</b> PLN<br>
-    🏅 Punkty: <b id="punkty">0</b>
-  `;
-
-  animateValue(document.getElementById("brutto"), 0, wygranaBrutto, 1000);
-  animateValue(document.getElementById("netto"), 0, wygranaNetto, 1000);
-  animateValue(document.getElementById("punkty"), 0, punkty, 1000);
+let typ="SOLO";
+document.getElementById("solo").onclick=()=>{typ="SOLO";setActive("solo")};
+document.getElementById("ako").onclick=()=>{typ="AKO";setActive("ako")};
+function setActive(id){
+  document.getElementById("solo").classList.remove("active");
+  document.getElementById("ako").classList.remove("active");
+  document.getElementById(id).classList.add("active");
 }
 
-function toggleTheme() {
-  document.body.classList.toggle("light-mode");
-  const btn = document.querySelector(".theme-toggle");
-  btn.textContent = document.body.classList.contains("light-mode") ? "🌙" : "☀️";
+function oblicz(){
+  const kurs=parseFloat(document.getElementById("kurs").value);
+  const stawka=parseFloat(document.getElementById("stawka").value);
+  const out=document.getElementById("result");
+  if(!kurs||!stawka){showToast("⚠️ Uzupełnij wszystkie pola!");return;}
+
+  const wygrana=stawka*kurs*0.88; // -12% bukmacher
+  let mnoznik=1;
+  
+  if(typ==="SOLO"){
+    if(kurs<1.5)mnoznik=1;
+    else if(kurs<5)mnoznik=3;
+    else mnoznik=7.5;
+  }else{
+    if(kurs<1.5)mnoznik=1;
+    else if(kurs<5)mnoznik=2;
+    else if(kurs<=10)mnoznik=5;
+    else mnoznik=8;
+  }
+
+  const punkty=wygrana*mnoznik;
+  out.style.animation="fadeUp .5s";
+  animateNumber(out,0,punkty,800);
+  showToast("✅ Wynik obliczony!");
 }
 
-/* Efekt wejścia */
-window.addEventListener("load", () => {
-  document.getElementById("calc-box").classList.add("show");
+window.addEventListener("load",()=>{
+  document.getElementById("loader").classList.add("hidden");
+  const cont=document.getElementById("calc-container");
+  cont.style.display="block";
+  setTimeout(()=>cont.classList.add("show"),100);
 });
 </script>
 </body>
