@@ -5,42 +5,77 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>🏆 Ranking Mistrzostw 2025</title>
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88;}
-body{
-  margin:0;padding:0;font-family:Arial, sans-serif;
-  background-color:var(--dark);color:var(--gold);text-align:center;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #000;
+  color: #FFD700;
+  text-align: center;
+  margin: 0;
+  padding: 0;
 }
-h1{margin:20px 0;}
-table{
-  width:90%;margin:0 auto 20px auto;border-collapse:collapse;
+h1 { margin: 20px 0; }
+table {
+  width: 90%;
+  margin: 0 auto 20px auto;
+  border-collapse: collapse;
 }
-th,td{
-  border:1px solid var(--gold);padding:10px;text-align:center;
+th, td {
+  border: 1px solid #FFD700;
+  padding: 10px;
+  text-align: center;
 }
-th{background-color:var(--gold);color:#000;}
-tr:nth-child(even){background-color:rgba(255,255,255,0.05);}
-tr:hover{background-color:rgba(255,215,0,0.2);cursor:pointer;}
-.points{color:var(--green);}
-#searchNick{width:80%;padding:8px;margin:12px 0;border-radius:6px;border:none;outline:none;text-align:center;}
+th {
+  background-color: #FFD700;
+  color: #000;
+}
+tr:nth-child(even) {
+  background-color: rgba(255,255,255,0.05);
+}
+tr:hover {
+  background-color: rgba(255,215,0,0.2);
+  cursor: pointer;
+}
+.points {
+  color: #00FF00;
+}
+#searchNick {
+  width: 80%;
+  padding: 8px;
+  margin: 12px 0;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  text-align: center;
+}
 
 /* Modal */
-.modal{
-  display:none;position:fixed;z-index:1000;
-  left:0;top:0;width:100%;height:100%;
-  overflow:auto;background-color:rgba(0,0,0,0.75);
+.modal {
+  display:none;
+  position:fixed;
+  z-index:1000;
+  left:0; top:0;
+  width:100%; height:100%;
+  background-color: rgba(0,0,0,0.75);
 }
-.modal-content{
-  background-color:#222;margin:15% auto;padding:20px;
-  border-radius:10px;width:90%;max-width:400px;color:var(--gold);
+.modal-content {
+  background-color:#222;
+  margin:15% auto;
+  padding:20px;
+  border-radius:10px;
+  width:90%; max-width:400px;
+  color:#FFD700;
   position:relative;
 }
-.close{
-  color:#FFD700;position:absolute;top:10px;right:16px;
-  font-size:24px;font-weight:bold;cursor:pointer;
+.close {
+  color:#FFD700;
+  position:absolute;
+  top:10px; right:16px;
+  font-size:24px; font-weight:bold;
+  cursor:pointer;
   transition:0.2s;
 }
-.close:hover{color:#00FF88;}
-.modal ul{padding-left:20px;}
+.close:hover { color:#00FF88; }
+.modal ul { padding-left:20px; text-align:left; }
 </style>
 </head>
 <body>
@@ -83,7 +118,7 @@ tr:hover{background-color:rgba(255,215,0,0.2);cursor:pointer;}
 </div>
 
 <script>
-// Dane użytkowników i ich kupony
+// Dane użytkowników
 const userData = {
   "Maciek":[{kupon:1,punkty:654},{kupon:2,punkty:273},{kupon:3,punkty:120}],
   "Zdzichu":[{kupon:1,punkty:126}],
@@ -139,11 +174,12 @@ function animateNumber(el,endValue){
   },20);
 }
 
-// Start animacja punktów
+// Uruchom animacje punktów
 animateNumber(document.getElementById('points1'),565);
 animateNumber(document.getElementById('points2'),126);
 animateNumber(document.getElementById('points3'),273);
 animateNumber(document.getElementById('points4'),150);
+
 </script>
 </body>
 </html>
