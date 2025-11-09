@@ -59,7 +59,7 @@ td.coupons{color:#ccc;text-align:center}
 }
 .popup-content h2{color:var(--gold);margin-bottom:10px;text-align:center}
 .popup-content a{
-  display:flex;align-items:center;gap:8px;
+  display:flex;flex-direction:column;align-items:flex-start;
   background:#111;padding:8px 12px;border-radius:8px;
   margin:6px 0;color:var(--green);text-decoration:none;
   transform:translateY(10px);opacity:0;animation:slideUp .4s ease forwards;
@@ -71,6 +71,7 @@ td.coupons{color:#ccc;text-align:center}
   display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);
   border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer
 }
+.popup-header{text-align:center;color:#ccc;font-size:.9rem;margin-bottom:6px}
 @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{to{transform:translateY(0);opacity:1}}
 
@@ -116,6 +117,7 @@ td.coupons{color:#ccc;text-align:center}
 <div id="popup" class="popup">
   <div class="popup-content">
     <h2 id="popup-nick"></h2>
+    <div class="popup-header">📅 Historia kuponów (od najnowszego)</div>
     <div id="popup-links"></div>
     <div id="popup-total" class="popup-total"></div>
     <button class="close-btn" onclick="closePopup()">Zamknij</button>
@@ -159,17 +161,19 @@ async function loadRanking(){
     const nickCol=header.findIndex(h=>h.includes("nick"));
     const punktyCol=header.findIndex(h=>h.includes("punk"));
     const linkCol=header.findIndex(h=>h.includes("link"));
+    const dataCol=header.findIndex(h=>h.includes("data"));
     const data={};
 
     rows.slice(1).forEach(r=>{
       const nick=(r[nickCol]||"").trim();
       const pts=parseFloat((r[punktyCol]||"0").replace(",","."))||0;
       const link=(r[linkCol]||"").trim();
+      const date=(r[dataCol]||"").trim();
       if(!nick)return;
       if(!data[nick])data[nick]={punkty:0,kupony:0,links:[]};
       data[nick].punkty+=pts;
       data[nick].kupony++;
-      if(link)data[nick].links.push({url:link,points:pts});
+      if(link)data[nick].links.push({url:link,points:pts,date:date});
     });
 
     playersData=data;
@@ -212,10 +216,23 @@ function openPopup(nick){
   const p=playersData[nick];
   if(!p)return;
   document.getElementById("popup-nick").textContent=nick;
+
+  const sortedLinks=[...p.links].sort((a,b)=>{
+    const da=new Date(a.date.split('.').reverse().join('-'));
+    const db=new Date(b.date.split('.').reverse().join('-'));
+    return db-da;
+  });
+
   const linksDiv=document.getElementById("popup-links");
-  linksDiv.innerHTML=p.links.length
-    ? p.links.map((l,i)=>`<a href="${l.url}" target="_blank" style="animation-delay:${i*0.08}s"><span>🎟️ Kupon ${i+1}</span> — ${l.points.toFixed(0)} pkt</a>`).join("")
+  linksDiv.innerHTML=sortedLinks.length
+    ? sortedLinks.map((l,i)=>`
+        <a href="${l.url}" target="_blank" style="animation-delay:${i*0.08}s">
+          <span>🎟️ Kupon ${i+1}</span> — ${l.points.toFixed(0)} pkt
+          <small style="color:#aaa;">📅 ${l.date || "Brak daty"}</small>
+        </a>
+      `).join("")
     : "<p>Brak linków do kuponów.</p>";
+
   document.getElementById("popup-total").textContent=`Łącznie: ${p.punkty.toFixed(0)} pkt`;
   document.getElementById("popup").classList.add("active");
 }
