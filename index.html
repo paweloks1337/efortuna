@@ -6,116 +6,71 @@
 <title>🏆 Ranking Mistrzostw Discorda 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88}
-body{
-  margin:0;padding:0;font-family:'Poppins',sans-serif;
-  background:linear-gradient(180deg,#000,#111);color:var(--gold);
-  text-align:center;overflow-x:hidden
-}
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
+body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
 nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
 nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
 nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
 h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
-
-#loader{
-  position:fixed;left:50%;top:48%;width:76px;height:76px;border-radius:50%;
-  border:8px solid rgba(255,215,0,0.18);border-top:8px solid var(--gold);
-  transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999
-}
+#loader{position:fixed;left:50%;top:48%;width:76px;height:76px;border-radius:50%;border:8px solid rgba(255,215,0,0.18);border-top:8px solid var(--gold);transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999}
 @keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
 #loader.hidden{display:none}
-
-.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
+.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
 .container.show{opacity:1;transform:translateY(0)}
-
+.sort-box{text-align:center;margin:10px auto;}
+.sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:600}
 table{width:100%;border-collapse:collapse;margin-top:12px}
 th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:left}
 th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
 td.nick{color:#fff;font-weight:600;cursor:pointer}
 td.points{color:var(--green);font-weight:700;text-align:right}
 td.coupons{color:#ccc;text-align:center}
-
 .stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
 .stat-box{display:inline-block;margin:6px 18px}
-.toast{position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);
-  padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);
-  opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001}
+.toast{position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001}
 .toast.show{opacity:1;transform:translateY(0)}
-#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);
-  background:#000;color:var(--gold);margin:8px auto;display:block}
+#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
 #search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
-
-.popup{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;
-  z-index:99999;visibility:hidden;opacity:0;transition:.3s
-}
+.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:99999;visibility:hidden;opacity:0;transition:.3s}
 .popup.active{visibility:visible;opacity:1}
-.popup-content{
-  background:#1a1a1a;border:2px solid var(--gold);border-radius:12px;
-  padding:20px;max-width:450px;width:90%;color:#fff;text-align:left;
-  box-shadow:0 0 20px rgba(255,215,0,0.3);animation:fadeIn .4s ease
-}
+.popup-content{background:#1a1a1a;border:2px solid var(--gold);border-radius:12px;padding:20px;max-width:450px;width:90%;color:#fff;text-align:left;box-shadow:0 0 20px rgba(255,215,0,0.3);animation:fadeIn .4s ease}
 .popup-content h2{color:var(--gold);margin-bottom:10px;text-align:center}
 .popup-content .sort-box{text-align:center;margin-bottom:10px}
-.popup-content select{
-  background:#111;border:1px solid var(--gold);color:var(--gold);
-  border-radius:8px;padding:6px 10px;font-weight:600
-}
-.popup-content .coupon{
-  display:flex;align-items:center;justify-content:space-between;
-  background:#111;padding:8px 12px;border-radius:8px;
-  margin:6px 0;opacity:0;transform:translateY(10px);
-  animation:slideUp .4s ease forwards;
-}
+.popup-content select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:600}
+.popup-content .coupon{display:flex;align-items:center;justify-content:space-between;background:#111;padding:8px 12px;border-radius:8px;margin:6px 0;opacity:0;transform:translateY(10px);animation:slideUp .4s ease forwards;}
 .popup-content .coupon-date{color:var(--gold);font-size:.85rem}
 .popup-content .coupon-points{color:var(--green);font-weight:700}
-.popup-content button.open-btn{
-  background:var(--gold);border:none;padding:6px 10px;border-radius:6px;
-  color:#000;font-weight:600;cursor:pointer;transition:.2s
-}
+.popup-content .coupon.best .coupon-points{color:var(--red);animation: pulse 1s infinite alternate;}
+@keyframes pulse{from{text-shadow:0 0 6px var(--red)}to{text-shadow:0 0 18px var(--red)}}
+.popup-content button.open-btn{background:var(--gold);border:none;padding:6px 10px;border-radius:6px;color:#000;font-weight:600;cursor:pointer;transition:.2s}
 .popup-content button.open-btn:hover{box-shadow:0 0 10px var(--gold)}
 .popup-total{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);text-align:center;color:var(--gold);font-weight:600}
-.close-btn{
-  display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);
-  border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer
-}
+.close-btn{display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer}
 @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{to{transform:translateY(0);opacity:1}}
-
-@media (max-width:600px){
-  nav a{margin:0 8px;font-size:.95rem}
-  th,td{padding:8px;font-size:.9rem}
-  .stat-box{display:block;margin:6px 0}
-}
+@media (max-width:600px){nav a{margin:0 8px;font-size:.95rem}th,td{padding:8px;font-size:.9rem}.stat-box{display:block;margin:6px 0}}
 </style>
 </head>
 <body>
-
 <div id="loader"></div>
-
 <nav>
   <a href="index.html">🏆 Ranking</a>
   <a href="kalkulator.html">📊 Kalkulator</a>
 </nav>
-
 <h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
 <input id="search" placeholder="🔍 Szukaj nicku..." />
-
+<div class="sort-box">
+  <label>📊 Sortuj według: </label>
+  <select id="main-sort">
+    <option value="points">🏆 Punktów</option>
+    <option value="coupons">🎟️ Kuponów</option>
+  </select>
+</div>
 <div class="container" id="ranking-container" style="display:none;">
   <table id="ranking">
-    <thead>
-      <tr>
-        <th style="width:60px;">Miejsce</th>
-        <th>Nick</th>
-        <th style="width:100px;text-align:center;">Kupony</th>
-        <th style="width:120px;text-align:right;">Punkty</th>
-      </tr>
-    </thead>
+    <thead><tr><th>Miejsce</th><th>Nick</th><th style="text-align:center;">Kupony</th><th style="text-align:right;">Punkty</th></tr></thead>
     <tbody></tbody>
   </table>
-
   <div class="stats">
     <div class="stat-box">👥 Typerzy: <b id="count">0</b></div>
     <div class="stat-box">💰 Suma punktów: <b id="sum">0</b></div>
@@ -138,110 +93,78 @@ td.coupons{color:#ccc;text-align:center}
     <button class="close-btn" onclick="closePopup()">Zamknij</button>
   </div>
 </div>
-
 <div id="toast" class="toast"></div>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
-let playersData = {};
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTThQFcv-8JkvXEePVWkQw7yoEJX9XcZDFCChCWL_JmzgLQItyNW5qmp2eUKxD6a5Wp--sfWzFes_Cj/pub?output=csv";
+let playersData={},list=[];
 
-function showToast(msg, ms=2500){
-  const t=document.getElementById("toast");
-  t.textContent=msg;t.classList.add("show");
-  clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove("show"),ms);
-}
-
-function parseCSV(text){
-  const lines=text.trim().split(/\r?\n/);
-  return lines.map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')));
-}
-
+function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
 async function loadRanking(){
-  const res=await fetch(CSV_URL);
-  const txt=await res.text();
-  const rows=parseCSV(txt);
-  const header=rows[0].map(x=>x.toLowerCase());
-  const nickCol=header.findIndex(h=>h.includes("nick"));
-  const punktyCol=header.findIndex(h=>h.includes("punk"));
-  const linkCol=header.findIndex(h=>h.includes("link"));
-  const dataCol=header.findIndex(h=>h.includes("data"));
+  const res=await fetch(CSV_URL);const txt=await res.text();
+  const rows=parseCSV(txt);const head=rows[0].map(x=>x.toLowerCase());
+  const n=head.findIndex(h=>h.includes("nick")),p=head.findIndex(h=>h.includes("punk")),l=head.findIndex(h=>h.includes("link")),d=head.findIndex(h=>h.includes("data"));
   const data={};
-
   rows.slice(1).forEach(r=>{
-    const nick=(r[nickCol]||"").trim();
-    const pts=parseFloat((r[punktyCol]||"0").replace(",","."))||0;
-    const link=(r[linkCol]||"").trim();
-    const date=(r[dataCol]||"").trim();
-    if(!nick)return;
+    const nick=(r[n]||"").trim();const pts=parseFloat((r[p]||"0").replace(",","."))||0;
+    const link=(r[l]||"").trim();const date=(r[d]||"").trim();if(!nick)return;
     if(!data[nick])data[nick]={punkty:0,kupony:0,links:[]};
-    data[nick].punkty+=pts;
-    data[nick].kupony++;
-    if(link)data[nick].links.push({url:link,points:pts,date:date});
+    data[nick].punkty+=pts;data[nick].kupony++;if(link)data[nick].links.push({url:link,points:pts,date:date});
   });
-
-  playersData=data;
-  const list=Object.entries(data).map(([nick,v])=>({nick,...v}));
-  list.sort((a,b)=>b.punkty-a.punkty);
-
-  const tbody=document.querySelector("#ranking tbody");
-  tbody.innerHTML="";
-  let total=0;
-  list.forEach((p,i)=>{
-    total+=p.punkty;
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${i+1}</td>
-      <td class="nick">${p.nick}</td>
-      <td class="coupons">${p.kupony}</td>
-      <td class="points">${Math.round(p.punkty)}</td>
-    `;
-    tr.querySelector(".nick").addEventListener("click",()=>openPopup(p.nick));
-    tbody.appendChild(tr);
-  });
-
+  playersData=data;list=Object.entries(data).map(([nick,v])=>({nick,...v}));
+  renderTable("points");
   document.getElementById("count").textContent=list.length;
-  document.getElementById("sum").textContent=total.toFixed(0);
-  document.getElementById("avg").textContent=(total/list.length).toFixed(1);
+  const sum=list.reduce((a,b)=>a+b.punkty,0);
+  document.getElementById("sum").textContent=sum.toFixed(0);
+  document.getElementById("avg").textContent=(sum/list.length).toFixed(1);
   document.getElementById("ranking-container").style.display="block";
   setTimeout(()=>document.querySelector(".container").classList.add("show"),60);
-  showToast("✅ Ranking załadowany!");
   document.getElementById("loader").classList.add("hidden");
 }
 
+function renderTable(sortBy){
+  const tb=document.querySelector("#ranking tbody");tb.innerHTML="";
+  const sorted=[...list];
+  sorted.sort((a,b)=>sortBy==="coupons"?b.kupony-a.kupony:b.punkty-a.punkty);
+  sorted.forEach((p,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td class="nick">${p.nick}</td><td class="coupons">${p.kupony}</td><td class="points">${Math.round(p.punkty)}</td>`;
+    tr.querySelector(".nick").addEventListener("click",()=>openPopup(p.nick));
+    tb.appendChild(tr);
+  });
+}
+
 function renderLinks(nick,sortType){
-  const p=playersData[nick];
-  if(!p)return;
+  const p=playersData[nick];if(!p)return;
   let sorted=[...p.links];
-  if(sortType==="points"){
-    sorted.sort((a,b)=>b.points-a.points);
-  } else {
-    sorted.sort((a,b)=>(new Date(b.date)-new Date(a.date))||b.points-a.points);
-  }
-  const linksDiv=document.getElementById("popup-links");
-  linksDiv.innerHTML=sorted.length
-    ? sorted.map((l,i)=>`
-      <div class="coupon" style="animation-delay:${i*0.08}s">
-        <div>
-          <div class="coupon-date">📅 ${l.date||"—"}</div>
-          <div class="coupon-points">🏆 ${l.points.toFixed(0)} pkt</div>
-        </div>
-        <button class="open-btn" onclick="window.open('${l.url}','_blank')">Otwórz</button>
-      </div>`).join("")
-    : "<p>Brak linków do kuponów.</p>";
+  if(sortType==="points"){sorted.sort((a,b)=>b.points-a.points);}
+  else{sorted.sort((a,b)=>(new Date(b.date)-new Date(a.date))||b.points-a.points);}
+  const maxPts=Math.max(...sorted.map(l=>l.points));
+  const div=document.getElementById("popup-links");
+  div.innerHTML=sorted.length
+  ? sorted.map((l,i)=>`
+    <div class="coupon ${l.points===maxPts?'best':''}" style="animation-delay:${i*0.08}s">
+      <div>
+        <div class="coupon-date">📅 ${l.date||"—"}</div>
+        <div class="coupon-points">🏆 ${l.points.toFixed(0)} pkt</div>
+      </div>
+      <button class="open-btn" onclick="window.open('${l.url}','_blank')">Otwórz</button>
+    </div>`).join("")
+  : "<p>Brak kuponów.</p>";
 }
 
 function openPopup(nick){
   const popup=document.getElementById("popup");
   document.getElementById("popup-nick").textContent=nick;
-  const select=document.getElementById("sort-select");
-  renderLinks(nick,select.value);
-  select.onchange=()=>renderLinks(nick,select.value);
+  const sel=document.getElementById("sort-select");
+  renderLinks(nick,sel.value);
+  sel.onchange=()=>renderLinks(nick,sel.value);
   document.getElementById("popup-total").textContent=`Łącznie: ${playersData[nick].punkty.toFixed(0)} pkt`;
   popup.classList.add("active");
 }
 
 function closePopup(){document.getElementById("popup").classList.remove("active");}
-
+document.getElementById("main-sort").addEventListener("change",e=>renderTable(e.target.value));
 document.getElementById("search").addEventListener("input",e=>{
   const q=e.target.value.toLowerCase();
   document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
@@ -249,7 +172,6 @@ document.getElementById("search").addEventListener("input",e=>{
     tr.style.display=nick.includes(q)?"":"none";
   });
 });
-
 window.addEventListener("load",loadRanking);
 </script>
 </body>
