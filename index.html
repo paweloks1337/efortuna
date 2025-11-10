@@ -59,10 +59,11 @@ td.coupons{color:#ccc;text-align:center}
 }
 .popup-content h2{color:var(--gold);margin-bottom:10px;text-align:center}
 .popup-content a{
-  display:flex;flex-direction:column;align-items:flex-start;
+  display:flex;align-items:center;gap:8px;
   background:#111;padding:8px 12px;border-radius:8px;
   margin:6px 0;color:var(--green);text-decoration:none;
   transform:translateY(10px);opacity:0;animation:slideUp .4s ease forwards;
+  cursor:pointer;
 }
 .popup-content a:hover{background:#222;color:var(--gold);box-shadow:0 0 10px rgba(255,215,0,0.2)}
 .popup-content a span{color:#fff;font-size:.9rem}
@@ -71,7 +72,34 @@ td.coupons{color:#ccc;text-align:center}
   display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);
   border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer
 }
-.popup-header{text-align:center;color:#ccc;font-size:.9rem;margin-bottom:6px}
+
+/* iframe popup */
+#previewPopup{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;
+  z-index:100000;visibility:hidden;opacity:0;transition:.3s
+}
+#previewPopup.active{visibility:visible;opacity:1}
+#previewPopup iframe{
+  width:90%;height:80%;border:none;border-radius:10px;
+  box-shadow:0 0 20px rgba(255,215,0,0.3);
+}
+#previewPopup .close-btn{
+  position:absolute;top:20px;right:20px;
+  padding:8px 16px;font-size:16px;
+}
+
+/* loader w podglądzie */
+#previewLoader{
+  position:absolute;top:50%;left:50%;
+  width:60px;height:60px;border-radius:50%;
+  border:6px solid rgba(255,215,0,0.2);
+  border-top:6px solid var(--gold);
+  animation:spin 1s linear infinite;
+  transform:translate(-50%,-50%);
+  display:none;
+}
+
 @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{to{transform:translateY(0);opacity:1}}
 
@@ -79,6 +107,7 @@ td.coupons{color:#ccc;text-align:center}
   nav a{margin:0 8px;font-size:.95rem}
   th,td{padding:8px;font-size:.9rem}
   .stat-box{display:block;margin:6px 0}
+  #previewPopup iframe{width:95%;height:75%}
 }
 </style>
 </head>
@@ -117,11 +146,17 @@ td.coupons{color:#ccc;text-align:center}
 <div id="popup" class="popup">
   <div class="popup-content">
     <h2 id="popup-nick"></h2>
-    <div class="popup-header">📅 Historia kuponów (od najnowszego)</div>
     <div id="popup-links"></div>
     <div id="popup-total" class="popup-total"></div>
     <button class="close-btn" onclick="closePopup()">Zamknij</button>
   </div>
+</div>
+
+<!-- Popup z podglądem kuponu -->
+<div id="previewPopup">
+  <div id="previewLoader"></div>
+  <iframe id="previewFrame" src=""></iframe>
+  <button class="close-btn" onclick="closePreview()">Zamknij</button>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -161,19 +196,17 @@ async function loadRanking(){
     const nickCol=header.findIndex(h=>h.includes("nick"));
     const punktyCol=header.findIndex(h=>h.includes("punk"));
     const linkCol=header.findIndex(h=>h.includes("link"));
-    const dataCol=header.findIndex(h=>h.includes("data"));
     const data={};
 
     rows.slice(1).forEach(r=>{
       const nick=(r[nickCol]||"").trim();
       const pts=parseFloat((r[punktyCol]||"0").replace(",","."))||0;
       const link=(r[linkCol]||"").trim();
-      const date=(r[dataCol]||"").trim();
       if(!nick)return;
       if(!data[nick])data[nick]={punkty:0,kupony:0,links:[]};
       data[nick].punkty+=pts;
       data[nick].kupony++;
-      if(link)data[nick].links.push({url:link,points:pts,date:date});
+      if(link)data[nick].links.push({url:link,points:pts});
     });
 
     playersData=data;
@@ -216,28 +249,34 @@ function openPopup(nick){
   const p=playersData[nick];
   if(!p)return;
   document.getElementById("popup-nick").textContent=nick;
-
-  const sortedLinks=[...p.links].sort((a,b)=>{
-    const da=new Date(a.date.split('.').reverse().join('-'));
-    const db=new Date(b.date.split('.').reverse().join('-'));
-    return db-da;
-  });
-
   const linksDiv=document.getElementById("popup-links");
-  linksDiv.innerHTML=sortedLinks.length
-    ? sortedLinks.map((l,i)=>`
-        <a href="${l.url}" target="_blank" style="animation-delay:${i*0.08}s">
-          <span>🎟️ Kupon ${i+1}</span> — ${l.points.toFixed(0)} pkt
-          <small style="color:#aaa;">📅 ${l.date || "Brak daty"}</small>
-        </a>
-      `).join("")
+  linksDiv.innerHTML=p.links.length
+    ? p.links.map((l,i)=>`<a onclick="openPreview('${l.url}')" style="animation-delay:${i*0.08}s"><span>🎟️ Kupon ${i+1}</span> — ${l.points.toFixed(0)} pkt</a>`).join("")
     : "<p>Brak linków do kuponów.</p>";
-
   document.getElementById("popup-total").textContent=`Łącznie: ${p.punkty.toFixed(0)} pkt`;
   document.getElementById("popup").classList.add("active");
 }
 
 function closePopup(){document.getElementById("popup").classList.remove("active");}
+
+function openPreview(url){
+  const iframe=document.getElementById("previewFrame");
+  const loader=document.getElementById("previewLoader");
+  loader.style.display="block";
+  iframe.style.opacity="0";
+  iframe.src=url;
+  document.getElementById("previewPopup").classList.add("active");
+  iframe.onload=()=>{
+    loader.style.display="none";
+    iframe.style.opacity="1";
+  };
+}
+
+function closePreview(){
+  const iframe=document.getElementById("previewFrame");
+  iframe.src="";
+  document.getElementById("previewPopup").classList.remove("active");
+}
 
 document.getElementById("search").addEventListener("input",e=>{
   const q=e.target.value.toLowerCase();
