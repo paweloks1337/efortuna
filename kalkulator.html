@@ -144,7 +144,15 @@ function oblicz(){
   
   if(!kurs||!stawka){showToast("⚠️ Uzupełnij wszystkie pola!");return;}
 
-  const wygrana=stawka*kurs*0.88; // -12% podatek
+  let wygrana = stawka * kurs * 0.88; // -12% podatek
+
+  // ➕ DODATKOWE 10% PODATKU OD NADWYŻKI POWYŻEJ 2280 PLN
+  if (wygrana > 2280) {
+      const nadwyzka = wygrana - 2280;
+      const podatek10 = nadwyzka * 0.10;
+      wygrana = wygrana - podatek10;
+  }
+
   let mnoznik=1;
   
   if(typ==="SOLO"){
@@ -163,6 +171,7 @@ function oblicz(){
   animateNumber(outWygr,0,wygrana,800,2);
   animateNumber(outPkt,0,punkty,1000,2);
   showToast("✅ Wynik obliczony!");
+
 }
 
 window.addEventListener("load",()=>{
