@@ -166,10 +166,10 @@ function oblicz(){
     else mnoznik=8;
   }
 
-  const punkty=wygrana*mnoznik;
+  const punkty = Math.round(wygrana * mnoznik);
 
-  animateNumber(outWygr,0,wygrana,800,2);
-  animateNumber(outPkt,0,punkty,1000,2);
+animateNumber(outWygr, 0, wygrana, 800, 2);
+animateNumber(outPkt, 0, punkty, 1000, 0);
   showToast("✅ Wynik obliczony!");
 
 }
