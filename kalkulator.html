@@ -144,15 +144,12 @@ function oblicz(){
   
   if(!kurs||!stawka){showToast("⚠️ Uzupełnij wszystkie pola!");return;}
 
-  let wygrana = stawka * kurs * 0.88; // -12% podatek
+  let wygrana = stawka * kurs * 0.88; // 12% podatek
 
-  // ➕ DODATKOWE 10% PODATKU OD NADWYŻKI POWYŻEJ 2280 PLN
-  if (wygrana > 2280) {
-      const nadwyzka = wygrana - 2280;
-      const podatek10 = nadwyzka * 0.10;
-      wygrana = wygrana - podatek10;
-  }
-
+// Jeśli przekroczono 2280 → odejmij stałe 228 zł
+if (wygrana > 2280) {
+    wygrana -= 228;
+}
   let mnoznik=1;
   
   if(typ==="SOLO"){
