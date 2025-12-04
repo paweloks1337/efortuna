@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -38,7 +36,6 @@ input{
   width:80%;padding:10px;margin:8px 0;border-radius:8px;border:2px solid var(--gold);
   background:#000;color:var(--gold);font-size:1rem;text-align:center;
 }
-input:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
 
 .toggle{
   display:flex;justify-content:center;margin:14px 0;
@@ -70,13 +67,6 @@ button.calc:hover{box-shadow:0 0 18px var(--gold)}
   opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001
 }
 .toast.show{opacity:1;transform:translateY(0)}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-@media (max-width:600px){
-  nav a{margin:0 8px;font-size:.95rem}
-  input{width:90%}
-}
 </style>
 </head>
 <body>
@@ -146,16 +136,18 @@ function oblicz(){
   
   if(!kurs||!stawka){showToast("⚠️ Uzupełnij wszystkie pola!");return;}
 
-  // PODSTAWOWA WYGRANA – 12% PODATEK
-  let wygrana = stawka * kurs * 0.88;
+  // BRUTTO
+  let brutto = stawka * kurs;
 
-  // DODATKOWY PODATEK 10% OD NADWYŻKI POWYŻEJ 2280 – TYLKO W AKO
-  if (typ === "AKO" && wygrana > 2280) {
-    const nadwyzka = wygrana - 2280;
-    const podatek10 = nadwyzka * 0.10;
-    wygrana = wygrana - podatek10;
+  // 12%
+  let wygrana = brutto * 0.88;
+
+  // DODATKOWE 10% JEŚLI AKO I brutto > 2280
+  if(typ === "AKO" && brutto > 2280){
+    wygrana -= (brutto - 2280) * 0.10;
   }
 
+  // MNOŻNIKI
   let mnoznik=1;
   
   if(typ==="SOLO"){
@@ -169,10 +161,10 @@ function oblicz(){
     else mnoznik=8;
   }
 
-  const punkty=Math.round(wygrana*mnoznik);
+  const punkty = wygrana * mnoznik;
 
   animateNumber(outWygr,0,wygrana,800,2);
-  animateNumber(outPkt,0,punkty,1000,0);
+  animateNumber(outPkt,0,punkty,1000,2);
   showToast("✅ Wynik obliczony!");
 }
 
