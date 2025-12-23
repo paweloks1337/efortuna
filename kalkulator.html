@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -71,6 +70,7 @@ input{
   background:#111;
   color:#FFD700;
   border:2px solid #FFD700;
+  transition:0.2s;
 }
 
 .buttons button.active{
@@ -118,16 +118,22 @@ input{
 <script>
 let type="SOLO";
 
-solo.onclick=()=>{
+const soloBtn = document.getElementById("solo");
+const akoBtn = document.getElementById("ako");
+const odds = document.getElementById("odds");
+const stake = document.getElementById("stake");
+const result = document.getElementById("result");
+
+soloBtn.onclick=()=>{
   type="SOLO";
-  solo.classList.add("active");
-  ako.classList.remove("active");
+  soloBtn.classList.add("active");
+  akoBtn.classList.remove("active");
   calculate();
 };
-ako.onclick=()=>{
+akoBtn.onclick=()=>{
   type="AKO";
-  ako.classList.add("active");
-  solo.classList.remove("active");
+  akoBtn.classList.add("active");
+  soloBtn.classList.remove("active");
   calculate();
 };
 
@@ -160,13 +166,10 @@ function calculate(){
   animatePoints(targetPoints);
 }
 
-// animacja liczenia punktów
+// animacja szybka i płynna niezależnie od liczby
 function animatePoints(target){
   let current = 0;
-  const duration = 700; // czas animacji w ms
-function animatePoints(target){
-  let current = 0;
-  const duration = 700; // czas całej animacji w ms
+  const duration = 700; // ms
   const start = performance.now();
 
   function step(timestamp){
@@ -176,7 +179,6 @@ function animatePoints(target){
     if(progress < 1) requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
-}
 }
 </script>
 
