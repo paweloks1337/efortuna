@@ -7,36 +7,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-:root{--gold:#FFD700;--green:#00FF88}
-body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
-nav{background:linear-gradient(90deg,#000,#222);padding:14px 0}
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
+body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
+nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
 nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600}
 h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
-
-.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
 .sort-box{margin:10px}
 .sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:600}
-
 #search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
 
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 
-table{width:100%;border-collapse:collapse;margin-top:12px;min-width:520px}
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left}
+table{width:100%;border-collapse:collapse;margin-top:12px;min-width:650px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:left}
 th{text-transform:uppercase;font-size:.9rem}
 td.nick{color:#fff;font-weight:600;cursor:pointer}
 td.points{color:var(--green);font-weight:700;text-align:right}
 td.coupons{text-align:center}
+td.reward{white-space:normal;line-height:1.25}
 
-.stats{margin-top:18px;border-top:1px solid rgba(255,255,255,.04);padding-top:14px;color:#ccc}
+.stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
 .stat-box{display:inline-block;margin:6px 18px}
 
-/* MOBILE */
+/* ================= MOBILE FIX ================= */
 @media (max-width:600px){
   .container{padding:10px}
   table{font-size:.82rem}
   th,td{padding:6px}
-  td.nick{max-width:120px}
+  td.reward{max-width:140px}
+  td.nick{max-width:110px}
   td.points{font-size:.9rem}
   .stat-box{display:block;margin:6px 0}
 }
@@ -68,6 +68,7 @@ td.coupons{text-align:center}
         <tr>
           <th>Miejsce</th>
           <th>Nick</th>
+          <th>Nagroda</th>
           <th>Kupony</th>
           <th style="text-align:right">Punkty</th>
         </tr>
@@ -87,9 +88,21 @@ td.coupons{text-align:center}
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
 let list=[];
 
-function parseCSV(t){
-  return t.trim().split(/\r?\n/)
-    .map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))
+function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
+
+function getReward(p){
+  if(p===1)return"🥇 1000 zł + ranga";
+  if(p===2)return"🥈 700 zł";
+  if(p===3)return"🥉 500 zł";
+  if(p===4)return"🏅 300 zł";
+  if(p===5)return"🏅 250 zł";
+  if(p<=10)return"🎁 150 zł";
+  if(p<=15)return"🎁 100 zł";
+  if(p<=20)return"🎁 80 zł";
+  if(p<=30)return"🎁 60 zł";
+  if(p<=40)return"🎁 40 zł";
+  if(p<=60)return"🎁 20 zł";
+  return"";
 }
 
 async function load(){
@@ -99,49 +112,32 @@ async function load(){
   const h=rows[0].map(x=>x.toLowerCase());
   const ni=h.findIndex(x=>x.includes("nick"));
   const pi=h.findIndex(x=>x.includes("punk"));
-
   rows.slice(1).forEach(r=>{
-    const nick=(r[ni]||"").trim();
-    const pts=parseFloat((r[pi]||"0").replace(",","."))||0;
-    if(!nick)return;
+    const nick=r[ni];const pts=parseFloat(r[pi])||0;
     let p=list.find(x=>x.nick===nick);
     if(!p){p={nick,punkty:0,kupony:0};list.push(p);}
-    p.punkty+=pts;
-    p.kupony++;
+    p.punkty+=pts;p.kupony++;
   });
-
   render("points");
-
-  document.getElementById("count").textContent=list.length;
-  const sum=list.reduce((a,b)=>a+b.punkty,0);
-  document.getElementById("sum").textContent=sum.toFixed(0);
-  document.getElementById("avg").textContent=(sum/list.length).toFixed(1);
 }
 
-function render(sortBy){
+function render(s){
   const tb=document.querySelector("tbody");
   tb.innerHTML="";
-  [...list].sort((a,b)=>sortBy==="coupons"?b.kupony-a.kupony:b.punkty-a.punkty)
+  [...list].sort((a,b)=>s==="coupons"?b.kupony-a.kupony:b.punkty-a.punkty)
   .forEach((p,i)=>{
     tb.innerHTML+=`
-      <tr>
-        <td>${i+1}</td>
-        <td class="nick">${p.nick}</td>
-        <td class="coupons">${p.kupony}</td>
-        <td class="points">${Math.round(p.punkty)}</td>
-      </tr>`;
+    <tr>
+      <td>${i+1}</td>
+      <td class="nick">${p.nick}</td>
+      <td class="reward">${getReward(i+1)}</td>
+      <td class="coupons">${p.kupony}</td>
+      <td class="points">${Math.round(p.punkty)}</td>
+    </tr>`;
   });
 }
 
 document.getElementById("main-sort").onchange=e=>render(e.target.value);
-
-document.getElementById("search").oninput=e=>{
-  const q=e.target.value.toLowerCase();
-  document.querySelectorAll("tbody tr").forEach(tr=>{
-    tr.style.display=tr.children[1].textContent.toLowerCase().includes(q)?"":"none";
-  });
-};
-
 window.onload=load;
 </script>
 
