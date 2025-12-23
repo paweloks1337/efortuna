@@ -65,10 +65,40 @@ td.coupons{color:#ccc;text-align:center}
 .close-btn{display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer}
 @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{to{transform:translateY(0);opacity:1}}
+/* --- Ogólne style tabeli --- */
+table {
+  width: 100%;
+  border-collapse: separate;  /* Oddzielne wiersze, dla przejrzystości */
+  border-spacing: 0 6px;      /* Odstęp między wierszami */
+}
+
+th, td {
+  padding: 12px 18px;          /* Większe odstępy dla czytelności */
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Minimalne szerokości kolumn, aby punkty i kupony się nie ściskały */
+td.nick { min-width: 130px; color: #fff; font-weight: 600; cursor: pointer; }
+td.coupons { min-width: 60px; text-align: center; color: #ccc; }
+td.points { min-width: 80px; text-align: right; color: var(--green); font-weight: 700; }
+
+/* Lekko zaokrąglone wiersze dla estetyki */
+tr { border-radius: 8px; overflow: hidden; display: table-row; }
+
+/* --- Styl mobilny --- */
 @media (max-width: 600px) {
-  table { table-layout: fixed; width: 100%; }
-  td.nick, td.points, td.coupons { word-wrap: break-word; overflow-wrap: break-word; }
-  td.points { text-align: right; white-space: nowrap; }
+  .container {
+    overflow-x: auto;           /* Scroll poziomy na małych ekranach */
+    padding: 0 8px;
+  }
+
+  table { width: auto; min-width: 100%; }
+
+  th, td { padding: 10px 14px; font-size: 0.95rem; }
+
+  td.nick, td.points, td.coupons { white-space: nowrap; } /* Nie łamiemy liczb ani nicków */
+}
 }
   </style>
 </head>
