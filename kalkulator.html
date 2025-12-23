@@ -98,12 +98,15 @@ input{
   <a href="kalkulator.html">📊 Kalkulator</a>
 </nav>
 
-<h1>📊 Kalkulator punktów</h1>
+<h1>📊 Kalkulator Mistrzostw</h1>
 
 <div class="box">
 
   <label>Kurs kuponu</label>
   <input type="number" id="odds" step="0.01" placeholder="np. 3.45">
+
+  <label>Stawka (zł)</label>
+  <input type="number" id="stake" step="0.01" placeholder="np. 20">
 
   <div class="buttons">
     <button id="solo" class="active">SOLO</button>
@@ -111,46 +114,48 @@ input{
   </div>
 
   <div class="result" id="result">—</div>
-  <div class="small">Stawka 1 zł · podatek 12%</div>
+  <div class="small">Podatek 12% · zaokrąglanie do najbliższej liczby</div>
 
 </div>
 
 <script>
 let type="SOLO";
 
-document.getElementById("solo").onclick=()=>{
+solo.onclick=()=>{
   type="SOLO";
   solo.classList.add("active");
   ako.classList.remove("active");
   calculate();
 };
-document.getElementById("ako").onclick=()=>{
+ako.onclick=()=>{
   type="AKO";
   ako.classList.add("active");
   solo.classList.remove("active");
   calculate();
 };
 
-document.getElementById("odds").addEventListener("input",calculate);
+odds.addEventListener("input",calculate);
+stake.addEventListener("input",calculate);
 
 function calculate(){
-  const odds=parseFloat(document.getElementById("odds").value);
-  if(!odds || odds<=0){
+  const oddsVal=parseFloat(odds.value);
+  const stakeVal=parseFloat(stake.value);
+
+  if(!oddsVal || !stakeVal || oddsVal<=0 || stakeVal<=0){
     result.textContent="—";
     return;
   }
 
-  const winBrutto = odds * 1;
+  const winBrutto = oddsVal * stakeVal;
   const winNetto = winBrutto * 0.88;
 
   let mult = 1;
-
-  if(odds >= 1.5){
+  if(oddsVal >= 1.5){
     if(type==="SOLO"){
-      mult = odds >= 5 ? 7.5 : 3;
+      mult = oddsVal >= 5 ? 7.5 : 3;
     }else{
-      if(odds > 10) mult = 8;
-      else if(odds >= 5) mult = 5;
+      if(oddsVal > 10) mult = 8;
+      else if(oddsVal >= 5) mult = 5;
       else mult = 2.5;
     }
   }
@@ -158,7 +163,7 @@ function calculate(){
   const points = Math.round(winNetto * mult);
 
   result.innerHTML = `
-    💰 Wygrana: <b>${winNetto.toFixed(2)} zł</b><br>
+    💰 Wygrana netto: <b>${winNetto.toFixed(2)} zł</b><br>
     🏆 Punkty: <b>${points}</b>
   `;
 }
