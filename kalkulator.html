@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>📊 Kalkulator Mistrzostw</title>
+<title>📊 Kalkulator punktów</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
@@ -43,14 +44,15 @@ label{
 }
 
 input{
-  width:100%;
-  padding:10px;
+  width:48%;
+  padding:8px;
   margin-top:6px;
   border-radius:8px;
   border:2px solid #FFD700;
   background:#000;
   color:#FFD700;
   font-size:1rem;
+  display:inline-block;
 }
 
 .buttons{
@@ -80,13 +82,9 @@ input{
   margin-top:20px;
   padding-top:14px;
   border-top:1px solid rgba(255,255,255,0.15);
-  font-size:1.1rem;
-}
-
-.small{
-  color:#aaa;
-  font-size:.85rem;
-  margin-top:6px;
+  font-size:1.3rem;
+  color:#00FF88; /* zielony wynik */
+  font-weight:700;
 }
 </style>
 </head>
@@ -98,15 +96,15 @@ input{
   <a href="kalkulator.html">📊 Kalkulator</a>
 </nav>
 
-<h1>📊 Kalkulator Mistrzostw</h1>
+<h1>📊 Kalkulator punktów</h1>
 
 <div class="box">
 
   <label>Kurs kuponu</label>
-  <input type="number" id="odds" step="0.01" placeholder="np. 3.45">
+  <input type="number" id="odds" step="0.01" placeholder="Kurs">
 
   <label>Stawka (zł)</label>
-  <input type="number" id="stake" step="0.01" placeholder="np. 20">
+  <input type="number" id="stake" step="0.01" placeholder="Stawka">
 
   <div class="buttons">
     <button id="solo" class="active">SOLO</button>
@@ -114,7 +112,6 @@ input{
   </div>
 
   <div class="result" id="result">—</div>
-  <div class="small">Podatek 12% · zaokrąglanie do najbliższej liczby</div>
 
 </div>
 
@@ -140,7 +137,6 @@ stake.addEventListener("input",calculate);
 function calculate(){
   const oddsVal=parseFloat(odds.value);
   const stakeVal=parseFloat(stake.value);
-
   if(!oddsVal || !stakeVal || oddsVal<=0 || stakeVal<=0){
     result.textContent="—";
     return;
@@ -160,12 +156,21 @@ function calculate(){
     }
   }
 
-  const points = Math.round(winNetto * mult);
+  const targetPoints = Math.round(winNetto * mult);
+  animatePoints(targetPoints);
+}
 
-  result.innerHTML = `
-    💰 Wygrana netto: <b>${winNetto.toFixed(2)} zł</b><br>
-    🏆 Punkty: <b>${points}</b>
-  `;
+// animacja liczenia punktów
+function animatePoints(target){
+  let current = 0;
+  const duration = 700; // czas animacji w ms
+  const stepTime = Math.max(10, duration / target);
+  clearInterval(window.countInterval);
+  window.countInterval = setInterval(()=>{
+    current++;
+    result.textContent = `🏆 Punkty: ${current}`;
+    if(current>=target) clearInterval(window.countInterval);
+  }, stepTime);
 }
 </script>
 
