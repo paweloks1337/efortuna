@@ -164,13 +164,19 @@ function calculate(){
 function animatePoints(target){
   let current = 0;
   const duration = 700; // czas animacji w ms
-  const stepTime = Math.max(10, duration / target);
-  clearInterval(window.countInterval);
-  window.countInterval = setInterval(()=>{
-    current++;
+function animatePoints(target){
+  let current = 0;
+  const duration = 700; // czas całej animacji w ms
+  const start = performance.now();
+
+  function step(timestamp){
+    const progress = Math.min((timestamp - start) / duration, 1);
+    current = Math.round(target * progress);
     result.textContent = `🏆 Punkty: ${current}`;
-    if(current>=target) clearInterval(window.countInterval);
-  }, stepTime);
+    if(progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 }
 </script>
 
