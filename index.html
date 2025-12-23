@@ -65,8 +65,12 @@ td.coupons{color:#ccc;text-align:center}
 .close-btn{display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer}
 @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{to{transform:translateY(0);opacity:1}}
-@media (max-width:600px){nav a{margin:0 8px;font-size:.95rem}th,td{padding:8px;font-size:.9rem}.stat-box{display:block;margin:6px 0}}
-</style>
+@media (max-width: 600px) {
+  table { table-layout: fixed; width: 100%; }
+  td.nick, td.points, td.coupons { word-wrap: break-word; overflow-wrap: break-word; }
+  td.points { text-align: right; white-space: nowrap; }
+}
+  </style>
 </head>
 <body>
 <div id="loader"></div>
