@@ -1,1 +1,168 @@
-https://www.efortuna.pl/cms/discord/kalkulator
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>📊 Kalkulator Mistrzostw</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(180deg,#000,#111);
+  color:#FFD700;
+  text-align:center;
+}
+nav{
+  background:linear-gradient(90deg,#000,#222);
+  padding:14px 0;
+}
+nav a{
+  color:#FFD700;
+  text-decoration:none;
+  margin:0 18px;
+  font-weight:600;
+}
+h1{margin:20px 0}
+
+.box{
+  width:90%;
+  max-width:420px;
+  margin:30px auto;
+  background:#1a1a1a;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+}
+
+label{
+  display:block;
+  margin-top:14px;
+  font-weight:600;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border-radius:8px;
+  border:2px solid #FFD700;
+  background:#000;
+  color:#FFD700;
+  font-size:1rem;
+}
+
+.buttons{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.buttons button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  background:#111;
+  color:#FFD700;
+  border:2px solid #FFD700;
+}
+
+.buttons button.active{
+  background:#FFD700;
+  color:#000;
+}
+
+.result{
+  margin-top:20px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,0.15);
+  font-size:1.1rem;
+}
+
+.small{
+  color:#aaa;
+  font-size:.85rem;
+  margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <a href="index.html">🏆 Ranking</a>
+  <a href="kalkulator.html">📊 Kalkulator</a>
+</nav>
+
+<h1>📊 Kalkulator punktów</h1>
+
+<div class="box">
+
+  <label>Kurs kuponu</label>
+  <input type="number" id="odds" step="0.01" placeholder="np. 3.45">
+
+  <div class="buttons">
+    <button id="solo" class="active">SOLO</button>
+    <button id="ako">AKO</button>
+  </div>
+
+  <div class="result" id="result">—</div>
+  <div class="small">Stawka 1 zł · podatek 12%</div>
+
+</div>
+
+<script>
+let type="SOLO";
+
+document.getElementById("solo").onclick=()=>{
+  type="SOLO";
+  solo.classList.add("active");
+  ako.classList.remove("active");
+  calculate();
+};
+document.getElementById("ako").onclick=()=>{
+  type="AKO";
+  ako.classList.add("active");
+  solo.classList.remove("active");
+  calculate();
+};
+
+document.getElementById("odds").addEventListener("input",calculate);
+
+function calculate(){
+  const odds=parseFloat(document.getElementById("odds").value);
+  if(!odds || odds<=0){
+    result.textContent="—";
+    return;
+  }
+
+  const winBrutto = odds * 1;
+  const winNetto = winBrutto * 0.88;
+
+  let mult = 1;
+
+  if(odds >= 1.5){
+    if(type==="SOLO"){
+      mult = odds >= 5 ? 7.5 : 3;
+    }else{
+      if(odds > 10) mult = 8;
+      else if(odds >= 5) mult = 5;
+      else mult = 2.5;
+    }
+  }
+
+  const points = Math.round(winNetto * mult);
+
+  result.innerHTML = `
+    💰 Wygrana: <b>${winNetto.toFixed(2)} zł</b><br>
+    🏆 Punkty: <b>${points}</b>
+  `;
+}
+</script>
+
+</body>
+</html>
