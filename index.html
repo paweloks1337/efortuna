@@ -85,7 +85,7 @@ td.coupons{color:#ccc;text-align:center}
 </div>
 <div class="container" id="ranking-container" style="display:none;">
   <table id="ranking">
-    <thead><tr><th>Miejsce</th><th>Nick</th><th style="text-align:center;">Kupony</th><th style="text-align:right;">Punkty</th></tr></thead>
+    <thead><tr><th>Miejsce</th><th>Nick</th><th>Nagroda</th><th style="text-align:center;">Kupony</th><th style="text-align:right;">Punkty</th></tr></thead>
     <tbody></tbody>
   </table>
   <div class="stats">
@@ -139,13 +139,40 @@ async function loadRanking(){
   document.getElementById("loader").classList.add("hidden");
 }
 
+function getReward(place) {
+  if (place === 1) return "🥇 1000 zł + ranga „#1 Typer”";
+  if (place === 2) return "🥈 700 zł";
+  if (place === 3) return "🥉 500 zł";
+  if (place === 4) return "🏅 300 zł";
+  if (place === 5) return "🏅 250 zł";
+  if (place >= 6 && place <= 10) return "🎁 150 zł";
+  if (place >= 11 && place <= 15) return "🎁 100 zł";
+  if (place >= 16 && place <= 20) return "🎁 80 zł";
+  if (place >= 21 && place <= 30) return "🎁 60 zł";
+  if (place >= 31 && place <= 40) return "🎁 40 zł";
+  if (place >= 41 && place <= 60) return "🎁 20 zł";
+  return "";
+}
+
 function renderTable(sortBy){
-  const tb=document.querySelector("#ranking tbody");tb.innerHTML="";
+  const tb=document.querySelector("#ranking tbody");
+  tb.innerHTML="";
+
   const sorted=[...list];
   sorted.sort((a,b)=>sortBy==="coupons"?b.kupony-a.kupony:b.punkty-a.punkty);
+
   sorted.forEach((p,i)=>{
+    const place = i + 1;
+    const reward = getReward(place);
+
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td class="nick">${p.nick}</td><td class="coupons">${p.kupony}</td><td class="points">${Math.round(p.punkty)}</td>`;
+    tr.innerHTML=`
+      <td>${place}</td>
+      <td class="nick">${p.nick}</td>
+      <td class="reward">${reward}</td>
+      <td class="coupons">${p.kupony}</td>
+      <td class="points">${Math.round(p.punkty)}</td>
+    `;
     tr.querySelector(".nick").addEventListener("click",()=>openPopup(p.nick));
     tb.appendChild(tr);
   });
