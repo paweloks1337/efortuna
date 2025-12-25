@@ -85,9 +85,14 @@ async function loadCoupons(){
     });
 
     allCoupons.sort((a,b)=>{
-      const da=new Date(a.date), db=new Date(b.date);
-      return sortOrder==="newest"?db-da:da-db;
-    });
+  const parseDate = str => {
+    const [day, month, year] = str.split(".");
+    return new Date(`${year}-${month}-${day}`);
+  };
+  const da = parseDate(a.date);
+  const db = parseDate(b.date);
+  return sortOrder==="newest" ? db - da : da - db;
+});
 
     let currentDate="";
     allCoupons.forEach(c=>{
