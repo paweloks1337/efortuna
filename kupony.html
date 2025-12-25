@@ -24,6 +24,22 @@ td.link button:hover{box-shadow:0 0 10px var(--gold)}
 #search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
 .sort-box{width:90%;max-width:860px;margin:12px auto;text-align:center}
 .sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer}
+/* Loader */
+#loader {
+  position: fixed;
+  left: 50%;
+  top: 48%;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 8px solid rgba(255,215,0,0.18);
+  border-top: 8px solid var(--gold);
+  transform: translate(-50%, -50%);
+  animation: spin 1s linear infinite;
+  z-index: 9999;
+}
+@keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+#loader.hidden { display: none; }
 @media (max-width:600px){.container{overflow-x:auto;padding:0 8px}table{width:auto;min-width:100%}th,td{padding:10px 14px;font-size:0.95rem}td.nick,td.points,td.link{white-space:nowrap}}
 </style>
 </head>
@@ -47,6 +63,7 @@ td.link button:hover{box-shadow:0 0 10px var(--gold)}
 </div>
 
 <div id="coupons-container"></div>
+<div id="loader"></div>
 
 <script>
 // URL do CSV (Twój plik Google Sheets)
@@ -55,6 +72,7 @@ const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoE
 function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
 
 async function loadCoupons(){
+  document.getElementById("loader").classList.remove("hidden");
   const res = await fetch(CSV_URL);
   const txt = await res.text();
   const rows = parseCSV(txt);
@@ -84,15 +102,14 @@ async function loadCoupons(){
       dataByDate[date].forEach(c=>allCoupons.push({date,...c}));
     });
 
+    const parseDate = str => {
+      const [day, month, year] = str.split(".");
+      return new Date(`${year}-${month}-${day}`);
+    };
     allCoupons.sort((a,b)=>{
-  const parseDate = str => {
-    const [day, month, year] = str.split(".");
-    return new Date(`${year}-${month}-${day}`);
-  };
-  const da = parseDate(a.date);
-  const db = parseDate(b.date);
-  return sortOrder==="newest" ? db - da : da - db;
-});
+      const da=parseDate(a.date), db=parseDate(b.date);
+      return sortOrder==="newest"?db-da:da-db;
+    });
 
     let currentDate="";
     allCoupons.forEach(c=>{
@@ -116,6 +133,7 @@ async function loadCoupons(){
       `;
       tbody.appendChild(tr);
     });
+    document.getElementById("loader").classList.add("hidden");
   }
 
   sortSelect.addEventListener("change", ()=>renderCoupons(sortSelect.value));
