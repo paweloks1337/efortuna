@@ -22,6 +22,8 @@ td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius
 td.link button:hover{box-shadow:0 0 10px var(--gold)}
 #search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
 #search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
+.sort-box{width:90%;max-width:860px;margin:12px auto;text-align:center}
+.sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer}
 @media (max-width:600px){.container{overflow-x:auto;padding:0 8px}table{width:auto;min-width:100%}th,td{padding:10px 14px;font-size:0.95rem}td.nick,td.points,td.link{white-space:nowrap}}
 </style>
 </head>
@@ -35,6 +37,14 @@ td.link button:hover{box-shadow:0 0 10px var(--gold)}
 
 <h1>🧾 Lista Kuponów - Mistrzostwa Discorda 2025</h1>
 <input id="search" placeholder="🔍 Szukaj nicku..." />
+
+<div class="sort-box">
+  <label>📅 Sortuj po dacie: </label>
+  <select id="sort-order">
+    <option value="newest">🔝 Najnowsze</option>
+    <option value="oldest">🔙 Najstarsze</option>
+  </select>
+</div>
 
 <div id="coupons-container"></div>
 
@@ -64,39 +74,53 @@ async function loadCoupons(){
     dataByDate[date].push({nick,points,link});
   });
 
-  const container=document.getElementById("coupons-container");
-  container.innerHTML="";
+  const sortSelect = document.getElementById("sort-order");
 
-  // sortujemy daty rosnąco
-  const sortedDates = Object.keys(dataByDate).sort((a,b)=>new Date(a)-new Date(b));
+  function renderCoupons(sortOrder="newest") {
+    const container=document.getElementById("coupons-container");
+    container.innerHTML="";
+    let allCoupons=[];
+    Object.keys(dataByDate).forEach(date=>{
+      dataByDate[date].forEach(c=>allCoupons.push({date,...c}));
+    });
 
-  sortedDates.forEach(date=>{
-    const div = document.createElement("div");
-    div.className="container";
-    div.innerHTML=`<h2>📅 ${date}</h2>
-      <table>
-        <thead><tr><th>Nick</th><th>Punkty</th><th>Otwórz</th></tr></thead>
-        <tbody></tbody>
-      </table>`;
-    
-    const tbody = div.querySelector("tbody");
-    dataByDate[date].forEach(c=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+    allCoupons.sort((a,b)=>{
+      const da=new Date(a.date), db=new Date(b.date);
+      return sortOrder==="newest"?db-da:da-db;
+    });
+
+    let currentDate="";
+    allCoupons.forEach(c=>{
+      if(c.date!==currentDate){
+        currentDate=c.date;
+        const div=document.createElement("div");
+        div.className="container";
+        div.innerHTML=`<h2>📅 ${currentDate}</h2>
+          <table>
+            <thead><tr><th>Nick</th><th>Punkty</th><th>Otwórz</th></tr></thead>
+            <tbody></tbody>
+          </table>`;
+        container.appendChild(div);
+      }
+      const tbody=container.lastElementChild.querySelector("tbody");
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
         <td class="nick">${c.nick}</td>
         <td class="points">${c.points.toFixed(0)}</td>
         <td class="link"><button onclick="window.open('${c.link}','_blank')">Otwórz</button></td>
       `;
       tbody.appendChild(tr);
     });
-    container.appendChild(div);
-  });
+  }
+
+  sortSelect.addEventListener("change", ()=>renderCoupons(sortSelect.value));
+  renderCoupons("newest");
 
   // wyszukiwanie po nicku
   document.getElementById("search").addEventListener("input", e=>{
     const q=e.target.value.toLowerCase();
     document.querySelectorAll("#coupons-container tbody tr").forEach(tr=>{
-      tr.style.display = tr.children[0].textContent.toLowerCase().includes(q) ? "" : "none";
+      tr.style.display = tr.children[0].textContent.toLowerCase().includes(q)?"":"none";
     });
   });
 }
