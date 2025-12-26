@@ -102,6 +102,51 @@ tr { border-radius: 8px; overflow: hidden; display: table-row; }
   td.nick, td.points, td.coupons { white-space: nowrap; } /* Nie łamiemy liczb ani nicków */
 }
 }
+  .info-box{
+  max-width:860px;
+  margin:10px auto 14px;
+  padding:10px 14px;
+  background:linear-gradient(90deg,#111,#1a1a1a);
+  border:1px solid rgba(255,215,0,0.35);
+  border-radius:12px;
+  box-shadow:0 0 14px rgba(255,215,0,0.12);
+  color:#fff;
+  font-size:.95rem;
+  text-align:left;
+}
+
+/* czerwony znacznik LED */
+.info-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  margin-right:8px;
+  border-radius:50%;
+  background:#ff3b3b;
+  box-shadow:0 0 6px rgba(255,59,59,0.6);
+  animation:pulseDot 2.4s infinite;
+  vertical-align:middle;
+}
+
+@keyframes pulseDot{
+  0%{box-shadow:0 0 4px rgba(255,59,59,.4)}
+  50%{box-shadow:0 0 8px rgba(255,59,59,.7)}
+  100%{box-shadow:0 0 4px rgba(255,59,59,.4)}
+}
+
+/* x2 na zielono */
+.info-box span{
+  color:#00FF88;
+  font-weight:700;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+  .info-box{
+    font-size:.9rem;
+    padding:8px 10px;
+  }
+}
   </style>
 </head>
 <body>
