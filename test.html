@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🏆 Ranking Mistrzostw Discorda 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#FFD700;--green:#00FF88;--red:#FF4444;--gray:#999;}
+body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
+nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
+nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
+nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
+h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
+.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:left}
+td.nick{color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;}
+td.points{color:var(--green);font-weight:700;text-align:right}
+td.coupons{color:#ccc;text-align:center}
+.stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
+.stat-box{display:inline-block;margin:6px 18px}
+#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
+#search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
+@media(max-width:600px){.container{overflow-x:auto}table{width:auto;min-width:100%}th,td{padding:8px;font-size:0.95rem}}
+.arrow{font-size:0.85rem;}
+.arrow.up{color:var(--green);}
+.arrow.down{color:var(--red);}
+.arrow.same{color:var(--gray);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html">🏆 Ranking</a>
+  <a href="kalkulator.html">📊 Kalkulator</a>
+  <a href="kupony.html">🧾 Lista Kuponów</a>
+  <a href="zasady.html">📖 Zasady</a>
+</nav>
+<h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
+<input id="search" placeholder="🔍 Szukaj nicku..." />
+<div class="container">
+  <table id="ranking">
+    <thead><tr><th>Miejsce</th><th>Nick</th><th style="text-align:center;">Kupony</th><th style="text-align:right;">Punkty</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="stats">
+    <div class="stat-box">👥 Typerzy: <b id="count">0</b></div>
+    <div class="stat-box">💰 Suma punktów: <b id="sum">0</b></div>
+    <div class="stat-box">📊 Średnia: <b id="avg">0</b></div>
+  </div>
+</div>
+
+<script>
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
+
+let playersData={}, list=[], positionsToday={}, positionsYesterday={};
+
+function parseCSV(t){
+  return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')));
+}
+
+async function loadRanking(){
+  const res = await fetch(CSV_URL);
+  const txt = await res.text();
+  const rows = parseCSV(txt);
+  const head = rows[0].map(x=>x.toLowerCase());
+  const n = head.findIndex(h=>h.includes("nick")),
+        p = head.findIndex(h=>h.includes("punk")),
+        d = head.findIndex(h=>h.includes("data"));
+  const datesSet = new Set();
+  const data = {};
+
+  rows.slice(1).forEach(r=>{
+    const nick=(r[n]||"").trim();
+    const pts=parseFloat((r[p]||"0").replace(",","."))||0;
+    const date=(r[d]||"").trim();
+    if(!nick||!date)return;
+    datesSet.add(date);
+    if(!data[nick]) data[nick]={pointsByDate:{},kupony:0};
+    data[nick].pointsByDate[date]=(data[nick].pointsByDate[date]||0)+pts;
+    data[nick].kupony++;
+  });
+
+  const dates = Array.from(datesSet).sort((a,b)=>new Date(a)-new Date(b));
+  const lastDate = dates[dates.length-1];
+  const prevDate = dates[dates.length-2]||lastDate;
+
+  // sumowanie punktów dla pozycji
+  for(const [nick,v] of Object.entries(data)){
+    const today=v.pointsByDate[lastDate]||0;
+    const yesterday=v.pointsByDate[prevDate]||0;
+    v.totalToday=today;
+    v.totalYesterday=yesterday;
+  }
+
+  playersData = data;
+  list = Object.entries(data).map(([nick,v])=>({nick,...v}));
+
+  // ustalenie pozycji wczoraj
+  const sortedYesterday=[...list].sort((a,b)=>b.totalYesterday-a.totalYesterday);
+  sortedYesterday.forEach((p,i)=>positionsYesterday[p.nick]=i+1);
+
+  renderTable();
+  document.getElementById("count").textContent=list.length;
+  const sum = list.reduce((a,b)=>a.totalToday+a,0);
+  document.getElementById("sum").textContent=list.reduce((a,b)=>a.totalToday+a,0).toFixed(0);
+  document.getElementById("avg").textContent=(list.reduce((a,b)=>a.totalToday+a,0)/list.length).toFixed(1);
+}
+
+function getArrow(nick){
+  const todayPos = positionsToday[nick];
+  const yesterdayPos = positionsYesterday[nick]||todayPos;
+  if(todayPos < yesterdayPos) return '<span class="arrow up">🔺</span>';
+  if(todayPos > yesterdayPos) return '<span class="arrow down">🔻</span>';
+  return '<span class="arrow same">⬜</span>';
+}
+
+function renderTable(){
+  const tb=document.querySelector("#ranking tbody"); tb.innerHTML="";
+  const sorted=[...list].sort((a,b)=>b.totalToday-a.totalToday);
+  sorted.forEach((p,i)=>{
+    positionsToday[p.nick]=i+1;
+  });
+
+  sorted.forEach((p,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td class="nick">${getArrow(p.nick)} ${p.nick}</td>
+      <td class="coupons">${p.kupony}</td>
+      <td class="points">${Math.round(p.totalToday)}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
+    const nick=tr.querySelector(".nick")?.textContent.toLowerCase()||"";
+    tr.style.display=nick.includes(q)?"":"none";
+  });
+});
+
+window.addEventListener("load",loadRanking);
+</script>
+</body>
+</html>
