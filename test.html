@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -7,48 +8,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
-body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center}
+:root{--gold:#FFD700;--green:#00FF88;--red:#FF4444}
+body{margin:0;font-family:'Poppins',sans-serif;background:#111;color:var(--gold);text-align:center}
 
-/* STRZAŁKI */
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+td.nick{color:#fff;font-weight:600;cursor:pointer}
+td.points{color:var(--green);font-weight:700;text-align:right}
+td.coupons{text-align:center;color:#ccc}
+
 .arrow-up{color:#00FF88;margin-left:6px}
 .arrow-down{color:#FF4444;margin-left:6px}
 .arrow-same{color:#888;margin-left:6px}
-
-/* reszta stylów BEZ ZMIAN */
-td.nick{color:#fff;font-weight:600;cursor:pointer}
-td.points{color:var(--green);font-weight:700;text-align:right}
-td.coupons{color:#ccc;text-align:center}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left}
 </style>
 </head>
 
 <body>
 <h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
 
-<div class="container" id="ranking-container">
 <table id="ranking">
 <thead>
 <tr><th>Miejsce</th><th>Nick</th><th>Kupony</th><th>Punkty</th></tr>
 </thead>
 <tbody></tbody>
 </table>
-</div>
 
 <script>
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
+
 let playersData={},list=[];
 
 function parseCSV(t){
-  return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))
+  return t.trim().split(/\r?\n/).map(l =>
+    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,''))
+  );
 }
 
 async function loadRanking(){
   const res=await fetch(CSV_URL);
   const txt=await res.text();
   const rows=parseCSV(txt);
-  const head=rows[0].map(x=>x.toLowerCase());
+  const head=rows[0].map(h=>h.toLowerCase());
+
   const n=head.findIndex(h=>h.includes("nick"));
   const p=head.findIndex(h=>h.includes("punk"));
   const d=head.findIndex(h=>h.includes("data"));
@@ -59,7 +60,7 @@ async function loadRanking(){
     const nick=(r[n]||"").trim();
     const pts=parseFloat((r[p]||"0").replace(",","."))||0;
     const date=(r[d]||"").trim();
-    if(!nick)return;
+    if(!nick) return;
 
     if(!data[nick]) data[nick]={punkty:0,kupony:0,daily:{}};
 
@@ -75,6 +76,7 @@ async function loadRanking(){
   renderTable();
 }
 
+/* 🔽 STRZAŁKI – DWIE NAJNOWSZE DATY (wczoraj vs przedwczoraj) */
 function getArrow(nick){
   const dates=[...new Set(
     Object.values(playersData).flatMap(p=>Object.keys(p.daily))
@@ -82,9 +84,10 @@ function getArrow(nick){
 
   if(dates.length<2) return "";
 
-  const [today,yesterday]=dates;
+  const today=dates[0];       // wczoraj (najnowsza data w CSV)
+  const yesterday=dates[1];  // przedwczoraj
 
-  const rank=(date)=>
+  const rank=date =>
     Object.entries(playersData)
       .map(([n,p])=>({nick:n,pts:p.daily[date]||0}))
       .sort((a,b)=>b.pts-a.pts)
@@ -105,6 +108,7 @@ function renderTable(){
   const tb=document.querySelector("#ranking tbody");
   tb.innerHTML="";
   list.sort((a,b)=>b.punkty-a.punkty);
+
   list.forEach((p,i)=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`
