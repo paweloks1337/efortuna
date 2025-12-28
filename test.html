@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🏆 Ranking Mistrzostw Discorda 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
+body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center}
+
+/* STRZAŁKI */
+.arrow-up{color:#00FF88;margin-left:6px}
+.arrow-down{color:#FF4444;margin-left:6px}
+.arrow-same{color:#888;margin-left:6px}
+
+/* reszta stylów BEZ ZMIAN */
+td.nick{color:#fff;font-weight:600;cursor:pointer}
+td.points{color:var(--green);font-weight:700;text-align:right}
+td.coupons{color:#ccc;text-align:center}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left}
+</style>
+</head>
+
+<body>
+<h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
+
+<div class="container" id="ranking-container">
+<table id="ranking">
+<thead>
+<tr><th>Miejsce</th><th>Nick</th><th>Kupony</th><th>Punkty</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<script>
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
+let playersData={},list=[];
+
+function parseCSV(t){
+  return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))
+}
+
+async function loadRanking(){
+  const res=await fetch(CSV_URL);
+  const txt=await res.text();
+  const rows=parseCSV(txt);
+  const head=rows[0].map(x=>x.toLowerCase());
+  const n=head.findIndex(h=>h.includes("nick"));
+  const p=head.findIndex(h=>h.includes("punk"));
+  const d=head.findIndex(h=>h.includes("data"));
+
+  const data={};
+
+  rows.slice(1).forEach(r=>{
+    const nick=(r[n]||"").trim();
+    const pts=parseFloat((r[p]||"0").replace(",","."))||0;
+    const date=(r[d]||"").trim();
+    if(!nick)return;
+
+    if(!data[nick]) data[nick]={punkty:0,kupony:0,daily:{}};
+
+    data[nick].punkty+=pts;
+    data[nick].kupony++;
+
+    if(!data[nick].daily[date]) data[nick].daily[date]=0;
+    data[nick].daily[date]+=pts;
+  });
+
+  playersData=data;
+  list=Object.entries(data).map(([nick,v])=>({nick,...v}));
+  renderTable();
+}
+
+function getArrow(nick){
+  const dates=[...new Set(
+    Object.values(playersData).flatMap(p=>Object.keys(p.daily))
+  )].sort((a,b)=>new Date(b)-new Date(a));
+
+  if(dates.length<2) return "";
+
+  const [today,yesterday]=dates;
+
+  const rank=(date)=>
+    Object.entries(playersData)
+      .map(([n,p])=>({nick:n,pts:p.daily[date]||0}))
+      .sort((a,b)=>b.pts-a.pts)
+      .map(x=>x.nick);
+
+  const rToday=rank(today);
+  const rYesterday=rank(yesterday);
+
+  const t=rToday.indexOf(nick);
+  const y=rYesterday.indexOf(nick);
+
+  if(t<y) return '<span class="arrow-up">▲</span>';
+  if(t>y) return '<span class="arrow-down">▼</span>';
+  return '<span class="arrow-same">▬</span>';
+}
+
+function renderTable(){
+  const tb=document.querySelector("#ranking tbody");
+  tb.innerHTML="";
+  list.sort((a,b)=>b.punkty-a.punkty);
+  list.forEach((p,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td class="nick">${p.nick}${getArrow(p.nick)}</td>
+      <td class="coupons">${p.kupony}</td>
+      <td class="points">${Math.round(p.punkty)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+window.addEventListener("load",loadRanking);
+</script>
+</body>
+</html>
