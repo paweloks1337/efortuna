@@ -27,7 +27,34 @@ td.coupons{text-align:center;color:#ccc}
 .coupon{display:flex;justify-content:space-between;background:#111;padding:8px 12px;border-radius:8px;margin:6px 0}
 .coupon.best .coupon-points{color:var(--red)}
 .open-btn{background:var(--gold);border:none;border-radius:6px;padding:6px 10px;font-weight:600;cursor:pointer}
-.close-btn{margin-top:10px;padding:8px 18px;border:none;border-radius:8px;background:var(--gold);font-weight:700}
+
+  .close-btn{margin-top:10px;padding:8px 18px;border:none;border-radius:8px;background:var(--gold);font-weight:700}
+/* =======================
+   MOBILE FIX – tabela
+======================= */
+
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+table{
+  min-width:520px; /* KLUCZOWE */
+  border-collapse:collapse;
+}
+
+@media (max-width:600px){
+  th,td{
+    padding:8px 10px;
+    font-size:.9rem;
+    white-space:nowrap;
+  }
+
+  td.nick{min-width:140px;}
+  td.coupons{min-width:60px;}
+  td.points{min-width:80px;}
+}
 </style>
 </head>
 
