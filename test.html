@@ -189,87 +189,119 @@ tr { border-radius: 8px; overflow: hidden; display: table-row; }
 <div id="toast" class="toast"></div>
 
 <script>
-  const CSV_URLS = {
+const CSV_URLS = {
   styczen: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pubhtml",
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
-let playersData={},list=[];
+let playersData={}, list=[];
 
-function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
-async function loadRanking(){
-  const res=await fetch(CSV_URL);const txt=await res.text();
-  const rows=parseCSV(txt);const head=rows[0].map(x=>x.toLowerCase());
-  const n=head.findIndex(h=>h.includes("nick")),p=head.findIndex(h=>h.includes("punk")),l=head.findIndex(h=>h.includes("link")),d=head.findIndex(h=>h.includes("data"));
-  const data={};
-  rows.slice(1).forEach(r=>{
-    const nick=(r[n]||"").trim();const pts=parseFloat((r[p]||"0").replace(",","."))||0;
-    const link=(r[l]||"").trim();const date=(r[d]||"").trim();if(!nick)return;
-    if(!data[nick])data[nick]={punkty:0,kupony:0,links:[]};
-    data[nick].punkty+=pts;data[nick].kupony++;if(link)data[nick].links.push({url:link,points:pts,date:date});
+function parseCSV(t){
+  return t.trim().split(/\r?\n/).map(l => l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x => x.replace(/^"|"$/g,'')));
+}
+
+async function loadRankingForMonth(month){
+  const CSV_URL = CSV_URLS[month];
+  if(!CSV_URL) return;
+
+  document.getElementById("loader").classList.remove("hidden");
+  document.getElementById("ranking-container").style.display = "none";
+
+  const res = await fetch(CSV_URL);
+  const txt = await res.text();
+  const rows = parseCSV(txt);
+  const head = rows[0].map(x => x.toLowerCase());
+  const n = head.findIndex(h => h.includes("nick")),
+        p = head.findIndex(h => h.includes("punk")),
+        l = head.findIndex(h => h.includes("link")),
+        d = head.findIndex(h => h.includes("data"));
+
+  const data = {};
+  rows.slice(1).forEach(r => {
+    const nick = (r[n]||"").trim();
+    const pts = parseFloat((r[p]||"0").replace(",", "."))||0;
+    const link = (r[l]||"").trim();
+    const date = (r[d]||"").trim();
+    if(!nick) return;
+    if(!data[nick]) data[nick] = {punkty:0, kupony:0, links:[]};
+    data[nick].punkty += pts;
+    data[nick].kupony++;
+    if(link) data[nick].links.push({url: link, points: pts, date: date});
   });
-  playersData=data;list=Object.entries(data).map(([nick,v])=>({nick,...v}));
+
+  playersData = data;
+  list = Object.entries(data).map(([nick,v]) => ({nick, ...v}));
+
   renderTable("points");
-  document.getElementById("count").textContent=list.length;
-  const sum=list.reduce((a,b)=>a+b.punkty,0);
-  document.getElementById("sum").textContent=sum.toFixed(0);
-  document.getElementById("avg").textContent=(sum/list.length).toFixed(1);
-  document.getElementById("ranking-container").style.display="block";
+  document.getElementById("count").textContent = list.length;
+  const sum = list.reduce((a,b) => a + b.punkty,0);
+  document.getElementById("sum").textContent = sum.toFixed(0);
+  document.getElementById("avg").textContent = (sum/list.length).toFixed(1);
+
+  document.getElementById("ranking-container").style.display = "block";
   setTimeout(()=>document.querySelector(".container").classList.add("show"),60);
   document.getElementById("loader").classList.add("hidden");
 }
 
 function renderTable(sortBy){
-  const tb=document.querySelector("#ranking tbody");tb.innerHTML="";
-  const sorted=[...list];
-  sorted.sort((a,b)=>sortBy==="coupons"?b.kupony-a.kupony:b.punkty-a.punkty);
+  const tb = document.querySelector("#ranking tbody"); tb.innerHTML = "";
+  const sorted = [...list];
+  sorted.sort((a,b) => sortBy==="coupons" ? b.kupony-a.kupony : b.punkty-a.punkty);
   sorted.forEach((p,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td class="nick">${p.nick}</td><td class="coupons">${p.kupony}</td><td class="points">${Math.round(p.punkty)}</td>`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${i+1}</td><td class="nick">${p.nick}</td><td class="coupons">${p.kupony}</td><td class="points">${Math.round(p.punkty)}</td>`;
     tr.querySelector(".nick").addEventListener("click",()=>openPopup(p.nick));
     tb.appendChild(tr);
   });
 }
 
 function renderLinks(nick,sortType){
-  const p=playersData[nick];if(!p)return;
-  let sorted=[...p.links];
-  if(sortType==="points"){sorted.sort((a,b)=>b.points-a.points);}
-  else{sorted.sort((a,b)=>(new Date(b.date)-new Date(a.date))||b.points-a.points);}
-  const maxPts=Math.max(...sorted.map(l=>l.points));
-  const div=document.getElementById("popup-links");
-  div.innerHTML=sorted.length
-  ? sorted.map((l,i)=>`
-    <div class="coupon ${l.points===maxPts?'best':''}" style="animation-delay:${i*0.08}s">
-      <div>
-        <div class="coupon-date">📅 ${l.date||"—"}</div>
-        <div class="coupon-points">🏆 ${l.points.toFixed(0)} pkt</div>
-      </div>
-      <button class="open-btn" onclick="window.open('${l.url}','_blank')">Otwórz</button>
-    </div>`).join("")
-  : "<p>Brak kuponów.</p>";
+  const p = playersData[nick]; if(!p) return;
+  let sorted = [...p.links];
+  if(sortType==="points") sorted.sort((a,b)=>b.points-a.points);
+  else sorted.sort((a,b)=>(new Date(b.date)-new Date(a.date))||b.points-a.points);
+  const maxPts = Math.max(...sorted.map(l=>l.points));
+  const div = document.getElementById("popup-links");
+  div.innerHTML = sorted.length
+    ? sorted.map((l,i)=>`
+      <div class="coupon ${l.points===maxPts?'best':''}" style="animation-delay:${i*0.08}s">
+        <div>
+          <div class="coupon-date">📅 ${l.date||"—"}</div>
+          <div class="coupon-points">🏆 ${l.points.toFixed(0)} pkt</div>
+        </div>
+        <button class="open-btn" onclick="window.open('${l.url}','_blank')">Otwórz</button>
+      </div>`).join("")
+    : "<p>Brak kuponów.</p>";
 }
 
 function openPopup(nick){
-  const popup=document.getElementById("popup");
-  document.getElementById("popup-nick").textContent=nick;
-  const sel=document.getElementById("sort-select");
+  const popup = document.getElementById("popup");
+  document.getElementById("popup-nick").textContent = nick;
+  const sel = document.getElementById("sort-select");
   renderLinks(nick,sel.value);
-  sel.onchange=()=>renderLinks(nick,sel.value);
-  document.getElementById("popup-total").textContent=`Łącznie: ${playersData[nick].punkty.toFixed(0)} pkt`;
+  sel.onchange = ()=>renderLinks(nick,sel.value);
+  document.getElementById("popup-total").textContent = `Łącznie: ${playersData[nick].punkty.toFixed(0)} pkt`;
   popup.classList.add("active");
 }
 
 function closePopup(){document.getElementById("popup").classList.remove("active");}
 
-document.getElementById("search").addEventListener("input",e=>{
-  const q=e.target.value.toLowerCase();
+document.getElementById("search").addEventListener("input", e=>{
+  const q = e.target.value.toLowerCase();
   document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
-    const nick=tr.querySelector(".nick")?.textContent.toLowerCase()||"";
-    tr.style.display=nick.includes(q)?"":"none";
+    const nick = tr.querySelector(".nick")?.textContent.toLowerCase()||"";
+    tr.style.display = nick.includes(q) ? "" : "none";
   });
 });
-window.addEventListener("load",loadRanking);
+
+window.addEventListener("load", ()=>{
+  const monthSelect = document.getElementById("month-select");
+  loadRankingForMonth(monthSelect.value);
+
+  monthSelect.addEventListener("change", ()=>{
+    loadRankingForMonth(monthSelect.value);
+  });
+});
 </script>
 </body>
 </html>
