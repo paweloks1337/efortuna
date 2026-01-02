@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🧾 Lista Kuponów - Mistrzostwa Discorda 2025</title>
+<title>🧾 Lista Kuponów - Mistrzostwa Discorda </title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
@@ -51,14 +51,14 @@ td.link button:hover{box-shadow:0 0 10px var(--gold)}
   <a href="zasady.html">📖 Zasady</a>
 </nav>
 
-<h1>🧾 Lista Kuponów - Mistrzostwa Discorda 2025</h1>
+<h1>🧾 Lista Kuponów - Mistrzostwa Discorda </h1>
 <input id="search" placeholder="🔍 Szukaj nicku..." />
 
 <div class="sort-box">
-  <label>📅 Sortuj po dacie: </label>
-  <select id="sort-order">
-    <option value="newest">🔝 Najnowsze</option>
-    <option value="oldest">🔙 Najstarsze</option>
+  <label>📅 Wybierz miesiąc:</label>
+  <select id="month-select">
+    <option value="styczen" selected>Styczeń</option>
+    <option value="grudzien">Grudzień</option>
   </select>
 </div>
 
@@ -66,21 +66,29 @@ td.link button:hover{box-shadow:0 0 10px var(--gold)}
 <div id="loader"></div>
 
 <script>
-// URL do CSV (Twój plik Google Sheets)
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
+const CSV_URLS = {
+  styczen: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
+  grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
+};
+
+const MONTH_NAMES = ["styczeń","luty","marzec","kwiecień","maj","czerwiec","lipiec","sierpień","wrzesień","październik","listopad","grudzień"];
 
 function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
 
-async function loadCoupons(){
+async function loadCoupons(month="styczen"){
   document.getElementById("loader").classList.remove("hidden");
+  const CSV_URL = CSV_URLS[month];
   const res = await fetch(CSV_URL);
   const txt = await res.text();
   const rows = parseCSV(txt);
   const head = rows[0].map(x=>x.toLowerCase());
-  const n=head.findIndex(h=>h.includes("nick")),p=head.findIndex(h=>h.includes("punk")),d=head.findIndex(h=>h.includes("data")),l=head.findIndex(h=>h.includes("link"));
+  const n=head.findIndex(h=>h.includes("nick")),
+        p=head.findIndex(h=>h.includes("punk")),
+        d=head.findIndex(h=>h.includes("data")),
+        l=head.findIndex(h=>h.includes("link"));
   
-  const dataByDate={};
-  
+  // Grupowanie kuponów według miesiąca z daty
+  const dataByMonth={};
   rows.slice(1).forEach(r=>{
     const nick=(r[n]||"").trim();
     if(!nick) return;
@@ -88,56 +96,49 @@ async function loadCoupons(){
     const points=parseFloat((r[p]||0).replace(",","."))||0;
     const link=(r[l]||"#").trim();
     
-    if(!dataByDate[date]) dataByDate[date]=[];
-    dataByDate[date].push({nick,points,link});
+    let monthName = "Nieznany";
+    if(date!=="—"){
+      const parts = date.split(".");
+      const m = parseInt(parts[1],10)-1;
+      monthName = MONTH_NAMES[m] || "Nieznany";
+    }
+
+    if(!dataByMonth[monthName]) dataByMonth[monthName]=[];
+    dataByMonth[monthName].push({nick,points,link,date});
   });
 
-  const sortSelect = document.getElementById("sort-order");
-
-  function renderCoupons(sortOrder="newest") {
+  function renderCoupons(){
     const container=document.getElementById("coupons-container");
     container.innerHTML="";
-    let allCoupons=[];
-    Object.keys(dataByDate).forEach(date=>{
-      dataByDate[date].forEach(c=>allCoupons.push({date,...c}));
-    });
 
-    const parseDate = str => {
-      const [day, month, year] = str.split(".");
-      return new Date(`${year}-${month}-${day}`);
-    };
-    allCoupons.sort((a,b)=>{
-      const da=parseDate(a.date), db=parseDate(b.date);
-      return sortOrder==="newest"?db-da:da-db;
-    });
+    let months = Object.keys(dataByMonth);
+    months.sort((a,b)=> MONTH_NAMES.indexOf(a)-MONTH_NAMES.indexOf(b) );
 
-    let currentDate="";
-    allCoupons.forEach(c=>{
-      if(c.date!==currentDate){
-        currentDate=c.date;
-        const div=document.createElement("div");
-        div.className="container";
-        div.innerHTML=`<h2>📅 ${currentDate}</h2>
-          <table>
-            <thead><tr><th>Nick</th><th>Punkty</th><th>Otwórz</th></tr></thead>
-            <tbody></tbody>
-          </table>`;
-        container.appendChild(div);
-      }
-      const tbody=container.lastElementChild.querySelector("tbody");
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td class="nick">${c.nick}</td>
-        <td class="points">${c.points.toFixed(0)}</td>
-        <td class="link"><button onclick="window.open('${c.link}','_blank')">Otwórz</button></td>
-      `;
-      tbody.appendChild(tr);
+    months.forEach(m=>{
+      const div=document.createElement("div");
+      div.className="container";
+      div.innerHTML=`<h2>📅 ${m}</h2>
+        <table>
+          <thead><tr><th>Nick</th><th>Punkty</th><th>Otwórz</th></tr></thead>
+          <tbody></tbody>
+        </table>`;
+      container.appendChild(div);
+
+      const tbody = div.querySelector("tbody");
+      dataByMonth[m].forEach(c=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML=`
+          <td class="nick">${c.nick}</td>
+          <td class="points">${c.points.toFixed(0)}</td>
+          <td class="link"><button onclick="window.open('${c.link}','_blank')">Otwórz</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
     });
     document.getElementById("loader").classList.add("hidden");
   }
 
-  sortSelect.addEventListener("change", ()=>renderCoupons(sortSelect.value));
-  renderCoupons("newest");
+  renderCoupons();
 
   // wyszukiwanie po nicku
   document.getElementById("search").addEventListener("input", e=>{
@@ -148,7 +149,13 @@ async function loadCoupons(){
   });
 }
 
-window.addEventListener("load", loadCoupons);
+// Obsługa zmiany miesiąca
+document.getElementById("month-select").addEventListener("change", e=>{
+  loadCoupons(e.target.value);
+});
+
+// Załaduj domyślnie styczeń
+window.addEventListener("load", ()=>loadCoupons("styczen"));
 </script>
 </body>
 </html>
