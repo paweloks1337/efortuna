@@ -1,126 +1,160 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>🏆 Ranking Mistrzostw Discorda 2025</title>
+<title>🏆 Ranking Discord</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-:root{--gold:#FFD700;--green:#00FF88;--red:#FF4444}
-body{margin:0;font-family:'Poppins',sans-serif;background:#111;color:var(--gold);text-align:center}
-
-table{width:100%;border-collapse:collapse;margin-top:20px}
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
+body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center}
+nav{background:#000;padding:14px 0}
+nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600}
+h1{margin:18px 0}
+select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:8px 12px;font-weight:600}
+.container{width:90%;max-width:860px;margin:24px auto;background:#1a1a1a;padding:18px;border-radius:14px;display:none}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.05)}
 td.nick{color:#fff;font-weight:600;cursor:pointer}
 td.points{color:var(--green);font-weight:700;text-align:right}
 td.coupons{text-align:center;color:#ccc}
-
-.arrow-up{color:#00FF88;margin-left:6px}
-.arrow-down{color:#FF4444;margin-left:6px}
-.arrow-same{color:#888;margin-left:6px}
+.stats{margin-top:14px;color:#ccc}
+.popup{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden}
+.popup.active{opacity:1;visibility:visible}
+.popup-content{background:#1a1a1a;border:2px solid var(--gold);border-radius:12px;padding:20px;width:90%;max-width:450px}
+.coupon{display:flex;justify-content:space-between;background:#111;padding:8px 12px;border-radius:8px;margin:6px 0}
+.coupon.best .coupon-points{color:var(--red)}
+.open-btn{background:var(--gold);border:none;border-radius:6px;padding:6px 10px;font-weight:600;cursor:pointer}
+.close-btn{margin-top:10px;padding:8px 18px;border:none;border-radius:8px;background:var(--gold);font-weight:700}
 </style>
 </head>
 
 <body>
-<h1>🏆 Ranking Mistrzostw Discorda 2025</h1>
 
-<table id="ranking">
-<thead>
-<tr><th>Miejsce</th><th>Nick</th><th>Kupony</th><th>Punkty</th></tr>
-</thead>
-<tbody></tbody>
-</table>
+<nav>
+  <a href="index.html">🏆 Ranking</a>
+  <a href="kalkulator.html">📊 Kalkulator</a>
+</nav>
+
+<h1 id="title">🏆 Ranking – Styczeń</h1>
+
+<div style="margin-bottom:14px">
+  <label>📂 Wybierz miesiąc: </label>
+  <select id="monthSelect"></select>
+</div>
+
+<div class="container" id="ranking-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Miejsce</th>
+        <th>Nick</th>
+        <th style="text-align:center">Kupony</th>
+        <th style="text-align:right">Punkty</th>
+      </tr>
+    </thead>
+    <tbody id="ranking"></tbody>
+  </table>
+
+  <div class="stats">
+    👥 Typerzy: <b id="count">0</b> |
+    💰 Suma punktów: <b id="sum">0</b>
+  </div>
+</div>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popup-nick"></h3>
+    <div id="popup-links"></div>
+    <button class="close-btn" onclick="closePopup()">Zamknij</button>
+  </div>
+</div>
 
 <script>
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
+/* =====================================================
+   🔴 TU PODMIENIASZ LINKI DO EXCELA
+===================================================== */
+const MONTHS = {
+  "styczeń": {
+    label: "Styczeń 2025",
+    title: "🏆 Ranking Discord – Styczeń",
+    csv: "LINK_DO_STYCZNIA.csv"
+  },
+  "grudzień": {
+    label: "Grudzień 2024 (Archiwum)",
+    title: "🏆 Wyniki Mistrzostw – Grudzień",
+    csv: "LINK_DO_GRUDNIA.csv"
+  }
+};
+/* ===================================================== */
 
-let playersData={},list=[];
+let playersData={}, list=[], currentCSV="";
+
+const monthSelect=document.getElementById("monthSelect");
+Object.entries(MONTHS).forEach(([k,v])=>{
+  const o=document.createElement("option");
+  o.value=k;o.textContent=v.label;
+  monthSelect.appendChild(o);
+});
+
+monthSelect.value="styczeń";
+loadMonth("styczeń");
+
+monthSelect.addEventListener("change",e=>loadMonth(e.target.value));
+
+function loadMonth(key){
+  document.getElementById("title").textContent=MONTHS[key].title;
+  currentCSV=MONTHS[key].csv;
+  fetchCSV();
+}
+
+async function fetchCSV(){
+  const res=await fetch(currentCSV);
+  const txt=await res.text();
+  parseCSV(txt);
+}
 
 function parseCSV(t){
-  return t.trim().split(/\r?\n/).map(l =>
-    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,''))
-  );
-}
-
-async function loadRanking(){
-  const res=await fetch(CSV_URL);
-  const txt=await res.text();
-  const rows=parseCSV(txt);
-  const head=rows[0].map(h=>h.toLowerCase());
-
-  const n=head.findIndex(h=>h.includes("nick"));
-  const p=head.findIndex(h=>h.includes("punk"));
-  const d=head.findIndex(h=>h.includes("data"));
-
+  const rows=t.trim().split(/\r?\n/).map(r=>r.split(","));
   const data={};
-
   rows.slice(1).forEach(r=>{
-    const nick=(r[n]||"").trim();
-    const pts=parseFloat((r[p]||"0").replace(",","."))||0;
-    const date=(r[d]||"").trim();
-    if(!nick) return;
-
-    if(!data[nick]) data[nick]={punkty:0,kupony:0,daily:{}};
-
+    const nick=r[0], pts=parseFloat(r[1])||0, link=r[2];
+    if(!data[nick])data[nick]={punkty:0,kupony:0,links:[]};
     data[nick].punkty+=pts;
     data[nick].kupony++;
-
-    if(!data[nick].daily[date]) data[nick].daily[date]=0;
-    data[nick].daily[date]+=pts;
+    if(link)data[nick].links.push({url:link,points:pts});
   });
-
   playersData=data;
   list=Object.entries(data).map(([nick,v])=>({nick,...v}));
-  renderTable();
+  render();
 }
 
-/* 🔽 STRZAŁKI – DWIE NAJNOWSZE DATY (wczoraj vs przedwczoraj) */
-function getArrow(nick){
-  const dates=[...new Set(
-    Object.values(playersData).flatMap(p=>Object.keys(p.daily))
-  )].sort((a,b)=>new Date(b)-new Date(a));
-
-  if(dates.length<2) return "";
-
-  const today=dates[0];       // wczoraj (najnowsza data w CSV)
-  const yesterday=dates[1];  // przedwczoraj
-
-  const rank=date =>
-    Object.entries(playersData)
-      .map(([n,p])=>({nick:n,pts:p.daily[date]||0}))
-      .sort((a,b)=>b.pts-a.pts)
-      .map(x=>x.nick);
-
-  const rToday=rank(today);
-  const rYesterday=rank(yesterday);
-
-  const t=rToday.indexOf(nick);
-  const y=rYesterday.indexOf(nick);
-
-  if(t<y) return '<span class="arrow-up">▲</span>';
-  if(t>y) return '<span class="arrow-down">▼</span>';
-  return '<span class="arrow-same">▬</span>';
-}
-
-function renderTable(){
-  const tb=document.querySelector("#ranking tbody");
+function render(){
+  const tb=document.getElementById("ranking");
   tb.innerHTML="";
   list.sort((a,b)=>b.punkty-a.punkty);
-
   list.forEach((p,i)=>{
     const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${i+1}</td>
-      <td class="nick">${p.nick}${getArrow(p.nick)}</td>
-      <td class="coupons">${p.kupony}</td>
-      <td class="points">${Math.round(p.punkty)}</td>`;
+    tr.innerHTML=`<td>${i+1}</td><td class="nick">${p.nick}</td><td class="coupons">${p.kupony}</td><td class="points">${Math.round(p.punkty)}</td>`;
+    tr.querySelector(".nick").onclick=()=>openPopup(p.nick);
     tb.appendChild(tr);
   });
+  document.getElementById("count").textContent=list.length;
+  document.getElementById("sum").textContent=list.reduce((a,b)=>a+b.punkty,0).toFixed(0);
+  document.getElementById("ranking-container").style.display="block";
 }
 
-window.addEventListener("load",loadRanking);
+function openPopup(nick){
+  const p=playersData[nick];
+  document.getElementById("popup-nick").textContent=nick;
+  document.getElementById("popup-links").innerHTML=
+    p.links.map(l=>`<div class="coupon"><span class="coupon-points">${l.points} pkt</span><button class="open-btn" onclick="window.open('${l.url}')">Otwórz</button></div>`).join("");
+  document.getElementById("popup").classList.add("active");
+}
+function closePopup(){document.getElementById("popup").classList.remove("active");}
 </script>
+
 </body>
 </html>
