@@ -189,7 +189,11 @@ tr { border-radius: 8px; overflow: hidden; display: table-row; }
 <div id="toast" class="toast"></div>
 
 <script>
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv";
+  const CSV_URLS = {
+  styczen: "LINK_DO_EXCELA_STYCZEN",
+  grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
+};
+
 let playersData={},list=[];
 
 function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
