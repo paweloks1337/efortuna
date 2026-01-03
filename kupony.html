@@ -3,56 +3,44 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🧾 Lista Kuponów - Mistrzostwa Discorda </title>
+<title>🧾 Lista Kuponów - Mistrzostwa Discorda</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
-body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
-nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
-nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
-nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
-h1,h2{margin:18px 0;text-shadow:0 0 12px var(--gold)}
-.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);text-align:left}
-table{width:100%;border-collapse:separate;border-spacing:0 6px;margin-top:12px}
-th,td{padding:12px 18px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05)}
+:root{--gold:#FFD700;--dark:#111;--green:#00FF88}
+body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center}
+nav{background:#111;padding:14px 0}
+nav a{color:var(--gold);text-decoration:none;margin:0 16px;font-weight:600}
+h1{margin:18px 0}
+
+.container{width:90%;max-width:860px;margin:24px auto;background:#1a1a1a;padding:16px;border-radius:14px;text-align:left}
+table{width:100%;border-collapse:separate;border-spacing:0 6px}
+th,td{padding:10px 14px}
 th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
-td.nick{min-width:130px;color:#fff;font-weight:600}
-td.points{color:var(--green);font-weight:700;text-align:center}
-td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius:6px;color:#000;font-weight:600;cursor:pointer;transition:.2s}
-td.link button:hover{box-shadow:0 0 10px var(--gold)}
-#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
-#search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
-.sort-box{width:90%;max-width:860px;margin:12px auto;text-align:center}
-.sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer}
-/* Loader */
-#loader {
-  position: fixed;
-  left: 50%;
-  top: 48%;
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  border: 8px solid rgba(255,215,0,0.18);
-  border-top: 8px solid var(--gold);
-  transform: translate(-50%, -50%);
-  animation: spin 1s linear infinite;
-  z-index: 9999;
-}
-@keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-#loader.hidden { display: none; }
-@media (max-width:600px){.container{overflow-x:auto;padding:0 8px}table{width:auto;min-width:100%}th,td{padding:10px 14px;font-size:0.95rem}td.nick,td.points,td.link{white-space:nowrap}}
+td.nick{color:#fff;font-weight:600}
+td.points{color:var(--green);text-align:center;font-weight:700}
+td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius:6px;font-weight:600;cursor:pointer}
+
+.sort-box{margin:12px auto}
+.sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);padding:6px 10px;border-radius:8px}
+
+#loader{position:fixed;left:50%;top:50%;width:70px;height:70px;border-radius:50%;border:8px solid rgba(255,215,0,.2);border-top:8px solid var(--gold);transform:translate(-50%,-50%);animation:spin 1s linear infinite}
+#loader.hidden{display:none}
+@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
 </style>
 </head>
+
 <body>
+<div id="loader"></div>
+
 <nav>
-  <a href="index.html">🏆 Ranking</a>
-  <a href="kalkulator.html">📊 Kalkulator</a>
-  <a href="kupony.html">🧾 Lista Kuponów</a>
-  <a href="zasady.html">📖 Zasady</a>
+  <a href="/">🏆 Ranking</a>
+  <a href="/kalkulator">📊 Kalkulator</a>
+  <a href="/kupony">🧾 Lista Kuponów</a>
+  <a href="/zasady">📖 Zasady</a>
 </nav>
 
-<h1>🧾 Lista Kuponów - Mistrzostwa Discorda </h1>
-<input id="search" placeholder="🔍 Szukaj nicku..." />
+<h1>🧾 Lista Kuponów</h1>
 
 <div class="sort-box">
   <label>📅 Wybierz miesiąc:</label>
@@ -63,7 +51,6 @@ td.link button:hover{box-shadow:0 0 10px var(--gold)}
 </div>
 
 <div id="coupons-container"></div>
-<div id="loader"></div>
 
 <script>
 const CSV_URLS = {
@@ -71,90 +58,75 @@ const CSV_URLS = {
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
-const MONTH_NAMES = ["styczeń","luty","marzec","kwiecień","maj","czerwiec","lipiec","sierpień","wrzesień","październik","listopad","grudzień"];
-
-function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))}
-
-async function loadCoupons(month="styczen"){
-  document.getElementById("loader").classList.remove("hidden");
-  const CSV_URL = CSV_URLS[month];
-  const res = await fetch(CSV_URL);
-  const txt = await res.text();
-  const rows = parseCSV(txt);
-  const head = rows[0].map(x=>x.toLowerCase());
-  const n=head.findIndex(h=>h.includes("nick")),
-        p=head.findIndex(h=>h.includes("punk")),
-        d=head.findIndex(h=>h.includes("data")),
-        l=head.findIndex(h=>h.includes("link"));
-  
-  // Grupowanie kuponów według miesiąca z daty
-  const dataByMonth={};
-  rows.slice(1).forEach(r=>{
-    const nick=(r[n]||"").trim();
-    if(!nick) return;
-    const date=(r[d]||"—").trim();
-    const points=parseFloat((r[p]||0).replace(",","."))||0;
-    const link=(r[l]||"#").trim();
-    
-    let monthName = "Nieznany";
-    if(date!=="—"){
-      const parts = date.split(".");
-      const m = parseInt(parts[1],10)-1;
-      monthName = MONTH_NAMES[m] || "Nieznany";
-    }
-
-    if(!dataByMonth[monthName]) dataByMonth[monthName]=[];
-    dataByMonth[monthName].push({nick,points,link,date});
-  });
-
-  function renderCoupons(){
-    const container=document.getElementById("coupons-container");
-    container.innerHTML="";
-
-    let months = Object.keys(dataByMonth);
-    months.sort((a,b)=> MONTH_NAMES.indexOf(a)-MONTH_NAMES.indexOf(b) );
-
-    months.forEach(m=>{
-      const div=document.createElement("div");
-      div.className="container";
-      div.innerHTML=`<h2>📅 ${m}</h2>
-        <table>
-          <thead><tr><th>Nick</th><th>Punkty</th><th>Otwórz</th></tr></thead>
-          <tbody></tbody>
-        </table>`;
-      container.appendChild(div);
-
-      const tbody = div.querySelector("tbody");
-      dataByMonth[m].forEach(c=>{
-        const tr = document.createElement("tr");
-        tr.innerHTML=`
-          <td class="nick">${c.nick}</td>
-          <td class="points">${c.points.toFixed(0)}</td>
-          <td class="link"><button onclick="window.open('${c.link}','_blank')">Otwórz</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    });
-    document.getElementById("loader").classList.add("hidden");
-  }
-
-  renderCoupons();
-
-  // wyszukiwanie po nicku
-  document.getElementById("search").addEventListener("input", e=>{
-    const q=e.target.value.toLowerCase();
-    document.querySelectorAll("#coupons-container tbody tr").forEach(tr=>{
-      tr.style.display = tr.children[0].textContent.toLowerCase().includes(q)?"":"none";
-    });
-  });
+function parseCSV(t){
+  return t.trim().split(/\r?\n/).map(r =>
+    r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
+  );
 }
 
-// Obsługa zmiany miesiąca
+async function loadCoupons(month){
+  document.getElementById("loader").classList.remove("hidden");
+  const res = await fetch(CSV_URLS[month]);
+  const txt = await res.text();
+  const rows = parseCSV(txt);
+  const head = rows[0].map(h=>h.toLowerCase());
+
+  const iNick=head.findIndex(h=>h.includes("nick"));
+  const iPts=head.findIndex(h=>h.includes("punk"));
+  const iDate=head.findIndex(h=>h.includes("data"));
+  const iLink=head.findIndex(h=>h.includes("link"));
+
+  const byDate = {};
+
+  rows.slice(1).forEach(r=>{
+    const date=(r[iDate]||"—").trim();
+    if(!byDate[date]) byDate[date]=[];
+    byDate[date].push({
+      nick:(r[iNick]||"").trim(),
+      points:parseFloat((r[iPts]||0).replace(",","."))||0,
+      link:(r[iLink]||"#").trim()
+    });
+  });
+
+  const dates = Object.keys(byDate).sort((a,b)=>{
+    const [da,ma,ya]=a.split(".");
+    const [db,mb,yb]=b.split(".");
+    return new Date(`${yb}-${mb}-${db}`) - new Date(`${ya}-${ma}-${da}`);
+  });
+
+  const container=document.getElementById("coupons-container");
+  container.innerHTML="";
+
+  dates.forEach(d=>{
+    const box=document.createElement("div");
+    box.className="container";
+    box.innerHTML=`
+      <h2>📅 ${d}</h2>
+      <table>
+        <thead><tr><th>Nick</th><th>Punkty</th><th>Kupon</th></tr></thead>
+        <tbody></tbody>
+      </table>`;
+    const tbody=box.querySelector("tbody");
+
+    byDate[d].forEach(c=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td class="nick">${c.nick}</td>
+        <td class="points">${c.points.toFixed(0)}</td>
+        <td class="link"><button onclick="window.open('${c.link}','_blank')">Otwórz</button></td>`;
+      tbody.appendChild(tr);
+    });
+
+    container.appendChild(box);
+  });
+
+  document.getElementById("loader").classList.add("hidden");
+}
+
 document.getElementById("month-select").addEventListener("change", e=>{
   loadCoupons(e.target.value);
 });
 
-// Załaduj domyślnie styczeń
 window.addEventListener("load", ()=>loadCoupons("styczen"));
 </script>
 </body>
