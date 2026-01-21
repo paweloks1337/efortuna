@@ -16,6 +16,9 @@ app.use(session({
   saveUninitialized: false,
 }));
 
+app.get("/", (req,res)=>{
+  res.redirect("/test");
+});
 // --- DB ---
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, username TEXT, avatar TEXT)`);
