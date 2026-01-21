@@ -1,9 +1,10 @@
-// index.js
 import express from "express";
 import session from "express-session";
 import fetch from "node-fetch";
 import sqlite3 from "sqlite3";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+
+// Serwowanie statycznych plików (CSS, JS jeśli dodasz)
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // --- DATABASE ---
 db.serialize(() => {
@@ -45,7 +49,7 @@ db.serialize(() => {
 
 // --- ROUTES ---
 
-// Optional redirect root (usuń jeśli root zajęty)
+// Root
 app.get("/", (req,res)=>{
   res.send("Główna strona serwisu");
 });
@@ -61,7 +65,7 @@ app.get("/test/login", (req,res)=>{
 // Discord callback
 app.get("/test/callback", async (req,res)=>{
   const code = req.query.code;
-  if(!code) return res.send("No code provided"); // pojawia się, jeśli login nie przesłał code
+  if(!code) return res.send("No code provided");
 
   const data = new URLSearchParams();
   data.append("client_id", process.env.CLIENT_ID);
@@ -103,46 +107,64 @@ app.get("/test/callback", async (req,res)=>{
   }
 });
 
-// Main test page
+// --- TEST PAGE / Panel z zakładkami ---
 app.get("/test", (req,res)=>{
-  const user = req.session.user;
-  let html = `<h1>Discord Typing Test</h1>`;
-  if(user){
-    html += `<p>Logged in as <strong>${user.username}</strong> <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" width="50"/></p>`;
-    
-    const isAdmin = process.env.ADMIN_IDS?.split(",").includes(user.id);
-    if(isAdmin){
-      html += `<p>You are admin!</p>`;
-    }
+  const user = req.session.user || null;
+  const adminIds = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(",") : [];
 
-    html += `
-      <form method="POST" action="/test/bet">
-        <input type="text" name="match_id" placeholder="Match ID" required />
-        <input type="text" name="bet_value" placeholder="Bet (3-1, TAK/NIE, etc)" required />
-        <button type="submit">Submit Bet</button>
-      </form>
-    `;
-  } else {
-    html += `<a href="/test/login">Login with Discord</a>`;
-  }
+  const htmlPath = path.join(process.cwd(), "test.html");
+  let html = fs.readFileSync(htmlPath, "utf-8");
+
+  // Wstrzykujemy dane użytkownika i adminów do JS w test.html
+  html = html.replace("const user = window.USER || null;", `const user = ${JSON.stringify(user)};`);
+  html = html.replace("const adminIds = window.ADMIN_IDS || [];", `const adminIds = ${JSON.stringify(adminIds)};`);
+
   res.send(html);
 });
 
-// Submit bet
+// --- Endpoint dodawania meczu (Admin) ---
+app.post("/test/admin/add-match", (req,res)=>{
+  const user = req.session.user;
+  const adminIds = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(",") : [];
+  if(!user || !adminIds.includes(user.id)) return res.send("Brak dostępu");
+
+  const { player1, player2, format, status } = req.body;
+  db.run(`INSERT INTO matches (player1, player2, format, status) VALUES (?, ?, ?, ?)`,
+    [player1, player2, format, status || "upcoming"],
+    (err)=> {
+      if(err) return res.send("Błąd dodawania meczu");
+      res.redirect("/test");
+    });
+});
+
+// --- Endpoint typowania meczu ---
 app.post("/test/bet", (req,res)=>{
   const user = req.session.user;
-  if(!user) return res.send("Not logged in");
+  if(!user) return res.send("Nie jesteś zalogowany");
 
   const { match_id, bet_value } = req.body;
   db.run(`INSERT OR REPLACE INTO bets (match_id, user_id, bet_value) VALUES (?, ?, ?)`,
     [match_id, user.id, bet_value],
     (err)=>{
-      if(err) return res.send("Error saving bet");
+      if(err) return res.send("Błąd zapisu typowania");
       res.redirect("/test");
-    }
-  );
+    });
+});
+
+// --- Endpoint ranking ---
+app.get("/test/ranking", (req,res)=>{
+  db.all(`
+    SELECT users.username, COUNT(bets.id) as points
+    FROM users
+    LEFT JOIN bets ON users.id = bets.user_id
+    GROUP BY users.id
+    ORDER BY points DESC
+  `, (err, rows)=>{
+    if(err) return res.send("Błąd pobierania rankingu");
+    res.json(rows);
+  });
 });
 
 // --- Start server ---
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`));
