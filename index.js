@@ -45,10 +45,9 @@ db.serialize(() => {
 
 // --- ROUTES ---
 
-// Optional: redirect root to /test
-// Comment out if root is used for inny serwis
+// Optional redirect root (usuń jeśli root zajęty)
 app.get("/", (req,res)=>{
-  res.redirect("/test");
+  res.send("Główna strona serwisu");
 });
 
 // Login Discord
@@ -62,7 +61,7 @@ app.get("/test/login", (req,res)=>{
 // Discord callback
 app.get("/test/callback", async (req,res)=>{
   const code = req.query.code;
-  if(!code) return res.send("No code provided");
+  if(!code) return res.send("No code provided"); // pojawia się, jeśli login nie przesłał code
 
   const data = new URLSearchParams();
   data.append("client_id", process.env.CLIENT_ID);
@@ -79,6 +78,7 @@ app.get("/test/callback", async (req,res)=>{
       headers: { "Content-Type": "application/x-www-form-urlencoded" }
     });
     const tokenJson = await tokenRes.json();
+
     const userRes = await fetch("https://discord.com/api/users/@me", {
       headers: { Authorization: `Bearer ${tokenJson.access_token}` }
     });
@@ -106,16 +106,15 @@ app.get("/test/callback", async (req,res)=>{
 // Main test page
 app.get("/test", (req,res)=>{
   const user = req.session.user;
-  let html = `
-    <h1>Discord Typing Test</h1>
-  `;
+  let html = `<h1>Discord Typing Test</h1>`;
   if(user){
     html += `<p>Logged in as <strong>${user.username}</strong> <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" width="50"/></p>`;
-    // Check if admin
+    
     const isAdmin = process.env.ADMIN_IDS?.split(",").includes(user.id);
     if(isAdmin){
       html += `<p>You are admin!</p>`;
     }
+
     html += `
       <form method="POST" action="/test/bet">
         <input type="text" name="match_id" placeholder="Match ID" required />
