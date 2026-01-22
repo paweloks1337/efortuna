@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<title>TESTOWY TYPER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --bg: #0e0e15;
+  --panel: #161625;
+  --accent: #7c3aed;
+  --accent-dark: #5b21b6;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: linear-gradient(180deg, #0e0e15, #0a0a12);
+  color: var(--text);
+}
+
+header {
+  height: 64px;
+  background: rgba(22,22,37,0.9);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #26263a;
+}
+
+.logo {
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+nav button.active {
+  color: var(--text);
+  border-bottom: 2px solid var(--accent);
+}
+
+.avatar {
+  position: relative;
+}
+.avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--accent);
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 52px;
+  background: var(--panel);
+  border: 1px solid #2a2a40;
+  border-radius: 8px;
+  display: none;
+  min-width: 160px;
+}
+.dropdown button {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+.dropdown button:hover {
+  background: var(--accent-dark);
+}
+
+main {
+  padding: 32px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.section {
+  display: none;
+  animation: fade 0.4s ease;
+}
+.section.active {
+  display: block;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid #26263a;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.match {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.match small {
+  color: var(--muted);
+}
+
+input, select {
+  background: #0f0f1c;
+  border: 1px solid #2a2a40;
+  color: var(--text);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+button.primary {
+  background: var(--accent);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+button.primary:hover {
+  background: var(--accent-dark);
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">TESTOWY TYPER</div>
+
+  <nav>
+    <button class="tab active" data-tab="matches">Mecze</button>
+    <button class="tab" data-tab="history">Moje typy</button>
+    <button class="tab" data-tab="ranking">Ranking</button>
+    <button class="tab admin-only" data-tab="admin" style="display:none">Admin</button>
+  </nav>
+
+  <div class="avatar" id="avatarBox" style="display:none">
+    <img id="avatarImg">
+    <div class="dropdown" id="dropdown">
+      <button id="logoutBtn">Wyloguj się</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="matches" class="section active"></section>
+
+<section id="history" class="section"></section>
+
+<section id="ranking" class="section"></section>
+
+<section id="admin" class="section"></section>
+
+</main>
+
+<script>
+const tabs = document.querySelectorAll(".tab");
+const sections = document.querySelectorAll(".section");
+
+tabs.forEach(btn => {
+  btn.onclick = () => {
+    tabs.forEach(b => b.classList.remove("active"));
+    sections.forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  };
+});
+
+// Avatar dropdown
+const avatarBox = document.getElementById("avatarBox");
+const dropdown = document.getElementById("dropdown");
+
+avatarBox.onclick = () => {
+  dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+};
+
+// Logout
+document.getElementById("logoutBtn").onclick = async () => {
+  await fetch("/test/logout", { method: "POST" });
+  location.reload();
+};
+
+// LOAD DATA
+async function loadMatches() {
+  const res = await fetch("/test/matches");
+  const data = await res.json();
+  const el = document.getElementById("matches");
+  el.innerHTML = "<h2>Mecze</h2>";
+
+  data.forEach(m => {
+    el.innerHTML += `
+      <div class="card match">
+        <div>
+          <strong>${m.player1} vs ${m.player2}</strong><br>
+          <small>${new Date(m.start_time).toLocaleString()}</small>
+        </div>
+        <div>
+          ${m.locked ? "<small>Zamknięte</small>" :
+          `<input placeholder="Twój typ" id="bet-${m.id}">
+           <button class="primary" onclick="bet(${m.id})">Wyślij</button>`}
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function bet(id) {
+  const value = document.getElementById("bet-" + id).value;
+  await fetch("/test/bet", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ match_id: id, bet_value: value })
+  });
+  alert("Typ zapisany");
+}
+
+loadMatches();
+</script>
+
+</body>
+</html>
