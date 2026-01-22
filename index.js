@@ -4,9 +4,11 @@ import fetch from "node-fetch";
 import sqlite3 from "sqlite3";
 import dotenv from "dotenv";
 import path from "path";
-import fs from "fs";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const db = new sqlite3.Database("./db.sqlite");
@@ -17,25 +19,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET || "defaultsecret",
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: false
 }));
-
-// Serwowanie statycznych plików (CSS, JS jeśli dodasz)
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 // --- DATABASE ---
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     username TEXT,
-    avatar TEXT
+    avatar TEXT,
+    points INTEGER DEFAULT 0
   )`);
   db.run(`CREATE TABLE IF NOT EXISTS matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     player1 TEXT,
     player2 TEXT,
     format TEXT,
-    status TEXT,
+    status TEXT DEFAULT 'upcoming',
     result TEXT
   )`);
   db.run(`CREATE TABLE IF NOT EXISTS bets (
@@ -49,10 +50,8 @@ db.serialize(() => {
 
 // --- ROUTES ---
 
-// Root
-app.get("/", (req,res)=>{
-  res.send("Główna strona serwisu");
-});
+// Root redirect
+app.get("/", (req,res)=>res.redirect("/test"));
 
 // Login Discord
 app.get("/test/login", (req,res)=>{
@@ -88,83 +87,96 @@ app.get("/test/callback", async (req,res)=>{
     });
     const userJson = await userRes.json();
 
-    // Save user to session
     req.session.user = {
       id: userJson.id,
       username: userJson.username,
       avatar: userJson.avatar
     };
 
-    // Save user to DB
     db.run(`INSERT OR REPLACE INTO users (id, username, avatar) VALUES (?, ?, ?)`,
       [userJson.id, userJson.username, userJson.avatar]
     );
 
     res.redirect("/test");
-  } catch(e) {
+  } catch(e){
     console.error(e);
     res.send("Error logging in");
   }
 });
 
-// --- TEST PAGE / Panel z zakładkami ---
+// Wylogowanie
+app.post("/test/logout", (req,res)=>{
+  req.session.destroy(err=>{
+    if(err) return res.send("Błąd wylogowania");
+    res.clearCookie("connect.sid");
+    res.sendStatus(200);
+  });
+});
+
+// Frontend test.html
 app.get("/test", (req,res)=>{
-  const user = req.session.user || null;
-  const adminIds = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(",") : [];
-
-  const htmlPath = path.join(process.cwd(), "test.html");
-  let html = fs.readFileSync(htmlPath, "utf-8");
-
-  // Wstrzykujemy dane użytkownika i adminów do JS w test.html
-  html = html.replace("const user = window.USER || null;", `const user = ${JSON.stringify(user)};`);
-  html = html.replace("const adminIds = window.ADMIN_IDS || [];", `const adminIds = ${JSON.stringify(adminIds)};`);
-
-  res.send(html);
+  res.sendFile(path.join(__dirname,"public","test.html"));
 });
 
-// --- Endpoint dodawania meczu (Admin) ---
-app.post("/test/admin/add-match", (req,res)=>{
+// --- API dla frontendu ---
+
+// Pobierz mecze
+app.get("/test/matches", (req,res)=>{
+  db.all(`SELECT * FROM matches WHERE status='upcoming'`, (err, rows)=>{
+    if(err) return res.json([]);
+    res.json(rows);
+  });
+});
+
+// Historia użytkownika
+app.get("/test/history", (req,res)=>{
   const user = req.session.user;
-  const adminIds = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(",") : [];
-  if(!user || !adminIds.includes(user.id)) return res.send("Brak dostępu");
-
-  const { player1, player2, format, status } = req.body;
-  db.run(`INSERT INTO matches (player1, player2, format, status) VALUES (?, ?, ?, ?)`,
-    [player1, player2, format, status || "upcoming"],
-    (err)=> {
-      if(err) return res.send("Błąd dodawania meczu");
-      res.redirect("/test");
-    });
+  if(!user) return res.json([]);
+  db.all(`
+    SELECT m.player1 || ' vs ' || m.player2 as match, b.bet_value, m.result
+    FROM bets b
+    JOIN matches m ON b.match_id = m.id
+    WHERE b.user_id=?
+  `, [user.id], (err, rows)=>{
+    if(err) return res.json([]);
+    res.json(rows);
+  });
 });
 
-// --- Endpoint typowania meczu ---
+// Ranking
+app.get("/test/ranking", (req,res)=>{
+  db.all(`SELECT username, points FROM users ORDER BY points DESC`, (err, rows)=>{
+    if(err) return res.json([]);
+    res.json(rows);
+  });
+});
+
+// Typowanie
 app.post("/test/bet", (req,res)=>{
   const user = req.session.user;
-  if(!user) return res.send("Nie jesteś zalogowany");
+  if(!user) return res.send("Not logged in");
 
   const { match_id, bet_value } = req.body;
   db.run(`INSERT OR REPLACE INTO bets (match_id, user_id, bet_value) VALUES (?, ?, ?)`,
     [match_id, user.id, bet_value],
     (err)=>{
-      if(err) return res.send("Błąd zapisu typowania");
-      res.redirect("/test");
+      if(err) return res.send("Error saving bet");
+      res.sendStatus(200);
     });
 });
 
-// --- Endpoint ranking ---
-app.get("/test/ranking", (req,res)=>{
-  db.all(`
-    SELECT users.username, COUNT(bets.id) as points
-    FROM users
-    LEFT JOIN bets ON users.id = bets.user_id
-    GROUP BY users.id
-    ORDER BY points DESC
-  `, (err, rows)=>{
-    if(err) return res.send("Błąd pobierania rankingu");
-    res.json(rows);
-  });
+// Admin dodawanie meczu
+app.post("/test/admin/add-match", (req,res)=>{
+  const user = req.session.user;
+  if(!user || !process.env.ADMIN_IDS.split(",").includes(user.id)) return res.sendStatus(403);
+
+  const { player1, player2, format } = req.body;
+  db.run(`INSERT INTO matches (player1, player2, format) VALUES (?, ?, ?)`,
+    [player1, player2, format],
+    (err)=> err ? res.send("Error") : res.sendStatus(200)
+  );
 });
 
 // --- Start server ---
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`));
