@@ -45,7 +45,8 @@ td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius
 <div class="sort-box">
   <label>📅 Wybierz miesiąc:</label>
   <select id="month-select">
-    <option value="styczen" selected>Styczeń</option>
+    <option value="luty" selected>Luty</option>
+    <option value="styczen">Styczeń</option>
     <option value="grudzien">Grudzień</option>
   </select>
 </div>
@@ -54,6 +55,7 @@ td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius
 
 <script>
 const CSV_URLS = {
+  luty: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQodqUqlWT0Ddd8ch_t3Jm7NzRmkrp_qyoP3KTz5gMw3exgx41WL7zcVrDvtQop7niDpeuyM57vaO9n/pub?output=csv",
   styczen: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
