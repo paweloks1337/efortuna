@@ -2,30 +2,37 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Typer F1</title>
+<title>🏎️ Typer F1</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 
+:root{
+--gold:#FFD700;
+--green:#00FF88;
+}
+
 body{
-background:#111;
-color:#FFD700;
-font-family:Poppins;
-text-align:center;
 margin:0;
+font-family:Poppins;
+background:linear-gradient(#000,#111);
+color:var(--gold);
+text-align:center;
 }
 
 h1{
 margin:20px 0;
+text-shadow:0 0 10px var(--gold);
 }
 
 .container{
 max-width:850px;
-margin:auto;
+margin:30px auto;
 background:#1a1a1a;
 padding:20px;
-border-radius:12px;
+border-radius:14px;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
 }
 
 table{
@@ -35,26 +42,32 @@ border-collapse:collapse;
 
 th,td{
 padding:12px;
-border-bottom:1px solid #333;
+border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+th{
+text-transform:uppercase;
+font-size:14px;
 }
 
 .nick{
-color:white;
+color:#fff;
 font-weight:600;
 }
 
 .points{
-color:#00ff88;
+color:var(--green);
 font-weight:700;
 text-align:right;
 }
 
 #search{
+width:260px;
 padding:10px;
 border-radius:8px;
-border:2px solid gold;
-background:black;
-color:gold;
+border:2px solid var(--gold);
+background:#000;
+color:var(--gold);
 margin-bottom:15px;
 }
 
@@ -65,7 +78,7 @@ margin-bottom:15px;
 
 <h1>🏎️ Typer F1</h1>
 
-<input id="search" placeholder="Szukaj nicku">
+<input id="search" placeholder="🔍 Szukaj nicku...">
 
 <div class="container">
 
@@ -75,7 +88,6 @@ margin-bottom:15px;
 <tr>
 <th>#</th>
 <th>Nick Discord</th>
-<th>Nick Fortuna</th>
 <th style="text-align:right">Suma PKT</th>
 </tr>
 </thead>
@@ -88,12 +100,9 @@ margin-bottom:15px;
 
 <script>
 
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRp2hT2oTmlau_LscwJn__KzOn0iy9WBofcfPbHRramcAHUuLyL3p0PfgKivra049MXaUiPtFc2TvHN/pub?output=csv"
-
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRp2hT2oTmlau_LscwJn__KzOn0iy9WBofcfPbHRramcAHUuLyL3p0PfgKivra049MXaUiPtFc2TvHN/pub?output=csv"
 
 function parseCSV(text){
-
 const rows=[]
 const lines=text.split(/\r?\n/)
 
@@ -101,37 +110,34 @@ lines.forEach(line=>{
 
 const result=[]
 let current=""
-let insideQuotes=false
+let inside=false
 
 for(let i=0;i<line.length;i++){
 
-const char=line[i]
+const c=line[i]
 
-if(char=='"'){
-insideQuotes=!insideQuotes
+if(c=='"'){
+inside=!inside
 }
 
-else if(char=="," && !insideQuotes){
+else if(c=="," && !inside){
 result.push(current)
 current=""
 }
 
 else{
-current+=char
+current+=c
 }
 
 }
 
 result.push(current)
-
 rows.push(result)
 
 })
 
 return rows
-
 }
-
 
 function parseTime(str){
 
@@ -142,7 +148,6 @@ str=str.replace(" ","T")
 return Date.parse(str)
 
 }
-
 
 async function loadRanking(){
 
@@ -155,7 +160,6 @@ const head=rows[0].map(x=>x.toLowerCase())
 
 const timeCol=head.findIndex(h=>h.includes("sygnatura"))
 const discordCol=head.findIndex(h=>h.includes("discord"))
-const fortunaCol=head.findIndex(h=>h.includes("fortuna"))
 const pointsCol=head.findIndex(h=>h.includes("suma"))
 
 const players={}
@@ -165,29 +169,22 @@ rows.slice(1).forEach(r=>{
 const nick=(r[discordCol]||"").trim()
 if(!nick) return
 
-const fortuna=(r[fortunaCol]||"").trim()
-
 const pts=parseFloat((r[pointsCol]||"0").replace(",","."))
 const time=parseTime(r[timeCol])
 
 if(!players[nick]){
 
 players[nick]={
-punkty:0,
-time:time,
-fortuna:fortuna
+points:0,
+time:time
 }
 
 }
 
-players[nick].punkty+=pts
+players[nick].points+=pts
 
 if(time<players[nick].time){
 players[nick].time=time
-}
-
-if(!players[nick].fortuna && fortuna){
-players[nick].fortuna=fortuna
 }
 
 })
@@ -196,8 +193,8 @@ const list=Object.entries(players).map(([nick,v])=>({nick,...v}))
 
 list.sort((a,b)=>{
 
-if(b.punkty!==a.punkty){
-return b.punkty-a.punkty
+if(b.points!==a.points){
+return b.points-a.points
 }
 
 return a.time-b.time
@@ -207,7 +204,6 @@ return a.time-b.time
 render(list)
 
 }
-
 
 function render(list){
 
@@ -222,8 +218,7 @@ const tr=document.createElement("tr")
 tr.innerHTML=`
 <td>${i+1}</td>
 <td class="nick">${p.nick}</td>
-<td>${p.fortuna||""}</td>
-<td class="points">${Math.round(p.punkty)}</td>
+<td class="points">${Math.round(p.points)}</td>
 `
 
 tbody.appendChild(tr)
@@ -231,7 +226,6 @@ tbody.appendChild(tr)
 })
 
 }
-
 
 document.getElementById("search").addEventListener("input",e=>{
 
