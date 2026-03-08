@@ -21,9 +21,9 @@ margin:20px 0;
 }
 
 .container{
-max-width:800px;
+max-width:850px;
 margin:auto;
-background:#1b1b1b;
+background:#1a1a1a;
 padding:20px;
 border-radius:12px;
 }
@@ -34,19 +34,19 @@ border-collapse:collapse;
 }
 
 th,td{
-padding:10px;
+padding:12px;
 border-bottom:1px solid #333;
-}
-
-.points{
-color:#00ff88;
-font-weight:600;
-text-align:right;
 }
 
 .nick{
 color:white;
 font-weight:600;
+}
+
+.points{
+color:#00ff88;
+font-weight:700;
+text-align:right;
 }
 
 #search{
@@ -93,47 +93,82 @@ const CSV_URL =
 
 
 function parseCSV(text){
-return text.trim().split("\n").map(r=>r.split(","))
+
+const rows=[]
+const lines=text.split(/\r?\n/)
+
+lines.forEach(line=>{
+
+const result=[]
+let current=""
+let insideQuotes=false
+
+for(let i=0;i<line.length;i++){
+
+const char=line[i]
+
+if(char=='"'){
+insideQuotes=!insideQuotes
+}
+
+else if(char=="," && !insideQuotes){
+result.push(current)
+current=""
+}
+
+else{
+current+=char
+}
+
+}
+
+result.push(current)
+
+rows.push(result)
+
+})
+
+return rows
+
 }
 
 
-function parseTime(t){
+function parseTime(str){
 
-if(!t) return Infinity
+if(!str) return Infinity
 
-// zamiana na ISO
-t = t.replace(" ","T")
+str=str.replace(" ","T")
 
-return Date.parse(t)
+return Date.parse(str)
 
 }
 
 
 async function loadRanking(){
 
-const res = await fetch(CSV_URL)
-const txt = await res.text()
+const res=await fetch(CSV_URL)
+const txt=await res.text()
 
-const rows = parseCSV(txt)
+const rows=parseCSV(txt)
 
-const header = rows[0].map(x=>x.toLowerCase())
+const head=rows[0].map(x=>x.toLowerCase())
 
-const timeCol = header.findIndex(x=>x.includes("sygnatura"))
-const discordCol = header.findIndex(x=>x.includes("discord"))
-const fortunaCol = header.findIndex(x=>x.includes("fortuna"))
-const pktCol = header.findIndex(x=>x.includes("suma"))
+const timeCol=head.findIndex(h=>h.includes("sygnatura"))
+const discordCol=head.findIndex(h=>h.includes("discord"))
+const fortunaCol=head.findIndex(h=>h.includes("fortuna"))
+const pointsCol=head.findIndex(h=>h.includes("suma"))
 
-const players = {}
+const players={}
 
 rows.slice(1).forEach(r=>{
 
-const nick = (r[discordCol]||"").trim()
+const nick=(r[discordCol]||"").trim()
 if(!nick) return
 
-const fortuna = (r[fortunaCol]||"").trim()
+const fortuna=(r[fortunaCol]||"").trim()
 
-const pts = parseFloat((r[pktCol]||0).replace(",","."))
-const time = parseTime(r[timeCol])
+const pts=parseFloat((r[pointsCol]||"0").replace(",","."))
+const time=parseTime(r[timeCol])
 
 if(!players[nick]){
 
@@ -145,27 +180,27 @@ fortuna:fortuna
 
 }
 
-players[nick].punkty += pts
+players[nick].punkty+=pts
 
-if(time < players[nick].time){
-players[nick].time = time
+if(time<players[nick].time){
+players[nick].time=time
 }
 
 if(!players[nick].fortuna && fortuna){
-players[nick].fortuna = fortuna
+players[nick].fortuna=fortuna
 }
 
 })
 
-const list = Object.entries(players).map(([nick,v])=>({nick,...v}))
+const list=Object.entries(players).map(([nick,v])=>({nick,...v}))
 
 list.sort((a,b)=>{
 
-if(b.punkty !== a.punkty){
-return b.punkty - a.punkty
+if(b.punkty!==a.punkty){
+return b.punkty-a.punkty
 }
 
-return a.time - b.time
+return a.time-b.time
 
 })
 
@@ -176,7 +211,7 @@ render(list)
 
 function render(list){
 
-const tbody = document.querySelector("#ranking tbody")
+const tbody=document.querySelector("#ranking tbody")
 
 tbody.innerHTML=""
 
@@ -185,12 +220,10 @@ list.forEach((p,i)=>{
 const tr=document.createElement("tr")
 
 tr.innerHTML=`
-
 <td>${i+1}</td>
 <td class="nick">${p.nick}</td>
 <td>${p.fortuna||""}</td>
 <td class="points">${Math.round(p.punkty)}</td>
-
 `
 
 tbody.appendChild(tr)
@@ -213,7 +246,6 @@ tr.style.display = nick.includes(q) ? "" : "none"
 })
 
 })
-
 
 loadRanking()
 
