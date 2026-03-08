@@ -1,104 +1,61 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
 <title>Typer F1</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 
-:root{
---gold:#FFD700;
---green:#00FF88;
-}
-
 body{
-margin:0;
+background:#111;
+color:#FFD700;
 font-family:Poppins;
-background:linear-gradient(#000,#111);
-color:var(--gold);
 text-align:center;
+margin:0;
 }
 
 h1{
 margin:20px 0;
-text-shadow:0 0 10px var(--gold);
 }
-
-#loader{
-position:fixed;
-left:50%;
-top:50%;
-width:70px;
-height:70px;
-border-radius:50%;
-border:7px solid rgba(255,215,0,0.2);
-border-top:7px solid var(--gold);
-transform:translate(-50%,-50%);
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-100%{transform:translate(-50%,-50%) rotate(360deg)}
-}
-
-#loader.hidden{display:none}
 
 .container{
-max-width:850px;
-margin:30px auto;
-background:#1a1a1a;
+max-width:800px;
+margin:auto;
+background:#1b1b1b;
 padding:20px;
-border-radius:14px;
-box-shadow:0 0 20px rgba(0,0,0,0.6);
+border-radius:12px;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-margin-top:15px;
 }
 
 th,td{
-padding:12px;
-border-bottom:1px solid rgba(255,255,255,0.05);
-}
-
-th{
-text-transform:uppercase;
-font-size:14px;
-}
-
-.nick{
-color:#fff;
-font-weight:600;
+padding:10px;
+border-bottom:1px solid #333;
 }
 
 .points{
-color:var(--green);
-font-weight:700;
+color:#00ff88;
+font-weight:600;
 text-align:right;
 }
 
+.nick{
+color:white;
+font-weight:600;
+}
+
 #search{
-width:260px;
 padding:10px;
 border-radius:8px;
-border:2px solid var(--gold);
-background:#000;
-color:var(--gold);
-}
-
-.stats{
-margin-top:15px;
-color:#ccc;
-}
-
-.stat-box{
-display:inline-block;
-margin:5px 15px;
+border:2px solid gold;
+background:black;
+color:gold;
+margin-bottom:15px;
 }
 
 </style>
@@ -106,19 +63,17 @@ margin:5px 15px;
 
 <body>
 
-<div id="loader"></div>
-
 <h1>🏎️ Typer F1</h1>
 
-<input id="search" placeholder="🔍 Szukaj nicku...">
+<input id="search" placeholder="Szukaj nicku">
 
-<div class="container" id="ranking-container" style="display:none;">
+<div class="container">
 
 <table id="ranking">
 
 <thead>
 <tr>
-<th>Miejsce</th>
+<th>#</th>
 <th>Nick Discord</th>
 <th>Nick Fortuna</th>
 <th style="text-align:right">Suma PKT</th>
@@ -129,148 +84,121 @@ margin:5px 15px;
 
 </table>
 
-<div class="stats">
-
-<div class="stat-box">👥 Typerzy: <b id="count">0</b></div>
-<div class="stat-box">💰 Suma punktów: <b id="sum">0</b></div>
-<div class="stat-box">📊 Średnia: <b id="avg">0</b></div>
-
-</div>
-
 </div>
 
 <script>
 
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRp2hT2oTmlau_LscwJn__KzOn0iy9WBofcfPbHRramcAHUuLyL3p0PfgKivra049MXaUiPtFc2TvHN/pub?output=csv"
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRp2hT2oTmlau_LscwJn__KzOn0iy9WBofcfPbHRramcAHUuLyL3p0PfgKivra049MXaUiPtFc2TvHN/pub?output=csv"
 
-let players={}
-let list=[]
 
-function parseCSV(t){
-return t.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')))
+function parseCSV(text){
+return text.trim().split("\n").map(r=>r.split(","))
 }
 
-function parseTime(timeStr){
 
-if(!timeStr) return new Date(9999,0,1)
+function parseTime(t){
 
-const parts=timeStr.split(" ")
-const d=parts[0].split("-")
-const c=parts[1].split(":")
+if(!t) return Infinity
 
-return new Date(
-parseInt(d[0]),
-parseInt(d[1])-1,
-parseInt(d[2]),
-parseInt(c[0]),
-parseInt(c[1]),
-parseInt(c[2])
-)
+// zamiana na ISO
+t = t.replace(" ","T")
+
+return Date.parse(t)
 
 }
+
 
 async function loadRanking(){
 
-const res=await fetch(CSV_URL)
-const txt=await res.text()
+const res = await fetch(CSV_URL)
+const txt = await res.text()
 
-const rows=parseCSV(txt)
+const rows = parseCSV(txt)
 
-const head=rows[0].map(x=>x.toLowerCase())
+const header = rows[0].map(x=>x.toLowerCase())
 
-const timeCol=head.findIndex(h=>h.includes("sygnatura"))
-const discordCol=head.findIndex(h=>h.includes("discord"))
-const fortunaCol=head.findIndex(h=>h.includes("fortuna"))
-const pointsCol=head.findIndex(h=>h.includes("suma"))
+const timeCol = header.findIndex(x=>x.includes("sygnatura"))
+const discordCol = header.findIndex(x=>x.includes("discord"))
+const fortunaCol = header.findIndex(x=>x.includes("fortuna"))
+const pktCol = header.findIndex(x=>x.includes("suma"))
 
-const data={}
+const players = {}
 
 rows.slice(1).forEach(r=>{
 
-const time=parseTime(r[timeCol])
-
-const nick=(r[discordCol]||"").trim()
-
-const fortuna=(r[fortunaCol]||"").trim()
-
-const pts=parseFloat((r[pointsCol]||"0").replace(",","."))||0
-
+const nick = (r[discordCol]||"").trim()
 if(!nick) return
 
-if(!data[nick]){
-data[nick]={
+const fortuna = (r[fortunaCol]||"").trim()
+
+const pts = parseFloat((r[pktCol]||0).replace(",","."))
+const time = parseTime(r[timeCol])
+
+if(!players[nick]){
+
+players[nick]={
 punkty:0,
-firstTime:time,
+time:time,
 fortuna:fortuna
 }
+
 }
 
-data[nick].punkty+=pts
+players[nick].punkty += pts
 
-if(time<data[nick].firstTime){
-data[nick].firstTime=time
+if(time < players[nick].time){
+players[nick].time = time
 }
 
-if(!data[nick].fortuna && fortuna){
-data[nick].fortuna=fortuna
+if(!players[nick].fortuna && fortuna){
+players[nick].fortuna = fortuna
 }
 
 })
 
-players=data
+const list = Object.entries(players).map(([nick,v])=>({nick,...v}))
 
-list=Object.entries(data).map(([nick,v])=>({nick,...v}))
+list.sort((a,b)=>{
 
-renderTable()
-
-document.getElementById("count").textContent=list.length
-
-const sum=list.reduce((a,b)=>a+b.punkty,0)
-
-document.getElementById("sum").textContent=sum.toFixed(0)
-
-document.getElementById("avg").textContent=(sum/list.length).toFixed(1)
-
-document.getElementById("ranking-container").style.display="block"
-
-document.getElementById("loader").classList.add("hidden")
-
+if(b.punkty !== a.punkty){
+return b.punkty - a.punkty
 }
 
-function renderTable(){
-
-const tb=document.querySelector("#ranking tbody")
-
-tb.innerHTML=""
-
-const sorted=[...list]
-
-sorted.sort((a,b)=>{
-
-if(b.punkty!==a.punkty){
-return b.punkty-a.punkty
-}
-
-return a.firstTime-b.firstTime
+return a.time - b.time
 
 })
 
-sorted.forEach((p,i)=>{
+render(list)
+
+}
+
+
+function render(list){
+
+const tbody = document.querySelector("#ranking tbody")
+
+tbody.innerHTML=""
+
+list.forEach((p,i)=>{
 
 const tr=document.createElement("tr")
 
 tr.innerHTML=`
+
 <td>${i+1}</td>
 <td class="nick">${p.nick}</td>
 <td>${p.fortuna||""}</td>
 <td class="points">${Math.round(p.punkty)}</td>
+
 `
 
-tb.appendChild(tr)
+tbody.appendChild(tr)
 
 })
 
 }
+
 
 document.getElementById("search").addEventListener("input",e=>{
 
@@ -280,13 +208,14 @@ document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
 
 const nick=tr.children[1].textContent.toLowerCase()
 
-tr.style.display=nick.includes(q)?"":"none"
+tr.style.display = nick.includes(q) ? "" : "none"
 
 })
 
 })
 
-window.onload=loadRanking
+
+loadRanking()
 
 </script>
 
