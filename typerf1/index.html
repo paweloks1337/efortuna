@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🏁 Typer F1 Ranking</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🏎️ Typer F1</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
 :root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
 body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
@@ -20,18 +19,15 @@ h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
 .container.show{opacity:1;transform:translateY(0)}
 .sort-box{text-align:center;margin:10px auto;}
 .sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:600}
-table{width:100%;border-collapse:separate;margin-top:12px;border-spacing:0 6px}
+table{width:100%;border-collapse:separate;border-spacing:0 6px;margin-top:12px}
 th,td{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:left}
 th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
-td.nick{color:#fff;font-weight:600;cursor:pointer}
-td.points{color:var(--green);font-weight:700;text-align:right}
-td.coupons{color:#ccc;text-align:center}
+td.nick{min-width:130px;color:#fff;font-weight:600;cursor:pointer}
+td.fortuna{min-width:130px;color:#ccc;text-align:left}
+td.points{min-width:80px;text-align:right;color:var(--green);font-weight:700}
+td.coupons{min-width:60px;text-align:center;color:#ccc}
 .stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
 .stat-box{display:inline-block;margin:6px 18px}
-.toast{position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001}
-.toast.show{opacity:1;transform:translateY(0)}
-#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
-#search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
 .popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:99999;visibility:hidden;opacity:0;transition:.3s}
 .popup.active{visibility:visible;opacity:1}
 .popup-content{background:#1a1a1a;border:2px solid var(--gold);border-radius:12px;padding:20px;max-width:450px;width:90%;color:#fff;text-align:left;box-shadow:0 0 20px rgba(255,215,0,0.3);animation:fadeIn .4s ease}
@@ -50,31 +46,26 @@ td.coupons{color:#ccc;text-align:center}
 @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{to{transform:translateY(0);opacity:1}}
 .info-box{max-width:860px;margin:10px auto 14px;padding:10px 14px;background:linear-gradient(90deg,#111,#1a1a1a);border:1px solid rgba(255,215,0,0.35);border-radius:12px;box-shadow:0 0 14px rgba(255,215,0,0.12);color:#fff;font-size:.95rem;text-align:left}
-.info-box span{color:#00FF88;font-weight:700}
 </style>
 </head>
 <body>
-
 <div id="loader"></div>
 <nav>
-  <a href="index.html">🏆 Ranking</a>
-  <a href="kalkulator.html">📊 Kalkulator</a>
-  <a href="kupony.html">🧾 Lista Kuponów</a>
-  <a href="zasady.html">📖 Zasady</a>
+  <a href="#">🏎️ Typer F1</a>
+  <a href="#">📊 Kalkulator</a>
+  <a href="#">🧾 Lista Kuponów</a>
+  <a href="#">📖 Zasady</a>
 </nav>
-
-<h1>🏁 Typer F1 Ranking</h1>
-<div class="info-box"><span class="info-dot"></span></div>
+<h1>🏎️ Typer F1</h1>
 
 <input id="search" placeholder="🔍 Szukaj nicku..." />
-
 <div class="sort-box">
-  <label>🏁 Wybierz wyścig:</label>
+  <label>📅 Wybierz wyścig:</label>
   <select id="race-select">
-    <option value="1" selected>Wyścig 1</option>
-    <option value="2">Wyścig 2</option>
-    <option value="3">Wyścig 3</option>
-    <option value="4">Wyścig 4</option>
+    <option value="race1" selected>Wyścig 1</option>
+    <option value="race2">Wyścig 2</option>
+    <option value="race3">Wyścig 3</option>
+    <option value="race4">Wyścig 4</option>
   </select>
 </div>
 
@@ -113,29 +104,29 @@ td.coupons{color:#ccc;text-align:center}
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
-
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp2hT2oTmlau_LscwJn__KzOn0iy9WBofcfPbHRramcAHUuLyL3p0PfgKivra049MXaUiPtFc2TvHN/pub?output=csv";
-let playersData={}, list=[];
+
+let playersData = {}, list = [];
 
 function parseCSV(t){
-  return t.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,'')));
+  return t.trim().split(/\r?\n/).map(l => l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x => x.replace(/^"|"$/g,'')));
 }
 
-async function loadRankingForRace(){
+async function loadRanking(){
   document.getElementById("loader").classList.remove("hidden");
   document.getElementById("ranking-container").style.display = "none";
 
   const res = await fetch(CSV_URL);
   const txt = await res.text();
   const rows = parseCSV(txt);
-  const head = rows[0].map(x=>x.toLowerCase());
+  const head = rows[0];
 
-  const timeCol = head.findIndex(h=>h.includes("sygnatura"));
-  const discordCol = head.findIndex(h=>h.includes("discord"));
-  const fortunaCol = head.findIndex(h=>h.includes("fortuna"));
-  const pointsCol = head.findIndex(h=>h.includes("suma")||h.includes("pkt"));
+  // Dokładne dopasowanie nazw kolumn
+  const timeCol    = head.findIndex(h => h.trim() === "Sygnatura czasowa");
+  const discordCol = head.findIndex(h => h.trim() === "💬 Nick z Discorda");
+  const fortunaCol = head.findIndex(h => h.trim() === "💬 Nick z Fortuny");
+  const pointsCol  = head.findIndex(h => h.trim() === "Suma PKT");
 
   const data = {};
   rows.slice(1).forEach(r=>{
@@ -143,17 +134,19 @@ async function loadRankingForRace(){
     const nick = (r[discordCol]||"").trim();
     const fortuna = (r[fortunaCol]||"").trim();
     const pts = parseFloat((r[pointsCol]||"0").replace(",", "."))||0;
+
     if(!nick) return;
-    if(!data[nick]) data[nick]={punkty:0, kupony:0, fortuna:fortuna, firstTime:time, links:[]};
+
+    if(!data[nick]) data[nick]={punkty:0, kupony:0, fortuna:fortuna, firstTime:time};
     data[nick].punkty += pts;
     data[nick].kupony++;
-    if(time<data[nick].firstTime) data[nick].firstTime=time;
+    if(time<data[nick].firstTime) data[nick].firstTime = time;
   });
 
   playersData = data;
-  list = Object.entries(data).map(([nick,v])=>({nick, ...v}));
-  renderTable("points");
+  list = Object.entries(data).map(([nick,v]) => ({nick, ...v}));
 
+  renderTable();
   document.getElementById("count").textContent = list.length;
   const sum = list.reduce((a,b)=>a+b.punkty,0);
   document.getElementById("sum").textContent = sum.toFixed(0);
@@ -164,31 +157,21 @@ async function loadRankingForRace(){
   document.getElementById("loader").classList.add("hidden");
 }
 
-function renderTable(sortBy){
-  const tb = document.querySelector("#ranking tbody"); tb.innerHTML="";
+function renderTable(){
+  const tb = document.querySelector("#ranking tbody"); tb.innerHTML = "";
   const sorted = [...list];
+  // Sortowanie po punktach, przy remisie po sygnaturze czasowej
   sorted.sort((a,b)=>{
-    if(b.punkty!==a.punkty) return b.punkty-a.punkty;
-    return new Date(a.firstTime)-new Date(b.firstTime);
+    if(b.punkty !== a.punkty) return b.punkty - a.punkty;
+    return a.firstTime - b.firstTime;
   });
+
   sorted.forEach((p,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${i+1}</td><td class="nick">${p.nick}</td><td>${p.fortuna}</td><td class="points">${Math.round(p.punkty)}</td>`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${i+1}</td><td class="nick">${p.nick}</td><td class="fortuna">${p.fortuna}</td><td class="points">${Math.round(p.punkty)}</td>`;
     tr.querySelector(".nick").addEventListener("click",()=>openPopup(p.nick));
     tb.appendChild(tr);
   });
-}
-
-function renderLinks(nick,sortType){
-  const p = playersData[nick]; if(!p) return;
-  let sorted = [...p.links];
-  if(sortType==="points") sorted.sort((a,b)=>b.points-a.points);
-  else sorted.sort((a,b)=>(new Date(b.date)-new Date(a.date))||b.points-a.points);
-  const maxPts = Math.max(...sorted.map(l=>l.points));
-  const div = document.getElementById("popup-links");
-  div.innerHTML = sorted.length
-    ? sorted.map((l,i)=>`<div class="coupon ${l.points===maxPts?'best':''}" style="animation-delay:${i*0.08}s"><div><div class="coupon-date">📅 ${l.date||"—"}</div><div class="coupon-points">🏆 ${l.points.toFixed(0)} pkt</div></div><button class="open-btn" onclick="window.open('${l.url}','_blank')">Otwórz</button></div>`).join("")
-    : "<p>Brak kuponów.</p>";
 }
 
 function openPopup(nick){
@@ -200,22 +183,26 @@ function openPopup(nick){
   document.getElementById("popup-total").textContent = `Łącznie: ${playersData[nick].punkty.toFixed(0)} pkt`;
   popup.classList.add("active");
 }
+
+function renderLinks(nick,sortType){
+  const p = playersData[nick]; if(!p) return;
+  const div = document.getElementById("popup-links");
+  div.innerHTML = `<p>Lista kuponów będzie tutaj (do uzupełnienia)</p>`;
+}
+
 function closePopup(){document.getElementById("popup").classList.remove("active");}
 
 document.getElementById("search").addEventListener("input", e=>{
   const q = e.target.value.toLowerCase();
   document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
     const nick = tr.querySelector(".nick")?.textContent.toLowerCase()||"";
-    tr.style.display = nick.includes(q)?"":"none";
+    tr.style.display = nick.includes(q) ? "" : "none";
   });
 });
 
 window.addEventListener("load", ()=>{
-  const raceSelect = document.getElementById("race-select");
-  loadRankingForRace();
-  raceSelect.addEventListener("change", ()=>loadRankingForRace());
+  loadRanking();
 });
 </script>
-
 </body>
 </html>
