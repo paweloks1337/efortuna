@@ -4,12 +4,15 @@
 <meta charset="UTF-8">
 <title>🏎️ Typer F1</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
+--red:#E10600;
 --gold:#FFD700;
+--bg:#0e0e0e;
+--panel:#1a1a1a;
 --green:#00FF88;
 }
 
@@ -17,19 +20,58 @@ body{
 margin:0;
 font-family:Poppins;
 background:linear-gradient(#000,#111);
-color:var(--gold);
+color:white;
 text-align:center;
 }
 
 h1{
+color:var(--red);
+text-shadow:0 0 12px var(--red);
 margin:20px 0;
-text-shadow:0 0 10px var(--gold);
 }
+
+/* nagrody */
+
+.prizes{
+max-width:850px;
+margin:20px auto;
+background:var(--panel);
+padding:20px;
+border-radius:14px;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
+}
+
+.prizes h2{
+margin-top:0;
+color:var(--red);
+}
+
+.prize-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.prize-table td{
+padding:10px;
+border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.prize-table td:first-child{
+text-align:left;
+}
+
+.prize-table td:last-child{
+text-align:right;
+color:var(--green);
+font-weight:600;
+}
+
+/* ranking */
 
 .container{
 max-width:850px;
 margin:30px auto;
-background:#1a1a1a;
+background:var(--panel);
 padding:20px;
 border-radius:14px;
 box-shadow:0 0 20px rgba(0,0,0,0.6);
@@ -46,12 +88,10 @@ border-bottom:1px solid rgba(255,255,255,0.05);
 }
 
 th{
-text-transform:uppercase;
-font-size:14px;
+color:var(--red);
 }
 
 .nick{
-color:#fff;
 font-weight:600;
 }
 
@@ -61,13 +101,47 @@ font-weight:700;
 text-align:right;
 }
 
+/* top 3 medal */
+
+.gold{
+color:var(--gold);
+font-weight:700;
+}
+
+.silver{
+color:#C0C0C0;
+font-weight:700;
+}
+
+.bronze{
+color:#CD7F32;
+font-weight:700;
+}
+
+/* animacja top10 */
+
+.top10{
+animation:goldGlow 2s infinite alternate;
+}
+
+@keyframes goldGlow{
+from{
+text-shadow:0 0 5px var(--gold);
+}
+to{
+text-shadow:0 0 15px var(--gold);
+}
+}
+
+/* search */
+
 #search{
 width:260px;
 padding:10px;
 border-radius:8px;
-border:2px solid var(--gold);
-background:#000;
-color:var(--gold);
+border:2px solid var(--red);
+background:black;
+color:white;
 margin-bottom:15px;
 }
 
@@ -78,7 +152,30 @@ margin-bottom:15px;
 
 <h1>🏎️ Typer F1</h1>
 
-<input id="search" placeholder="🔍 Szukaj nicku...">
+<div class="prizes">
+
+<h2>🏆 Nagrody</h2>
+
+<table class="prize-table">
+
+<tr><td>🥇 1 miejsce</td><td>200 zł FREEBET</td></tr>
+<tr><td>🥈 2 miejsce</td><td>100 zł FREEBET</td></tr>
+<tr><td>🥉 3 miejsce</td><td>100 zł FREEBET</td></tr>
+
+<tr><td>4 miejsce</td><td>50 zł FREEBET</td></tr>
+<tr><td>5 miejsce</td><td>50 zł FREEBET</td></tr>
+
+<tr><td>6 miejsce</td><td>5000 COINS</td></tr>
+<tr><td>7 miejsce</td><td>5000 COINS</td></tr>
+<tr><td>8 miejsce</td><td>5000 COINS</td></tr>
+<tr><td>9 miejsce</td><td>5000 COINS</td></tr>
+<tr><td>10 miejsce</td><td>5000 COINS</td></tr>
+
+</table>
+
+</div>
+
+<input id="search" placeholder="🔎 Szukaj nicku...">
 
 <div class="container">
 
@@ -213,12 +310,26 @@ tbody.innerHTML=""
 
 list.forEach((p,i)=>{
 
+let medal=""
+
+if(i===0) medal="🥇"
+if(i===1) medal="🥈"
+if(i===2) medal="🥉"
+
+let medalClass=""
+
+if(i===0) medalClass="gold"
+if(i===1) medalClass="silver"
+if(i===2) medalClass="bronze"
+
+let top10 = i<10 ? "top10" : ""
+
 const tr=document.createElement("tr")
 
 tr.innerHTML=`
-<td>${i+1}</td>
-<td class="nick">${p.nick}</td>
-<td class="points">${Math.round(p.points)}</td>
+<td class="${medalClass} ${top10}">${medal} ${i+1}</td>
+<td class="nick ${top10}">${p.nick}</td>
+<td class="points ${top10}">${Math.round(p.points)}</td>
 `
 
 tbody.appendChild(tr)
