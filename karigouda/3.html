@@ -2,86 +2,105 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ekskluzywna Loteria 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Loteria Promocyjna</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,Arial;background:#020617;color:#fff}header{ background:linear-gradient(120deg,#1e3a8a,#7c3aed,#9333ea); padding:80px 20px; text-align:center; }
+body{font-family:Poppins,Arial;background:#f6f7fb;color:#111}header{ background:linear-gradient(90deg,#ffd200,#ffb800); padding:30px 20px; box-shadow:0 6px 20px rgba(0,0,0,.1) }
 
-header h1{font-size:56px;font-weight:700;margin-bottom:15px} header p{font-size:18px;opacity:.9}
+.nav{ max-width:1200px; margin:auto; display:flex; align-items:center; justify-content:space-between }
 
-.container{max-width:1200px;margin:auto;padding:60px 20px}
+.logo{ font-weight:700; font-size:22px }
 
-.hero{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center }
+.nav a{ margin-left:20px; text-decoration:none; color:#111; font-weight:500 }
 
-.card{ background:#0f172a; padding:35px; border-radius:18px; box-shadow:0 20px 40px rgba(0,0,0,.6) }
+.hero{ max-width:1200px; margin:auto; padding:60px 20px; display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center }
 
-.prize{ font-size:64px; font-weight:700; background:linear-gradient(90deg,#facc15,#fde047); -webkit-background-clip:text; color:transparent; margin:20px 0 }
+.hero h1{ font-size:48px; margin-bottom:10px }
 
-.car{ width:100%; max-width:520px; display:block; margin:30px auto 0 auto; filter:drop-shadow(0 25px 35px rgba(0,0,0,.6)); }
+.hero p{ font-size:18px; margin-bottom:25px; color:#444 }
 
-.badge{ display:inline-block; background:#facc15; color:#000; padding:6px 12px; border-radius:999px; font-weight:600; font-size:13px; margin-bottom:10px }
+.badge{ background:#ff0033; color:#fff; padding:6px 14px; border-radius:30px; font-size:13px; font-weight:600; display:inline-block; margin-bottom:15px }
 
-.countdown{ display:flex; gap:12px; margin-top:20px }
+.cta{ background:#0066ff; color:#fff; padding:14px 24px; border-radius:10px; text-decoration:none; font-weight:600; display:inline-block }
 
-.time{ background:#020617; padding:14px 18px; border-radius:10px; text-align:center }
+.car{ width:100%; max-width:520px; filter:drop-shadow(0 20px 30px rgba(0,0,0,.25)) }
 
-.time span{display:block;font-size:24px;font-weight:600}
+.section{ max-width:1200px; margin:auto; padding:60px 20px }
 
-.form-group{margin-bottom:16px}
-
-label{display:block;font-size:14px;margin-bottom:6px}
-
-input,select{ width:100%; padding:12px; border-radius:10px; border:none; background:#020617; color:#fff }
-
-button{ width:100%; padding:14px; border:none; border-radius:12px; font-weight:600; font-size:16px; cursor:pointer; background:linear-gradient(90deg,#22c55e,#4ade80); transition:.25s }
-
-button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.6)}
-
-.success{display:none;margin-top:12px;color:#4ade80}
-
-.section-title{ text-align:center; font-size:34px; margin-bottom:40px }
+.section h2{ text-align:center; font-size:32px; margin-bottom:40px }
 
 .features{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:25px }
 
-.feature{ background:#0f172a; padding:30px; border-radius:16px; text-align:center; transition:.25s }
+.feature{ background:#fff; padding:30px; border-radius:14px; box-shadow:0 8px 25px rgba(0,0,0,.08); text-align:center }
 
-.feature:hover{transform:translateY(-6px)}
+.prizes{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:25px }
 
-.prizes{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px }
+.prize-card{ background:#fff; padding:25px; border-radius:14px; box-shadow:0 8px 25px rgba(0,0,0,.08); text-align:center }
 
-.prize-card{ background:#0f172a; padding:25px; border-radius:16px; text-align:center }
+.form-box{ background:#fff; padding:35px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.1) }
 
-.testimonials{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:25px }
+.form-box h3{margin-bottom:15px}
 
-.testimonial{ background:#0f172a; padding:25px; border-radius:16px }
+.form-group{margin-bottom:15px}
 
-footer{ margin-top:80px; padding:40px 20px; text-align:center; background:#020617; color:#94a3b8 }
+label{display:block;font-size:14px;margin-bottom:5px}
 
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center }
+input,select{ width:100%; padding:12px; border-radius:8px; border:1px solid #ddd }
 
-.modal-content{ background:#020617; padding:30px; border-radius:16px; max-width:600px }
+button{ width:100%; padding:14px; background:#ff0033; color:#fff; border:none; border-radius:10px; font-weight:600; cursor:pointer }
 
-.close{ margin-top:20px; background:#ef4444; color:#fff }
+button:hover{opacity:.9}
 
-@media(max-width:900px){ .hero{grid-template-columns:1fr} header h1{font-size:40px} } </style>
+.success{display:none;margin-top:10px;color:green}
+
+.winners{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:25px }
+
+.winner{ background:#fff; padding:20px; border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,.08); text-align:center }
+
+footer{ margin-top:40px; background:#111; color:#fff; text-align:center; padding:30px 20px }
+
+@media(max-width:900px){ .hero{grid-template-columns:1fr} .hero h1{font-size:36px} } </style>
 
 </head>
 <body><header>
-<h1>Ekskluzywna Loteria Samochodowa</h1>
-<p>Weź udział i wygraj luksusowy samochód lub nagrody pieniężne</p>
-</header><div class="container"><div class="hero"><div class="card">
-<span class="badge">NAGRODA GŁÓWNA</span>
-<h2>BMW M4 Competition</h2>
-<div class="prize">+ 50 000 zł</div>
-<p>Dołącz do loterii i wygraj samochód marzeń. Losowanie już wkrótce.</p><img class="car" src="https://pngimg.com/uploads/bmw/bmw_PNG1711.png" alt="BMW" /><div class="countdown">
-<div class="time"><span id="d">30</span>Dni</div>
-<div class="time"><span id="h">12</span>Godz</div>
-<div class="time"><span id="m">45</span>Min</div>
+<div class="nav">
+<div class="logo">SuperLoteria</div>
+<div>
+<a href="#nagrody">Nagrody</a>
+<a href="#jak">Jak działa</a>
+<a href="#formularz">Zgłoszenie</a>
 </div>
-</div><div class="card">
-<h2>Formularz zgłoszeniowy</h2>
-<form id="lotteryForm"><div class="form-group">
+</div>
+</header><section class="hero"><div>
+<span class="badge">WIELKA LOTERIA</span>
+<h1>Wygraj BMW M4</h1>
+<p>Zarejestruj się w loterii i weź udział w losowaniu nagrody głównej.</p>
+<a class="cta" href="#formularz">Weź udział</a>
+</div><div>
+<img class="car" src="https://pngimg.com/uploads/bmw/bmw_PNG1711.png" alt="BMW">
+</div></section><section id="jak" class="section">
+<h2>Jak działa loteria</h2><div class="features"><div class="feature">
+<h3>1. Zarejestruj się</h3>
+<p>Wypełnij formularz zgłoszeniowy.</p>
+</div><div class="feature">
+<h3>2. Weź udział</h3>
+<p>Twoje zgłoszenie trafia do puli losowania.</p>
+</div><div class="feature">
+<h3>3. Losowanie</h3>
+<p>Zwycięzca zostaje wybrany automatycznie.</p>
+</div></div></section><section id="nagrody" class="section">
+<h2>Nagrody</h2><div class="prizes"><div class="prize-card">
+<h3>1 miejsce</h3>
+<p>BMW M4 + 50 000 zł</p>
+</div><div class="prize-card">
+<h3>2 miejsce</h3>
+<p>10 000 zł</p>
+</div><div class="prize-card">
+<h3>3 miejsce</h3>
+<p>iPhone 15</p>
+</div></div></section><section id="formularz" class="section"><div class="form-box">
+<h3>Formularz zgłoszeniowy</h3><form id="lotteryForm"><div class="form-group">
 <label>Imię i nazwisko</label>
 <input type="text" required>
 </div><div class="form-group">
@@ -93,80 +112,36 @@ footer{ margin-top:80px; padding:40px 20px; text-align:center; background:#02061
 </div><div class="form-group">
 <label>Kraj</label>
 <select required>
-<option value="">Wybierz</option>
 <option>Polska</option>
 <option>Niemcy</option>
 <option>Czechy</option>
-<option>Słowacja</option>
 </select>
 </div><div class="form-group">
 <label>
 <input type="checkbox" required> Akceptuję regulamin
 </label>
-</div><button type="submit">Dołącz do loterii</button>
+</div><button type="submit">Zarejestruj się</button>
 
-<div class="success" id="successMsg">Zgłoszenie zostało wysłane!</div></form>
-</div></div></div><div class="container"><h2 class="section-title">Dlaczego warto wziąć udział</h2><div class="features"><div class="feature">
-<h3>Uczciwe losowanie</h3>
-<p>System losowania gwarantuje pełną transparentność.</p>
-</div><div class="feature">
-<h3>Bezpieczeństwo</h3>
-<p>Dane uczestników są szyfrowane i chronione.</p>
-</div><div class="feature">
-<h3>Szybkie ogłoszenie</h3>
-<p>Zwycięzca zostanie ogłoszony publicznie.</p>
-</div><div class="feature">
-<h3>Duże nagrody</h3>
-<p>Oprócz nagrody głównej przewidziano nagrody dodatkowe.</p>
-</div></div></div><div class="container"><h2 class="section-title">Nagrody dodatkowe</h2><div class="prizes"><div class="prize-card">
-<h4>1 miejsce</h4>
-<p>50 000 zł</p>
-</div><div class="prize-card">
-<h4>2 miejsce</h4>
-<p>5 000 zł</p>
-</div><div class="prize-card">
-<h4>3 miejsce</h4>
-<p>2 000 zł</p>
-</div></div></div><div class="container"><h2 class="section-title">Opinie zwycięzców</h2><div class="testimonials"><div class="testimonial">
-<p>"Nie wierzyłem że wygram — a jednak!"</p>
-<strong>— Michał</strong>
-</div><div class="testimonial">
-<p>"Profesjonalna organizacja i szybka wypłata nagrody."</p>
-<strong>— Anna</strong>
-</div><div class="testimonial">
-<p>"Najlepsza loteria w jakiej brałem udział."</p>
-<strong>— Piotr</strong>
-</div></div><div style="text-align:center;margin-top:40px">
-<button onclick="openRules()">Zobacz regulamin</button>
-</div></div><footer>
-© 2026 Loteria Promocyjna | Wszystkie prawa zastrzeżone
-</footer><div class="modal" id="rulesModal">
-<div class="modal-content">
-<h2>Regulamin loterii</h2>
-<p>
-1. Udział jest darmowy.<br>
-2. Jedno zgłoszenie na osobę.<br>
-3. Losowanie odbędzie się publicznie.<br>
-4. Organizator kontaktuje się ze zwycięzcą.
-</p>
-<button class="close" onclick="closeRules()">Zamknij</button>
-</div>
-</div><script>
+<div class="success" id="successMsg">Twoje zgłoszenie zostało wysłane.</div></form></div></section><section class="section">
+<h2>Ostatni zwycięzcy</h2><div class="winners"><div class="winner">
+<strong>Michał K.</strong>
+<p>Warszawa</p>
+</div><div class="winner">
+<strong>Anna P.</strong>
+<p>Kraków</p>
+</div><div class="winner">
+<strong>Piotr W.</strong>
+<p>Gdańsk</p>
+</div></div></section><footer>
+© 2026 SuperLoteria | Regulamin | Polityka prywatności
+</footer><script>
 const form=document.getElementById('lotteryForm')
 const success=document.getElementById('successMsg')
 
 form.addEventListener('submit',function(e){
-e.preventDefault()
-success.style.display='block'
-form.reset()
+ e.preventDefault()
+ success.style.display='block'
+ form.reset()
 })
-
-function openRules(){
-document.getElementById('rulesModal').style.display='flex'
-}
-
-function closeRules(){
-document.getElementById('rulesModal').style.display='none'
-}
 </script></body>
 </html>
