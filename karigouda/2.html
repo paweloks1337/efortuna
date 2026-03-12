@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PAWELOKS TEST – Konkurs</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+background:linear-gradient(180deg,#f4f8ff,#ffffff);
+color:#222;
+}
+
+/* HEADER */
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 40px;
+background:white;
+box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logo{
+font-weight:700;
+font-size:20px;
+color:#2563eb;
+}
+
+nav a{
+margin-left:20px;
+text-decoration:none;
+color:#444;
+font-size:14px;
+}
+
+/* HERO */
+
+.hero{
+text-align:center;
+padding:100px 20px;
+background:linear-gradient(135deg,#3b82f6,#60a5fa);
+color:white;
+position:relative;
+overflow:hidden;
+}
+
+.hero h1{
+font-size:48px;
+margin-bottom:10px;
+}
+
+.hero p{
+max-width:600px;
+margin:auto;
+opacity:0.9;
+}
+
+/* BADGE */
+
+.prize-badge{
+display:inline-block;
+background:#ffcc00;
+color:#222;
+font-weight:700;
+padding:12px 24px;
+border-radius:50px;
+margin-bottom:25px;
+font-size:18px;
+}
+
+/* COUNTDOWN */
+
+.countdown{
+display:flex;
+justify-content:center;
+gap:15px;
+margin-bottom:30px;
+}
+
+.time{
+background:white;
+color:#222;
+padding:12px 18px;
+border-radius:10px;
+min-width:70px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.time span{
+font-weight:700;
+font-size:20px;
+display:block;
+}
+
+/* BUTTON */
+
+.cta{
+margin-top:30px;
+background:#ffcc00;
+border:none;
+padding:16px 40px;
+border-radius:40px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+}
+
+.cta:hover{
+transform:translateY(-3px);
+}
+
+/* SECTIONS */
+
+section{
+padding:80px 20px;
+max-width:1100px;
+margin:auto;
+}
+
+.section-title{
+text-align:center;
+font-size:32px;
+margin-bottom:40px;
+}
+
+/* STEPS */
+
+.steps{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:25px;
+}
+
+.step{
+background:white;
+padding:30px;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.05);
+text-align:center;
+}
+
+/* PRIZES */
+
+.prizes{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+}
+
+.prize{
+background:white;
+padding:30px;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.05);
+text-align:center;
+}
+
+.prize img{
+width:100%;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+/* FORM */
+
+.form-box{
+background:white;
+padding:40px;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+max-width:600px;
+margin:auto;
+}
+
+form{
+display:grid;
+gap:15px;
+}
+
+input, textarea{
+padding:14px;
+border-radius:8px;
+border:1px solid #ddd;
+font-size:14px;
+}
+
+textarea{
+min-height:120px;
+}
+
+.submit{
+background:#2563eb;
+color:white;
+border:none;
+padding:14px;
+border-radius:30px;
+font-weight:600;
+cursor:pointer;
+}
+
+/* FOOTER */
+
+footer{
+text-align:center;
+padding:30px;
+color:#777;
+font-size:14px;
+}
+
+/* POPUP */
+
+.popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:flex;
+justify-content:center;
+align-items:center;
+opacity:0;
+pointer-events:none;
+transition:0.3s;
+}
+
+.popup.active{
+opacity:1;
+pointer-events:auto;
+}
+
+.popup-box{
+background:white;
+padding:40px;
+border-radius:12px;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">FORTUNA PROMO</div>
+
+<nav>
+<a href="#">Start</a>
+<a href="#">Zasady</a>
+<a href="#">Nagrody</a>
+<a href="#">Formularz</a>
+</nav>
+
+</header>
+
+<!-- HERO -->
+
+<section class="hero">
+
+<div class="prize-badge">
+NAGRODA GŁÓWNA 10 000 ZŁ
+</div>
+
+<div class="countdown">
+
+<div class="time"><span id="days">00</span>dni</div>
+<div class="time"><span id="hours">00</span>godz</div>
+<div class="time"><span id="minutes">00</span>min</div>
+<div class="time"><span id="seconds">00</span>sek</div>
+
+</div>
+
+<h1>Wygraj w naszym konkursie</h1>
+
+<p>
+Napisz jakie są twoje wymarzone wakacje i gdzie chciałbyś je spędzić.
+Wybierzemy 3 najlepsze odpowiedzi.
+</p>
+
+<button class="cta" onclick="scrollForm()">Weź udział</button>
+
+</section>
+
+<!-- STEPS -->
+
+<section>
+
+<h2 class="section-title">Jak wziąć udział</h2>
+
+<div class="steps">
+
+<div class="step">
+<h3>1</h3>
+<p>Napisz gdzie chciałbyś spędzić wymarzone wakacje</p>
+</div>
+
+<div class="step">
+<h3>2</h3>
+<p>Wypełnij formularz konkursowy</p>
+</div>
+
+<div class="step">
+<h3>3</h3>
+<p>3 najlepsze odpowiedzi wygrywają</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- PRIZES -->
+
+<section>
+
+<h2 class="section-title">Nagrody</h2>
+
+<div class="prizes">
+
+<div class="prize">
+<img src="https://picsum.photos/400/250">
+<h3>10 000 zł</h3>
+</div>
+
+<div class="prize">
+<img src="https://picsum.photos/401/250">
+<h3>iPhone 15 Pro Max</h3>
+</div>
+
+<div class="prize">
+<img src="https://picsum.photos/402/250">
+<h3>PlayStation 5</h3>
+</div>
+
+</div>
+
+</section>
+
+<!-- FORM -->
+
+<section id="form">
+
+<h2 class="section-title">Formularz</h2>
+
+<div class="form-box">
+
+<form id="contestForm">
+
+<input type="text" placeholder="Imię i nazwisko" required>
+<input type="email" placeholder="Email" required>
+<input type="tel" placeholder="Telefon" required>
+
+<textarea placeholder="Twoje wymarzone wakacje..."></textarea>
+
+<label>
+<input type="checkbox" required>
+Akceptuję regulamin
+</label>
+
+<label>
+<input type="checkbox" required>
+Zgoda na przetwarzanie danych
+</label>
+
+<button class="submit">Wyślij zgłoszenie</button>
+
+</form>
+
+</div>
+
+</section>
+
+<footer>
+
+© 2026 PAWELOKS TEST
+
+</footer>
+
+<div class="popup" id="popup">
+
+<div class="popup-box">
+<h3>Dziękujemy za zgłoszenie!</h3>
+</div>
+
+</div>
+
+<script>
+
+/* SCROLL */
+
+function scrollForm(){
+document.getElementById("form").scrollIntoView({behavior:"smooth"});
+}
+
+/* POPUP */
+
+const form=document.getElementById("contestForm");
+const popup=document.getElementById("popup");
+
+form.addEventListener("submit",(e)=>{
+e.preventDefault();
+popup.classList.add("active");
+form.reset();
+});
+
+/* COUNTDOWN */
+
+const end=new Date("March 31, 2026 23:59:59").getTime();
+
+setInterval(()=>{
+
+const now=new Date().getTime();
+const diff=end-now;
+
+const d=Math.floor(diff/(1000*60*60*24));
+const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+const m=Math.floor((diff%(1000*60*60))/(1000*60));
+const s=Math.floor((diff%(1000*60))/1000);
+
+document.getElementById("days").innerText=d;
+document.getElementById("hours").innerText=h;
+document.getElementById("minutes").innerText=m;
+document.getElementById("seconds").innerText=s;
+
+},1000);
+
+</script>
+
+</body>
+</html>
