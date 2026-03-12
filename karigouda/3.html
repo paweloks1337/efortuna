@@ -3,16 +3,19 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Super Loteria</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"><style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Poppins,Arial;background:#f6f7fb;color:#111}header{background:linear-gradient(90deg,#ffd200,#ffb800);padding:30px 20px;box-shadow:0 6px 20px rgba(0,0,0,.1)}
+body{font-family:Poppins,Arial;background:#f6f7fb;color:#111}
 
-.nav{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between} .logo{font-weight:700;font-size:22px}
+header{background:linear-gradient(90deg,#ffd200,#ffb800);padding:30px 20px;box-shadow:0 6px 20px rgba(0,0,0,.1)}
 
+.nav{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:700;font-size:22px}
 .nav a{margin-left:20px;text-decoration:none;color:#111;font-weight:500}
 
-.hero{max-width:1200px;margin:auto;padding:60px 20px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center} .hero h1{font-size:48px;margin-bottom:10px} .hero p{font-size:18px;margin-bottom:25px;color:#444}
+.hero{max-width:1200px;margin:auto;padding:60px 20px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero h1{font-size:48px;margin-bottom:10px}
+.hero p{font-size:18px;margin-bottom:25px;color:#444}
 
 .badge{background:#ff0033;color:#fff;padding:6px 14px;border-radius:30px;font-size:13px;font-weight:600;display:inline-block;margin-bottom:15px}
 
@@ -20,14 +23,13 @@ body{font-family:Poppins,Arial;background:#f6f7fb;color:#111}header{background:l
 
 .car{width:100%;max-width:520px;filter:drop-shadow(0 20px 30px rgba(0,0,0,.25))}
 
-.section{max-width:1200px;margin:auto;padding:60px 20px} .section h2{text-align:center;font-size:32px;margin-bottom:40px}
+.section{max-width:1200px;margin:auto;padding:60px 20px}
+.section h2{text-align:center;font-size:32px;margin-bottom:40px}
 
 .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px}
 
 .feature{background:#fff;padding:30px;border-radius:14px;box-shadow:0 8px 25px rgba(0,0,0,.08);text-align:center;cursor:pointer;transition:.2s}
-
 .feature strong{color:#ff0033}
-
 .feature:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,.12)}
 
 .prizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:25px}
@@ -36,15 +38,68 @@ body{font-family:Poppins,Arial;background:#f6f7fb;color:#111}header{background:l
 
 .prize-img{width:100%;max-width:260px;margin:15px auto 0 auto;display:block}
 
-.form-box{background:#fff;padding:35px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+/* FORM */
 
-.form-group{margin-bottom:15px} label{display:block;font-size:14px;margin-bottom:5px}
+.form-wrapper{display:flex;justify-content:center}
 
-input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #ddd}
+.form-box{
+background:#fff;
+padding:40px;
+border-radius:18px;
+box-shadow:0 15px 40px rgba(0,0,0,.15);
+max-width:520px;
+width:100%;
+}
 
-button{width:100%;padding:14px;background:#ff0033;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer} button:hover{opacity:.9}
+.form-box h3{text-align:center;margin-bottom:25px}
 
-.success{display:none;margin-top:10px;color:green}
+.progress{
+height:8px;
+background:#eee;
+border-radius:20px;
+margin-bottom:25px;
+overflow:hidden
+}
+
+.progress-bar{
+height:100%;
+width:50%;
+background:#ff0033;
+}
+
+.form-group{margin-bottom:18px;position:relative}
+
+label{display:block;font-size:14px;margin-bottom:6px}
+
+input,select{
+width:100%;
+padding:12px 12px 12px 40px;
+border-radius:10px;
+border:1px solid #ccc;
+font-size:14px
+}
+
+.icon{
+position:absolute;
+left:12px;
+top:38px;
+font-size:16px;
+opacity:.6
+}
+
+button{
+width:100%;
+padding:15px;
+background:#ff0033;
+color:#fff;
+border:none;
+border-radius:12px;
+font-weight:600;
+font-size:16px;
+cursor:pointer
+}
+
+button:hover{opacity:.9}
 
 .winners{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px}
 
@@ -52,15 +107,24 @@ button{width:100%;padding:14px;background:#ff0033;color:#fff;border:none;border-
 
 footer{margin-top:40px;background:#111;color:#fff;text-align:center;padding:30px 20px}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
 
-.modal-content{background:#fff;padding:30px;border-radius:12px;max-width:500px;text-align:center}
+.modal-content{background:#fff;padding:40px;border-radius:16px;text-align:center;max-width:420px;animation:pop .4s}
+
+@keyframes pop{
+0%{transform:scale(.6);opacity:0}
+100%{transform:scale(1);opacity:1}
+}
+
+.success-icon{font-size:48px;margin-bottom:10px}
 
 .close{margin-top:20px;background:#111;color:#fff;padding:10px 18px;border:none;border-radius:8px;cursor:pointer}
 
-@media(max-width:900px){ .hero{grid-template-columns:1fr} .hero h1{font-size:36px} } </style>
-
-</head>
+@media(max-width:900px){
+.hero{grid-template-columns:1fr}
+.hero h1{font-size:36px}
+}
+</style></head>
 <body><header>
 <div class="nav">
 <div class="logo">SuperLoteria</div>
@@ -77,40 +141,24 @@ footer{margin-top:40px;background:#111;color:#fff;text-align:center;padding:30px
 <a class="cta" href="#formularz">Weź udział</a>
 </div><div>
 <img class="car" src="https://pngimg.com/uploads/audi/audi_PNG1741.png" alt="Audi">
-</div></section><section id="jak" class="section">
-<h2>Jak działa loteria</h2><div class="features"><div class="feature" onclick="openPopup('popup1')">
-<h3><strong>1.</strong> Zarejestruj się</h3>
-<p>Kliknij aby zobaczyć szczegóły.</p>
-</div><div class="feature" onclick="openPopup('popup2')">
-<h3><strong>2.</strong> Weź udział</h3>
-<p>Kliknij aby zobaczyć szczegóły.</p>
-</div><div class="feature" onclick="openPopup('popup3')">
-<h3><strong>3.</strong> Losowanie</h3>
-<p>Kliknij aby zobaczyć szczegóły.</p>
-</div></div></section><section id="nagrody" class="section">
-<h2>Nagrody</h2><div class="prizes"><div class="prize-card">
-<h3>1 miejsce</h3>
-<p>Audi A3</p>
-<img class="prize-img" src="https://pngimg.com/uploads/audi/audi_PNG1741.png">
-</div><div class="prize-card">
-<h3>2 miejsce</h3>
-<p>iPhone 15 Pro Max</p>
-<img class="prize-img" src="https://pngimg.com/uploads/iphone15/iphone15_PNG27.png">
-</div><div class="prize-card">
-<h3>3 miejsce</h3>
-<p>10 000 zł</p>
-</div></div></section><section id="formularz" class="section"><div class="form-box">
-<h3>Formularz zgłoszeniowy</h3><form id="lotteryForm"><div class="form-group">
+</div></section><section id="formularz" class="section"><div class="form-wrapper"><div class="form-box">
+<h3>Formularz zgłoszeniowy</h3><div class="progress">
+<div class="progress-bar"></div>
+</div><form id="lotteryForm"><div class="form-group">
 <label>Imię i nazwisko</label>
+<span class="icon">👤</span>
 <input type="text" required>
 </div><div class="form-group">
 <label>Email</label>
+<span class="icon">📧</span>
 <input type="email" required>
 </div><div class="form-group">
 <label>Telefon</label>
+<span class="icon">📱</span>
 <input type="tel" required>
 </div><div class="form-group">
 <label>Kraj</label>
+<span class="icon">🌍</span>
 <select required>
 <option>Polska</option>
 <option>Niemcy</option>
@@ -120,9 +168,13 @@ footer{margin-top:40px;background:#111;color:#fff;text-align:center;padding:30px
 <label>
 <input type="checkbox" required> Akceptuję regulamin
 </label>
+</div><div class="form-group">
+<label>
+<input type="checkbox"> Zgoda marketingowa na kontakt
+</label>
 </div><button type="submit">Zarejestruj się</button>
 
-<div class="success" id="successMsg">Twoje zgłoszenie zostało wysłane.</div></form></div></section><section class="section">
+</form></div></div></section><section class="section">
 <h2>Tablica zwycięzców</h2><div class="winners"><div class="winner">
 <strong>Michał K.</strong>
 <p>Warszawa</p>
@@ -137,40 +189,24 @@ footer{margin-top:40px;background:#111;color:#fff;text-align:center;padding:30px
 <p>Nagroda: Audi A3</p>
 </div></div></section><footer>
 © 2026 SuperLoteria | Regulamin | Polityka prywatności
-</footer><div class="modal" id="popup1">
+</footer><div class="modal" id="successPopup">
 <div class="modal-content">
-<h3>Rejestracja</h3>
-<p>Wypełnij formularz zgłoszeniowy aby wziąć udział w loterii.</p>
-<button class="close" onclick="closePopup('popup1')">Zamknij</button>
-</div>
-</div><div class="modal" id="popup2">
-<div class="modal-content">
-<h3>Udział w losowaniu</h3>
-<p>Po rejestracji Twoje zgłoszenie trafia do systemu losującego.</p>
-<button class="close" onclick="closePopup('popup2')">Zamknij</button>
-</div>
-</div><div class="modal" id="popup3">
-<div class="modal-content">
-<h3>Losowanie</h3>
-<p>Zwycięzca zostaje wybrany automatycznie przez system.</p>
-<button class="close" onclick="closePopup('popup3')">Zamknij</button>
+<div class="success-icon">🎉</div>
+<h3>Zgłoszenie wysłane!</h3>
+<p>Twoje zgłoszenie bierze udział w losowaniu.</p>
+<button class="close" onclick="closePopup()">Zamknij</button>
 </div>
 </div><script>
 const form=document.getElementById('lotteryForm')
-const success=document.getElementById('successMsg')
 
 form.addEventListener('submit',function(e){
  e.preventDefault()
- success.style.display='block'
+ document.getElementById('successPopup').style.display='flex'
  form.reset()
 })
 
-function openPopup(id){
- document.getElementById(id).style.display='flex'
-}
-
-function closePopup(id){
- document.getElementById(id).style.display='none'
+function closePopup(){
+ document.getElementById('successPopup').style.display='none'
 }
 </script></body>
 </html>
