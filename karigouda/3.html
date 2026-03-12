@@ -3,378 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wielka Loteria</title>
-
+<title>Wielka Loteria Premium</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
+body{background:#fff7d6;color:#222;}
+header{background:linear-gradient(90deg,#ffd200,#ffb800);padding:20px;position:sticky;top:0;z-index:10;}
+.nav{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-size:26px;font-weight:700;color:#111;}
+.hero{max-width:1200px;margin:auto;padding:60px 20px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:40px;position:relative;}
+.hero h1{font-size:52px;margin-bottom:15px;color:#111;animation:fadeUp 1s ease forwards;}
+.hero p{margin-bottom:25px;color:#444;font-size:18px;animation:fadeUp 1.2s ease forwards;}
+.cta{background:#ff0033;color:white;padding:16px 28px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;font-size:18px;animation:fadeUp 1.4s ease forwards;transition:.3s;}
+.cta:hover{transform:scale(1.05);}
+.hero img{width:100%;max-width:500px;position:relative;animation:fadeInScale 1s ease forwards;}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes fadeInScale{0%{opacity:0;transform:scale(0.8);}100%{opacity:1;transform:scale(1);}}
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
+.section{max-width:1200px;margin:auto;padding:70px 20px;}
+.section h2{text-align:center;margin-bottom:50px;font-size:36px;}
 
-body{
-font-family:Poppins;
-background:#fff7d6;
-color:#222;
-}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;}
+.step{background:white;padding:30px;border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.1);text-align:center;cursor:pointer;transition:.3s;position:relative;}
+.step:hover{transform:translateY(-6px);box-shadow:0 16px 35px rgba(0,0,0,.15);}
+.step h3{margin-bottom:10px;color:#ff0033;font-size:22px;}
+.step p{color:#555;font-size:16px;}
 
-header{
-background:linear-gradient(90deg,#ffd200,#ffb800);
-padding:20px;
-}
+.prizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px;}
+.prize{background:white;padding:30px;border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.1);text-align:center;transition:.3s;}
+.prize:hover{transform:translateY(-6px);}
+.prize img{width:100%;max-width:220px;margin:auto;display:block;}
 
-.nav{
-max-width:1200px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+.form-box{background:white;max-width:520px;margin:auto;padding:40px;border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.2);}
+.form-box h2{text-align:center;margin-bottom:25px;}
+.form-box input,.form-box select{width:100%;padding:16px 14px;margin-bottom:15px;border-radius:12px;border:1px solid #ddd;font-size:16px;}
+button{width:100%;padding:16px;background:#ff0033;color:white;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;transition:.3s;}
+button:hover{transform:scale(1.03);}
+.winners{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px;}
+.winner{background:white;padding:22px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.12);text-align:center;transition:.3s;}
+.winner:hover{transform:translateY(-5px);}
 
-.logo{
-font-size:22px;
-font-weight:700;
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100;}
+.modal-content{background:white;padding:40px;border-radius:20px;text-align:center;max-width:450px;animation:pop 0.4s ease;}
+@keyframes pop{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
 
-.hero{
-max-width:1200px;
-margin:auto;
-padding:60px 20px;
-display:grid;
-grid-template-columns:1fr 1fr;
-align-items:center;
-gap:40px;
-}
+.confetti-piece{position:absolute;width:10px;height:10px;background:red;animation:confettiFall 3s linear infinite;}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);}100%{transform:translateY(800px) rotate(360deg);}}
 
-.hero h1{
-font-size:48px;
-margin-bottom:10px;
-}
+.counter{font-size:20px;color:#111;font-weight:600;text-align:center;margin-bottom:20px;}
+.timer{font-size:22px;color:#ff0033;font-weight:700;text-align:center;margin-bottom:30px;}
 
-.hero p{
-margin-bottom:20px;
-color:#444;
-}
+footer{background:#111;color:white;text-align:center;padding:35px;margin-top:60px;}
 
-.cta{
-background:#ff0033;
-color:white;
-padding:14px 25px;
-border-radius:10px;
-text-decoration:none;
-font-weight:600;
-}
-
-.hero img{
-width:100%;
-filter:drop-shadow(0 20px 30px rgba(0,0,0,.3));
-}
-
-.section{
-max-width:1200px;
-margin:auto;
-padding:70px 20px;
-}
-
-.section h2{
-text-align:center;
-margin-bottom:40px;
-font-size:34px;
-}
-
-.steps{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:25px;
-}
-
-.step{
-background:white;
-padding:30px;
-border-radius:16px;
-box-shadow:0 10px 25px rgba(0,0,0,.1);
-text-align:center;
-cursor:pointer;
-transition:.2s;
-}
-
-.step:hover{
-transform:translateY(-5px);
-}
-
-.prizes{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
-}
-
-.prize{
-background:white;
-padding:30px;
-border-radius:16px;
-box-shadow:0 10px 25px rgba(0,0,0,.1);
-text-align:center;
-}
-
-.prize img{
-width:100%;
-max-width:220px;
-margin:auto;
-display:block;
-}
-
-.form-box{
-background:white;
-max-width:500px;
-margin:auto;
-padding:40px;
-border-radius:20px;
-box-shadow:0 15px 40px rgba(0,0,0,.15);
-}
-
-.form-box input,
-.form-box select{
-width:100%;
-padding:14px;
-margin-bottom:15px;
-border-radius:10px;
-border:1px solid #ddd;
-}
-
-button{
-width:100%;
-padding:15px;
-background:#ff0033;
-color:white;
-border:none;
-border-radius:10px;
-font-size:16px;
-font-weight:600;
-cursor:pointer;
-}
-
-button:hover{
-opacity:.9;
-}
-
-.winners{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
-}
-
-.winner{
-background:white;
-padding:20px;
-border-radius:14px;
-box-shadow:0 8px 20px rgba(0,0,0,.1);
-text-align:center;
-}
-
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-align-items:center;
-justify-content:center;
-}
-
-.modal-content{
-background:white;
-padding:30px;
-border-radius:15px;
-max-width:400px;
-text-align:center;
-}
-
-footer{
-background:#111;
-color:white;
-text-align:center;
-padding:30px;
-margin-top:60px;
-}
-
-@media(max-width:900px){
-.hero{
-grid-template-columns:1fr;
-}
-}
-
+@media(max-width:900px){.hero{grid-template-columns:1fr;}.hero h1{font-size:40px;}.hero p{font-size:16px;}}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="nav">
-<div class="logo">Super Loteria</div>
-</div>
+<div class="nav"><div class="logo">Wielka Loteria Premium</div></div>
 </header>
 
 <section class="hero">
-
 <div>
-<h1>Wygraj Audi A3</h1>
-<p>Weź udział w wielkiej loterii i wygraj samochód oraz nagrody pieniężne.</p>
+<h1>Wygraj Audi A3 i iPhone 15 Pro Max!</h1>
+<p>Weź udział w największej loterii 2026 roku i zgarnij nagrody.</p>
 <a class="cta" href="#formularz">Weź udział</a>
+<div class="counter">Aktualnie zgłoszonych: <span id="counterNumber">0</span></div>
+<div class="timer">Do losowania pozostało: <span id="timer">00:00:00</span></div>
 </div>
-
 <div>
-<img src="https://pngimg.com/uploads/audi/audi_PNG1741.png">
+<img src="https://pngimg.com/uploads/audi/audi_PNG1741.png" alt="Audi A3">
 </div>
-
 </section>
 
 <section class="section">
-
 <h2>Jak wziąć udział</h2>
-
 <div class="steps">
-
-<div class="step" onclick="openPopup('p1')">
-<h3>1. Kup produkt</h3>
-<p>Dokonaj zakupu promocyjnego.</p>
+<div class="step" onclick="openPopup('p1')"><h3>1. Kup produkt</h3><p>Kup promocyjny produkt.</p></div>
+<div class="step" onclick="openPopup('p2')"><h3>2. Zarejestruj paragon</h3><p>Zachowaj dowód zakupu.</p></div>
+<div class="step" onclick="openPopup('p3')"><h3>3. Wypełnij formularz</h3><p>Podaj dane i zgłoś się.</p></div>
+<div class="step" onclick="openPopup('p4')"><h3>4. Wygraj</h3><p>Losowanie nagród.</p></div>
 </div>
-
-<div class="step" onclick="openPopup('p2')">
-<h3>2. Zarejestruj paragon</h3>
-<p>Zachowaj dowód zakupu.</p>
-</div>
-
-<div class="step" onclick="openPopup('p3')">
-<h3>3. Wypełnij formularz</h3>
-<p>Podaj dane zgłoszenia.</p>
-</div>
-
-<div class="step" onclick="openPopup('p4')">
-<h3>4. Wygraj</h3>
-<p>Weź udział w losowaniu.</p>
-</div>
-
-</div>
-
 </section>
 
 <section class="section">
-
 <h2>Nagrody</h2>
-
 <div class="prizes">
-
-<div class="prize">
-<h3>Audi A3</h3>
-<img src="https://pngimg.com/uploads/audi/audi_PNG1741.png">
+<div class="prize"><h3>Audi A3</h3><img src="https://pngimg.com/uploads/audi/audi_PNG1741.png"></div>
+<div class="prize"><h3>iPhone 15 Pro Max</h3><img src="https://pngimg.com/uploads/iphone15/iphone15_PNG27.png"></div>
+<div class="prize"><h3>10 000 zł</h3></div>
 </div>
-
-<div class="prize">
-<h3>iPhone 15 Pro Max</h3>
-<img src="https://pngimg.com/uploads/iphone15/iphone15_PNG27.png">
-</div>
-
-<div class="prize">
-<h3>10 000 zł</h3>
-</div>
-
-</div>
-
 </section>
 
 <section id="formularz" class="section">
-
 <div class="form-box">
-
 <h2>Formularz zgłoszeniowy</h2>
-
 <form id="form">
-
 <input type="text" placeholder="Imię i nazwisko" required>
 <input type="email" placeholder="Email" required>
 <input type="tel" placeholder="Telefon" required>
-
 <select>
 <option>Polska</option>
 <option>Niemcy</option>
 <option>Czechy</option>
 </select>
-
-<label>
-<input type="checkbox" required> Akceptuję regulamin
-</label>
-
-<label>
-<input type="checkbox"> Zgoda marketingowa
-</label>
-
+<label><input type="checkbox" required> Akceptuję regulamin</label>
+<label><input type="checkbox"> Zgoda marketingowa</label>
 <button type="submit">Wyślij zgłoszenie</button>
-
 </form>
-
 </div>
-
 </section>
 
 <section class="section">
-
 <h2>Tablica zwycięzców</h2>
-
 <div class="winners">
-
-<div class="winner">
-<strong>Michał K.</strong>
-<p>Warszawa</p>
-<p>Nagroda: 10 000 zł</p>
+<div class="winner"><strong>Michał K.</strong><p>Warszawa</p><p>Nagroda: 10 000 zł</p></div>
+<div class="winner"><strong>Anna P.</strong><p>Kraków</p><p>Nagroda: iPhone</p></div>
+<div class="winner"><strong>Piotr W.</strong><p>Gdańsk</p><p>Nagroda: Audi A3</p></div>
 </div>
-
-<div class="winner">
-<strong>Anna P.</strong>
-<p>Kraków</p>
-<p>Nagroda: iPhone</p>
-</div>
-
-<div class="winner">
-<strong>Piotr W.</strong>
-<p>Gdańsk</p>
-<p>Nagroda: Audi A3</p>
-</div>
-
-</div>
-
 </section>
 
 <footer>
-© 2026 Super Loteria
+© 2026 Wielka Loteria Premium | Regulamin | Polityka prywatności
 </footer>
 
 <div class="modal" id="success">
 <div class="modal-content">
-<h3>🎉 Zgłoszenie wysłane</h3>
+<h3>🎉 Zgłoszenie wysłane!</h3>
 <p>Twoje zgłoszenie bierze udział w losowaniu.</p>
 <button onclick="closePopup()">Zamknij</button>
 </div>
 </div>
 
 <script>
+// popup kroki
+function openPopup(id){alert('Tutaj możesz dodać szczegóły kroku.');}
+// popup po wysłaniu
+const form=document.getElementById('form');
+form.addEventListener('submit',function(e){
+e.preventDefault();
+document.getElementById('success').style.display='flex';
+form.reset();
+confettiAnimation();
+});
 
-const form=document.getElementById("form")
+// zamknięcie popup
+function closePopup(){document.getElementById('success').style.display='none';}
 
-form.addEventListener("submit",function(e){
-e.preventDefault()
-document.getElementById("success").style.display="flex"
-})
+// licznik zgłoszeń
+let count=0;
+const counterSpan=document.getElementById('counterNumber');
+setInterval(()=>{if(count<150000){count+=Math.floor(Math.random()*50);counterSpan.textContent=count;}},1000);
 
-function closePopup(){
-document.getElementById("success").style.display="none"
+// odliczanie do losowania
+let endDate=new Date();
+endDate.setDate(endDate.getDate()+7);
+function updateTimer(){
+let now=new Date();
+let diff=endDate-now;
+if(diff<0){document.getElementById('timer').textContent='00:00:00';return;}
+let h=Math.floor(diff/1000/60/60);let m=Math.floor((diff/1000/60)%60);let s=Math.floor((diff/1000)%60);
+document.getElementById('timer').textContent=(`${h}`.padStart(2,'0')+':'+`${m}`.padStart(2,'0')+':'+`${s}`.padStart(2,'0'));
 }
+setInterval(updateTimer,1000);
+updateTimer();
 
-function openPopup(id){
-alert("Tutaj można dodać szczegóły kroku.")
+// konfetti po wysłaniu
+function confettiAnimation(){
+for(let i=0;i<150;i++){
+let conf=document.createElement('div');
+conf.className='confetti-piece';
+conf.style.left=Math.random()*window.innerWidth+'px';
+conf.style.background=`hsl(${Math.random()*360},80%,60%)`;
+document.body.appendChild(conf);
+setTimeout(()=>{conf.remove();},3000);
 }
-
+}
 </script>
 
 </body>
