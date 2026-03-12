@@ -1,0 +1,360 @@
+<!DOCTYPE html><html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAWELOKS TEST – Konkurs</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:'Poppins',sans-serif;
+background:#05070f;
+color:#fff;
+line-height:1.6;
+overflow-x:hidden;
+}
+
+/* BACKGROUND */
+body::before{
+content:"";
+position:fixed;
+width:800px;
+height:800px;
+background:radial-gradient(circle,#1e90ff33,transparent 70%);
+top:-300px;
+left:-200px;
+filter:blur(120px);
+z-index:-1;
+}
+
+body::after{
+content:"";
+position:fixed;
+width:800px;
+height:800px;
+background:radial-gradient(circle,#00bfff33,transparent 70%);
+bottom:-300px;
+right:-200px;
+filter:blur(120px);
+z-index:-1;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:25px 40px;
+border-bottom:1px solid #ffffff14;
+}
+
+.logo{
+font-weight:700;
+font-size:20px;
+letter-spacing:1px;
+color:#3da5ff;
+}
+
+nav a{
+margin-left:25px;
+text-decoration:none;
+color:#ccc;
+font-size:14px;
+transition:.3s;
+}
+
+nav a:hover{color:white}
+
+.hero{
+min-height:90vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:40px;
+}
+
+.hero h1{
+font-size:56px;
+max-width:900px;
+line-height:1.1;
+background:linear-gradient(90deg,#fff,#3da5ff);
+-webkit-background-clip:text;
+color:transparent;
+animation:fadeUp 1s ease;
+}
+
+.hero p{
+margin-top:20px;
+color:#cfcfcf;
+max-width:600px;
+font-size:18px;
+}
+
+.cta{
+margin-top:35px;
+padding:16px 40px;
+font-size:16px;
+border:none;
+border-radius:40px;
+background:linear-gradient(135deg,#3da5ff,#007bff);
+color:white;
+font-weight:600;
+cursor:pointer;
+box-shadow:0 10px 30px #3da5ff55;
+transition:.3s;
+}
+
+.cta:hover{
+transform:translateY(-4px);
+box-shadow:0 15px 40px #3da5ff99;
+}
+
+section{
+padding:90px 25px;
+max-width:1200px;
+margin:auto;
+}
+
+.section-title{
+text-align:center;
+font-size:36px;
+margin-bottom:60px;
+}
+
+/* STEPS */
+.steps{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+}
+
+.step{
+background:#0c0f1c;
+padding:35px;
+border-radius:14px;
+border:1px solid #ffffff10;
+transition:.3s;
+}
+
+.step:hover{
+transform:translateY(-6px);
+border:1px solid #3da5ff55;
+}
+
+.step h3{
+margin-bottom:10px;
+color:#3da5ff;
+}
+
+/* PRIZES */
+.prizes{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+}
+
+.prize{
+background:#0c0f1c;
+padding:35px;
+border-radius:14px;
+text-align:center;
+border:1px solid #ffffff10;
+transition:.3s;
+}
+
+.prize:hover{
+transform:translateY(-6px);
+border:1px solid #3da5ff55;
+}
+
+.prize img{
+width:100%;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+.prize h4{
+color:#3da5ff;
+margin-bottom:5px;
+}
+
+/* FORM */
+.form-box{
+background:#0c0f1c;
+padding:45px;
+border-radius:16px;
+border:1px solid #ffffff15;
+max-width:650px;
+margin:auto;
+}
+
+form{
+display:grid;
+gap:18px;
+}
+
+input,textarea{
+padding:14px;
+border-radius:10px;
+border:1px solid #ffffff14;
+background:#070912;
+color:white;
+font-size:14px;
+}
+
+textarea{min-height:120px}
+
+input:focus,textarea:focus{
+outline:none;
+border:1px solid #3da5ff;
+}
+
+.submit-btn{
+padding:16px;
+border:none;
+border-radius:30px;
+background:linear-gradient(135deg,#3da5ff,#007bff);
+font-weight:600;
+font-size:15px;
+cursor:pointer;
+transition:.3s;
+}
+
+.submit-btn:hover{transform:translateY(-3px)}
+
+.checkbox{
+display:flex;
+align-items:center;
+font-size:13px;
+color:#bbb;
+}
+
+.checkbox input{margin-right:10px}
+
+/* FOOTER */
+footer{
+padding:40px;
+text-align:center;
+font-size:14px;
+color:#aaa;
+border-top:1px solid #ffffff10;
+margin-top:80px;
+}
+
+/* POPUP */
+.popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000000aa;
+display:flex;
+justify-content:center;
+align-items:center;
+visibility:hidden;
+opacity:0;
+transition:.3s;
+}
+
+.popup.active{
+visibility:visible;
+opacity:1;
+}
+
+.popup-box{
+background:#0c0f1c;
+padding:40px;
+border-radius:14px;
+text-align:center;
+max-width:400px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(40px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+@media(max-width:700px){
+.hero h1{font-size:36px}
+header{padding:20px}
+}
+</style></head><body><header>
+<div class="logo">FORTUNA PROMO</div>
+<nav>
+<a href="#">Start</a>
+<a href="#">Zasady</a>
+<a href="#">Nagrody</a>
+<a href="#">Formularz</a>
+</nav>
+</header><section class="hero">
+<h1>Wygraj Nagrodę Główną 10 000 zł</h1>
+<p>Napisz jakie są twoje wymarzone wakacje i gdzie chciałbyś je spędzić. Wybierzemy 3 najlepsze odpowiedzi.</p>
+<button class="cta" onclick="scrollToForm()">WEŹ UDZIAŁ</button>
+</section><section>
+<h2 class="section-title">Jak wziąć udział</h2>
+<div class="steps"><div class="step">
+<h3>1. Wymyśl odpowiedź</h3>
+<p>Napisz gdzie chciałbyś spędzić swoje wymarzone wakacje.</p>
+</div><div class="step">
+<h3>2. Wypełnij formularz</h3>
+<p>Podaj swoje dane kontaktowe i odpowiedź konkursową.</p>
+</div><div class="step">
+<h3>3. Wygraj nagrodę</h3>
+<p>3 najlepsze odpowiedzi zostaną nagrodzone.</p>
+</div></div>
+</section><section>
+<h2 class="section-title">Nagrody</h2>
+<div class="prizes"><div class="prize">
+<img src="https://picsum.photos/400/250" alt="nagroda">
+<h4>10 000 zł</h4>
+<p>Nagroda główna</p>
+</div><div class="prize">
+<img src="https://picsum.photos/401/250" alt="nagroda">
+<h4>iPhone 15 Pro Max</h4>
+<p>Nagroda specjalna</p>
+</div><div class="prize">
+<img src="https://picsum.photos/402/250" alt="nagroda">
+<h4>PlayStation 5</h4>
+<p>Nagroda dodatkowa</p>
+</div></div>
+</section><section id="form">
+<h2 class="section-title">Formularz zgłoszeniowy</h2><div class="form-box">
+<form id="contestForm"><input type="text" placeholder="Imię i nazwisko" required>
+<input type="email" placeholder="Email" required>
+<input type="tel" placeholder="Telefon" required><textarea placeholder="Twoje wymarzone wakacje..."></textarea><label class="checkbox">
+<input type="checkbox" required>
+Akceptuję regulamin konkursu
+</label><label class="checkbox">
+<input type="checkbox" required>
+Wyrażam zgodę na przetwarzanie danych
+</label><button class="submit-btn" type="submit">Wyślij zgłoszenie</button>
+
+</form>
+</div>
+</section><footer>
+© 2026 PAWELOKS TEST – Konkurs promocyjny
+</footer><div class="popup" id="popup">
+<div class="popup-box">
+<h3>Dziękujemy!</h3>
+<p>Twoje zgłoszenie zostało wysłane.</p>
+</div>
+</div><script>
+
+function scrollToForm(){
+document.getElementById("form").scrollIntoView({behavior:"smooth"});
+}
+
+const form=document.getElementById("contestForm");
+const popup=document.getElementById("popup");
+
+form.addEventListener("submit",function(e){
+e.preventDefault();
+popup.classList.add("active");
+form.reset();
+});
+
+</script></body>
+</html>
