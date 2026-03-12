@@ -1,119 +1,173 @@
 <!DOCTYPE html><html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAWELOKS TEST – Konkurs Loteryjny</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ekskluzywna Loteria 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#fefefe;color:#111;overflow-x:hidden;}
-/* HERO */
-.hero{display:grid;grid-template-columns:1fr 1fr;min-height:90vh;align-items:center;padding:80px;gap:40px;position:relative;overflow:hidden;background:linear-gradient(135deg,#e0f7ff,#ffffff);}
-.hero-text h1{font-size:48px;margin-bottom:20px;color:#222;}
-.hero-text p{font-size:18px;opacity:0.8;margin-bottom:30px;max-width:500px;}
-.hero-btn{background:#2563eb;color:white;border:none;padding:16px 36px;border-radius:40px;font-size:16px;cursor:pointer;transition:0.3s;}
-.hero-btn:hover{transform:translateY(-3px);}
-.hero-image img{width:400px;animation:float 5s infinite ease-in-out;}
-@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-15px)}100%{transform:translateY(0)}}
-/* BADGE */
-.badge{position:absolute;top:30px;left:30px;background:#ffcc00;color:#222;font-weight:700;padding:16px 28px;border-radius:50px;font-size:20px;box-shadow:0 5px 20px rgba(0,0,0,0.2);}
-/* COUNTDOWN */
-.countdown{display:flex;gap:10px;position:absolute;top:30px;right:30px;}
-.time{background:#2563eb;color:white;padding:10px 14px;border-radius:12px;font-weight:700;min-width:60px;text-align:center;}
-.time span{display:block;font-size:18px;}
-/* TIMELINE */
-.timeline{padding:100px 20px;max-width:900px;margin:auto;display:flex;flex-direction:column;gap:40px;}
-.timeline-item{display:flex;gap:20px;align-items:flex-start;}
-.timeline-number{background:#2563eb;color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;}
-/* PRIZE STRIP */
-.prize-strip{display:flex;overflow-x:auto;padding:80px 20px;gap:30px;}
-.prize-card{min-width:260px;background:white;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;transition:0.3s;}
-.prize-card:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(0,0,0,0.15);}
-.prize-card img{width:100%;border-radius:20px;margin-bottom:10px;background:transparent;}
-/* FORM POPUP */
-.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:0.3s;z-index:999;}
-.popup.active{opacity:1;pointer-events:auto;}
-.popup-box{background:white;padding:40px;border-radius:20px;text-align:center;max-width:400px;animation:popupAnim 0.5s ease;}
-@keyframes popupAnim{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
-input,textarea{width:100%;padding:14px;border-radius:10px;border:1px solid #ddd;font-size:14px;}
-textarea{min-height:120px;}
-.submit{background:#2563eb;color:white;border:none;padding:16px;border-radius:30px;font-weight:600;cursor:pointer;transition:0.3s;}
-.submit:hover{transform:translateY(-3px);}
-footer{text-align:center;padding:40px;color:#777;font-size:14px;}
-@media(max-width:900px){.hero{grid-template-columns:1fr;text-align:center;}.hero-image{margin-top:40px;}}
-</style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Arial;background:#020617;color:#fff}header{ background:linear-gradient(120deg,#1e3a8a,#7c3aed,#9333ea); padding:80px 20px; text-align:center; position:relative; overflow:hidden; }
+
+header h1{font-size:56px;font-weight:700;margin-bottom:15px} header p{font-size:18px;opacity:.9}
+
+.container{max-width:1200px;margin:auto;padding:60px 20px}
+
+.hero{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center }
+
+.card{ background:#0f172a; padding:35px; border-radius:18px; box-shadow:0 20px 40px rgba(0,0,0,.6) }
+
+.prize{ font-size:64px; font-weight:700; background:linear-gradient(90deg,#facc15,#fde047); -webkit-background-clip:text; color:transparent; margin:20px 0 }
+
+.countdown{ display:flex; gap:12px; margin-top:20px }
+
+.time{ background:#020617; padding:14px 18px; border-radius:10px; text-align:center }
+
+.time span{display:block;font-size:24px;font-weight:600}
+
+form{margin-top:10px}
+
+.form-group{margin-bottom:16px}
+
+label{display:block;font-size:14px;margin-bottom:6px}
+
+input,select{ width:100%; padding:12px; border-radius:10px; border:none; background:#020617; color:#fff }
+
+button{ width:100%; padding:14px; border:none; border-radius:12px; font-weight:600; font-size:16px; cursor:pointer; background:linear-gradient(90deg,#22c55e,#4ade80); transition:.25s }
+
+button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+
+.success{display:none;margin-top:12px;color:#4ade80}
+
+.section-title{ text-align:center; font-size:34px; margin-bottom:40px }
+
+.features{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:25px }
+
+.feature{ background:#0f172a; padding:30px; border-radius:16px; text-align:center; transition:.25s }
+
+.feature:hover{transform:translateY(-6px)}
+
+.feature h3{margin-bottom:10px}
+
+.prizes{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px }
+
+.prize-card{ background:#0f172a; padding:25px; border-radius:16px; text-align:center }
+
+.prize-card h4{font-size:22px;margin-bottom:10px}
+
+.testimonials{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:25px }
+
+.testimonial{ background:#0f172a; padding:25px; border-radius:16px }
+
+footer{ margin-top:80px; padding:40px 20px; text-align:center; background:#020617; color:#94a3b8 }
+
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center }
+
+.modal-content{ background:#020617; padding:30px; border-radius:16px; max-width:600px }
+
+.close{ margin-top:20px; background:#ef4444; color:#fff }
+
+@media(max-width:900px){ .hero{grid-template-columns:1fr} header h1{font-size:40px} } </style>
+
 </head>
-<body>
-<!-- HERO -->
-<section class="hero">
-<div class="badge">NAGRODA GŁÓWNA 10 000 ZŁ</div>
-<div class="countdown">
-<div class="time" id="days">00d</div>
-<div class="time" id="hours">00h</div>
-<div class="time" id="minutes">00m</div>
-<div class="time" id="seconds">00s</div>
+<body><header>
+<h1>Ekskluzywna Loteria 2026</h1>
+<p>Weź udział i wygraj wyjątkowe nagrody</p>
+</header><div class="container"><div class="hero"><div class="card">
+<h2>Nagroda Główna</h2>
+<div class="prize">50 000 zł</div>
+<p>Dołącz do loterii i weź udział w losowaniu nagrody głównej.</p><div class="countdown">
+<div class="time"><span id="d">30</span>Dni</div>
+<div class="time"><span id="h">12</span>Godz</div>
+<div class="time"><span id="m">45</span>Min</div>
 </div>
-<div class="hero-text">
-<h1>Wygraj w naszym konkursie</h1>
-<p>Napisz jakie są twoje wymarzone wakacje i gdzie chciałbyś je spędzić. Wybierzemy 3 najlepsze odpowiedzi.</p>
-<button class="hero-btn" onclick="openForm()">Weź udział</button>
+</div><div class="card">
+<h2>Formularz zgłoszeniowy</h2>
+<form id="lotteryForm"><div class="form-group">
+<label>Imię i nazwisko</label>
+<input type="text" required>
+</div><div class="form-group">
+<label>Email</label>
+<input type="email" required>
+</div><div class="form-group">
+<label>Telefon</label>
+<input type="tel" required>
+</div><div class="form-group">
+<label>Kraj</label>
+<select required>
+<option value="">Wybierz</option>
+<option>Polska</option>
+<option>Niemcy</option>
+<option>Czechy</option>
+<option>Słowacja</option>
+</select>
+</div><div class="form-group">
+<label>
+<input type="checkbox" required> Akceptuję regulamin
+</label>
+</div><button type="submit">Dołącz do loterii</button>
+
+<div class="success" id="successMsg">Zgłoszenie zostało wysłane!</div></form>
+</div></div></div><div class="container"><h2 class="section-title">Dlaczego warto wziąć udział</h2><div class="features"><div class="feature">
+<h3>Uczciwe losowanie</h3>
+<p>System losowania gwarantuje pełną transparentność.</p>
+</div><div class="feature">
+<h3>Bezpieczeństwo</h3>
+<p>Dane uczestników są szyfrowane i chronione.</p>
+</div><div class="feature">
+<h3>Szybkie ogłoszenie</h3>
+<p>Zwycięzca zostanie ogłoszony publicznie.</p>
+</div><div class="feature">
+<h3>Duże nagrody</h3>
+<p>Oprócz nagrody głównej przewidziano nagrody dodatkowe.</p>
+</div></div></div><div class="container"><h2 class="section-title">Nagrody</h2><div class="prizes"><div class="prize-card">
+<h4>1 miejsce</h4>
+<p>50 000 zł</p>
+</div><div class="prize-card">
+<h4>2 miejsce</h4>
+<p>5 000 zł</p>
+</div><div class="prize-card">
+<h4>3 miejsce</h4>
+<p>2 000 zł</p>
+</div></div></div><div class="container"><h2 class="section-title">Opinie zwycięzców</h2><div class="testimonials"><div class="testimonial">
+<p>"Nie wierzyłem że wygram — a jednak!"</p>
+<strong>— Michał</strong>
+</div><div class="testimonial">
+<p>"Profesjonalna organizacja i szybka wypłata nagrody."</p>
+<strong>— Anna</strong>
+</div><div class="testimonial">
+<p>"Najlepsza loteria w jakiej brałem udział."</p>
+<strong>— Piotr</strong>
+</div></div><div style="text-align:center;margin-top:40px">
+<button onclick="openRules()">Zobacz regulamin</button>
+</div></div><footer>
+© 2026 Loteria Promocyjna | Wszystkie prawa zastrzeżone
+</footer><div class="modal" id="rulesModal">
+<div class="modal-content">
+<h2>Regulamin loterii</h2>
+<p>
+1. Udział jest darmowy.<br>
+2. Jedno zgłoszenie na osobę.<br>
+3. Losowanie odbędzie się publicznie.<br>
+4. Organizator kontaktuje się ze zwycięzcą.
+</p>
+<button class="close" onclick="closeRules()">Zamknij</button>
 </div>
-<div class="hero-image">
-<img src="https://i.ibb.co/5h5sFzT/placeholder-transparent.png" alt="Nagroda">
-</div>
-</section>
-<!-- TIMELINE -->
-<section class="timeline">
-<div class="timeline-item"><div class="timeline-number">1</div><div>Napisz swoje wymarzone wakacje</div></div>
-<div class="timeline-item"><div class="timeline-number">2</div><div>Wypełnij formularz w popupie</div></div>
-<div class="timeline-item"><div class="timeline-number">3</div><div>3 najlepsze odpowiedzi wygrywają</div></div>
-</section>
-<!-- PRIZES -->
-<section class="prize-strip">
-<div class="prize-card"><img src="https://i.ibb.co/5h5sFzT/placeholder-transparent.png" alt="10 000 zł"><h3>10 000 zł</h3></div>
-<div class="prize-card"><img src="https://i.ibb.co/5h5sFzT/placeholder-transparent.png" alt="iPhone 15 Pro Max"><h3>iPhone 15 Pro Max</h3></div>
-<div class="prize-card"><img src="https://i.ibb.co/5h5sFzT/placeholder-transparent.png" alt="PlayStation 5"><h3>PlayStation 5</h3></div>
-</section>
-<!-- FORM POPUP -->
-<div class="popup" id="popup">
-<div class="popup-box">
-<h3>Formularz konkursowy</h3>
-<form id="contestForm">
-<input type="text" placeholder="Imię i nazwisko" required>
-<input type="email" placeholder="Email" required>
-<input type="tel" placeholder="Telefon" required>
-<textarea placeholder="Twoje wymarzone wakacje..." required></textarea>
-<label><input type="checkbox" required> Akceptuję regulamin</label>
-<button class="submit">Wyślij zgłoszenie</button>
-</form>
-</div>
-</div>
-<footer>© 2026 PAWELOKS TEST</footer>
-<script>
-/* COUNTDOWN */
-const end=new Date("March 31, 2026 23:59:59").getTime();
-setInterval(()=>{
-const now=new Date().getTime();
-const diff=end-now;
-const d=Math.floor(diff/(1000*60*60*24));
-const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-const m=Math.floor((diff%(1000*60*60))/(1000*60));
-const s=Math.floor((diff%(1000*60))/1000);
-document.getElementById("days").innerText=d+"d";
-document.getElementById("hours").innerText=h+"h";
-document.getElementById("minutes").innerText=m+"m";
-document.getElementById("seconds").innerText=s+"s";
-},1000);
-/* FORM */
-const popup=document.getElementById("popup");
-function openForm(){popup.classList.add("active");}
-const form=document.getElementById("contestForm");
-form.addEventListener("submit",(e)=>{
-e.preventDefault();
-popup.classList.remove("active");
-alert("Dziękujemy za zgłoszenie!");
-form.reset();
-});
-</script>
-</body>
+</div><script>
+const form=document.getElementById('lotteryForm')
+const success=document.getElementById('successMsg')
+
+form.addEventListener('submit',function(e){
+e.preventDefault()
+success.style.display='block'
+form.reset()
+})
+
+function openRules(){
+document.getElementById('rulesModal').style.display='flex'
+}
+
+function closeRules(){
+document.getElementById('rulesModal').style.display='none'
+}
+</script></body>
 </html>
