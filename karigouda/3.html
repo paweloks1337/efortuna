@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formularz zgłoszeniowy Legia Warszawa</title>
+    <title>Formularz Legia Warszawa</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             background: linear-gradient(135deg, #004225 0%, #006400 50%, #008000 100%);
             min-height: 100vh;
             display: flex;
@@ -22,111 +18,135 @@
         }
 
         .formularz {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 66, 37, 0.3);
-            width: 100%;
-            max-width: 500px;
-            backdrop-filter: blur(10px);
+            width: 480px;
+            height: 680px;
+            background: 
+                /* Krzywy prawy dół - gradient Legii */
+                radial-gradient(ellipse 200px 150px at 85% 90%, #DC143C 0%, #006400 50%, transparent 70%),
+                /* Główne białe tło z nieregularnym kształtem */
+                linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 25px 15px 25px 25px;
+            padding: 35px;
+            position: relative;
+            box-shadow: 
+                0 25px 50px rgba(0, 66, 37, 0.4),
+                inset 0 0 0 2px rgba(255,255,255,0.8);
+            overflow: hidden;
+        }
+
+        /* Krzywy "wcięcie" w prawym dolnym */
+        .formularz::before {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 120px;
+            height: 100px;
+            background: linear-gradient(45deg, #DC143C, #B22222, #006400);
+            border-radius: 50% 20% 30% 40%;
+            z-index: 0;
+        }
+
+        .formularz > * {
+            position: relative;
+            z-index: 1;
         }
 
         .formularz h1 {
             background: linear-gradient(135deg, #DC143C, #B22222);
             color: white;
-            padding: 20px;
+            padding: 18px 25px;
             text-align: center;
-            border-radius: 15px;
+            border-radius: 18px;
             margin-bottom: 30px;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
         }
 
         .pole {
-            margin-bottom: 25px;
-            position: relative;
+            margin-bottom: 22px;
         }
 
         .pole label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
             color: #004225;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .pole input,
         .pole textarea {
             width: 100%;
-            height: 50px;
-            padding: 0 20px;
-            border: 2px solid #E0E0E0;
+            height: 48px;
+            padding: 0 18px;
+            border: 2px solid #e1e5e9;
             border-radius: 12px;
+            background: rgba(255,255,255,0.9);
             font-size: 16px;
-            background: white;
             transition: all 0.3s ease;
             font-family: inherit;
         }
 
         .pole textarea {
-            height: 150px;
-            resize: vertical;
-            padding: 20px;
+            height: 140px;
+            padding: 18px;
+            resize: none;
         }
 
         .pole input:focus,
         .pole textarea:focus {
             outline: none;
             border-color: #DC143C;
+            background: white;
             box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+        }
+
+        .zalacznik input {
+            padding-right: 45px;
         }
 
         .zalacznik::before {
             content: '☁️';
             position: absolute;
-            right: 15px;
+            right: 25px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 20px;
+            font-size: 18px;
             pointer-events: none;
+            z-index: 2;
         }
 
         button {
             width: 100%;
-            height: 55px;
+            height: 52px;
             background: linear-gradient(135deg, #DC143C, #B22222);
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
-            margin-top: 10px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 2;
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(220, 20, 60, 0.5);
+            box-shadow: 0 12px 30px rgba(220, 20, 60, 0.6);
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 480px) {
+        @media (max-width: 500px) {
             .formularz {
-                padding: 30px 25px;
-                margin: 10px;
-            }
-            
-            .formularz h1 {
-                font-size: 24px;
-                padding: 18px;
+                width: 95%;
+                height: auto;
+                padding: 30px;
             }
         }
     </style>
@@ -157,7 +177,7 @@
         
         <div class="pole">
             <label>Napisz dlaczego chcesz Dzień z Czystą Energią</label>
-            <textarea name="wiadomosc" placeholder="Opisz swoje motywy..." required></textarea>
+            <textarea name="wiadomosc" placeholder="Opisz swoje motywy..."></textarea>
         </div>
         
         <button type="submit">Prześlij</button>
