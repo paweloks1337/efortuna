@@ -3,184 +3,577 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wielka Loteria Premium</title>
+
+<title>Wielka Loteria Kibiców</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
-body{background:#fff7d6;color:#222;}
-header{background:linear-gradient(90deg,#ffd200,#ffb800);padding:20px;position:sticky;top:0;z-index:10;}
-.nav{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;}
-.logo{font-size:26px;font-weight:700;color:#111;}
-.hero{max-width:1200px;margin:auto;padding:60px 20px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:40px;position:relative;}
-.hero h1{font-size:52px;margin-bottom:15px;color:#111;animation:fadeUp 1s ease forwards;}
-.hero p{margin-bottom:25px;color:#444;font-size:18px;animation:fadeUp 1.2s ease forwards;}
-.cta{background:#ff0033;color:white;padding:16px 28px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;font-size:18px;animation:fadeUp 1.4s ease forwards;transition:.3s;}
-.cta:hover{transform:scale(1.05);}
-.hero img{width:100%;max-width:500px;position:relative;animation:fadeInScale 1s ease forwards;}
-@keyframes fadeUp{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
-@keyframes fadeInScale{0%{opacity:0;transform:scale(0.8);}100%{opacity:1;transform:scale(1);}}
 
-.section{max-width:1200px;margin:auto;padding:70px 20px;}
-.section h2{text-align:center;margin-bottom:50px;font-size:36px;}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
 
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;}
-.step{background:white;padding:30px;border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.1);text-align:center;cursor:pointer;transition:.3s;position:relative;}
-.step:hover{transform:translateY(-6px);box-shadow:0 16px 35px rgba(0,0,0,.15);}
-.step h3{margin-bottom:10px;color:#ff0033;font-size:22px;}
-.step p{color:#555;font-size:16px;}
+body{
+background:#0f3d2e;
+color:#fff;
+overflow-x:hidden;
+}
 
-.prizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px;}
-.prize{background:white;padding:30px;border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.1);text-align:center;transition:.3s;}
-.prize:hover{transform:translateY(-6px);}
-.prize img{width:100%;max-width:220px;margin:auto;display:block;}
+/* NAV */
 
-.form-box{background:white;max-width:520px;margin:auto;padding:40px;border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.2);}
-.form-box h2{text-align:center;margin-bottom:25px;}
-.form-box input,.form-box select{width:100%;padding:16px 14px;margin-bottom:15px;border-radius:12px;border:1px solid #ddd;font-size:16px;}
-button{width:100%;padding:16px;background:#ff0033;color:white;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;transition:.3s;}
-button:hover{transform:scale(1.03);}
-.winners{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px;}
-.winner{background:white;padding:22px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.12);text-align:center;transition:.3s;}
-.winner:hover{transform:translateY(-5px);}
+header{
+background:#0b2c22;
+padding:16px 25px;
+position:sticky;
+top:0;
+z-index:50;
+}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100;}
-.modal-content{background:white;padding:40px;border-radius:20px;text-align:center;max-width:450px;animation:pop 0.4s ease;}
-@keyframes pop{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.nav{
+max-width:1200px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-.confetti-piece{position:absolute;width:10px;height:10px;background:red;animation:confettiFall 3s linear infinite;}
-@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);}100%{transform:translateY(800px) rotate(360deg);}}
+.logo-area{
+display:flex;
+align-items:center;
+gap:15px;
+}
 
-.counter{font-size:20px;color:#111;font-weight:600;text-align:center;margin-bottom:20px;}
-.timer{font-size:22px;color:#ff0033;font-weight:700;text-align:center;margin-bottom:30px;}
+.logo{
+font-size:22px;
+font-weight:700;
+}
 
-footer{background:#111;color:white;text-align:center;padding:35px;margin-top:60px;}
+.sponsor-logo{
+height:36px;
+}
 
-@media(max-width:900px){.hero{grid-template-columns:1fr;}.hero h1{font-size:40px;}.hero p{font-size:16px;}}
+/* HERO */
+
+.hero{
+height:95vh;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+/* stadion */
+
+.hero::before{
+content:"";
+position:absolute;
+inset:0;
+background:url("https://images.pexels.com/photos/3621104/pexels-photo-3621104.jpeg") center/cover no-repeat;
+animation:stadiumZoom 20s ease-in-out infinite alternate;
+z-index:0;
+}
+
+@keyframes stadiumZoom{
+0%{transform:scale(1)}
+100%{transform:scale(1.08)}
+}
+
+/* overlay */
+
+.overlay{
+position:absolute;
+inset:0;
+background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.8));
+z-index:1;
+}
+
+/* LIGHTS */
+
+.light{
+position:absolute;
+width:600px;
+height:600px;
+background:radial-gradient(circle,rgba(255,255,255,.3),transparent 70%);
+border-radius:50%;
+animation:lightMove 10s linear infinite;
+z-index:2;
+}
+
+.light1{top:-200px;left:-200px}
+.light2{top:-200px;right:-200px;animation-delay:3s}
+
+@keyframes lightMove{
+0%{transform:rotate(0)}
+100%{transform:rotate(360deg)}
+}
+
+/* SMOKE */
+
+.smoke{
+position:absolute;
+bottom:0;
+width:200%;
+height:200px;
+background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);
+animation:smokeMove 25s linear infinite;
+z-index:2;
+}
+
+@keyframes smokeMove{
+0%{transform:translateX(-20%)}
+100%{transform:translateX(20%)}
+}
+
+/* PLAYERS */
+
+.player{
+position:absolute;
+bottom:0;
+height:80%;
+opacity:0;
+z-index:3;
+animation:playerEnter 1.3s forwards;
+}
+
+.player-left{
+left:0;
+animation-delay:.5s;
+}
+
+.player-right{
+right:0;
+animation-delay:.7s;
+}
+
+@keyframes playerEnter{
+0%{
+opacity:0;
+transform:translateY(120px);
+}
+100%{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+/* HERO CONTENT */
+
+.hero-content{
+max-width:1200px;
+width:100%;
+display:grid;
+grid-template-columns:1fr 480px;
+gap:40px;
+position:relative;
+z-index:4;
+padding:30px;
+}
+
+.hero-text h1{
+font-size:54px;
+margin-bottom:15px;
+}
+
+.hero-text p{
+color:#ddd;
+margin-bottom:20px;
+font-size:18px;
+}
+
+.counter{
+font-size:18px;
+margin-top:15px;
+}
+
+.timer{
+font-size:22px;
+color:#d2232a;
+font-weight:700;
+}
+
+/* FORM */
+
+.form-card{
+background:rgba(15,61,46,.92);
+backdrop-filter:blur(10px);
+padding:35px;
+border-radius:18px;
+box-shadow:0 25px 60px rgba(0,0,0,.6);
+border:2px solid #d2232a;
+}
+
+.form-card h3{
+margin-bottom:20px;
+}
+
+.form-card input{
+width:100%;
+padding:14px;
+margin-bottom:15px;
+border-radius:10px;
+border:none;
+font-size:14px;
+}
+
+.form-card label{
+font-size:14px;
+display:block;
+margin-bottom:8px;
+}
+
+.form-card button{
+width:100%;
+padding:15px;
+background:#d2232a;
+border:none;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
+transition:.25s;
+}
+
+.form-card button:hover{
+transform:scale(1.05);
+}
+
+/* SECTIONS */
+
+.section{
+max-width:1200px;
+margin:auto;
+padding:80px 20px;
+}
+
+.section h2{
+text-align:center;
+margin-bottom:40px;
+font-size:32px;
+}
+
+/* STEPS */
+
+.steps{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+}
+
+.step{
+background:#123d30;
+padding:28px;
+border-radius:14px;
+text-align:center;
+cursor:pointer;
+transition:.3s;
+}
+
+.step:hover{
+transform:translateY(-6px);
+background:#184f3e;
+}
+
+/* PRIZES */
+
+.prizes{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+}
+
+.prize{
+background:#123d30;
+padding:30px;
+border-radius:14px;
+text-align:center;
+transition:.3s;
+}
+
+.prize:hover{
+transform:translateY(-6px);
+}
+
+.prize img{
+width:100%;
+max-width:200px;
+margin:auto;
+display:block;
+}
+
+/* WINNERS */
+
+.winners{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.winner{
+background:#123d30;
+padding:20px;
+border-radius:12px;
+text-align:center;
+}
+
+/* POPUP */
+
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.8);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:100;
+}
+
+.modal-content{
+background:white;
+color:black;
+padding:40px;
+border-radius:16px;
+text-align:center;
+}
+
+/* FOOTER */
+
+footer{
+background:#0b2c22;
+text-align:center;
+padding:30px;
+margin-top:60px;
+}
+
+@media(max-width:900px){
+
+.hero{
+height:auto;
+padding:100px 0;
+}
+
+.hero-content{
+grid-template-columns:1fr;
+}
+
+.player{
+display:none;
+}
+
+.hero-text h1{
+font-size:36px;
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="nav"><div class="logo">Wielka Loteria Premium</div></div>
+
+<div class="nav">
+
+<div class="logo-area">
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fortuna_logo.svg/512px-Fortuna_logo.svg.png" class="sponsor-logo">
+
+<div class="logo">Loteria Kibiców</div>
+
+</div>
+
+</div>
+
 </header>
 
 <section class="hero">
-<div>
-<h1>Wygraj Audi A3 i iPhone 15 Pro Max!</h1>
-<p>Weź udział w największej loterii 2026 roku i zgarnij nagrody.</p>
-<a class="cta" href="#formularz">Weź udział</a>
-<div class="counter">Aktualnie zgłoszonych: <span id="counterNumber">0</span></div>
-<div class="timer">Do losowania pozostało: <span id="timer">00:00:00</span></div>
-</div>
-<div>
-<img src="https://pngimg.com/uploads/audi/audi_PNG1741.png" alt="Audi A3">
-</div>
-</section>
 
-<section class="section">
-<h2>Jak wziąć udział</h2>
-<div class="steps">
-<div class="step" onclick="openPopup('p1')"><h3>1. Kup produkt</h3><p>Kup promocyjny produkt.</p></div>
-<div class="step" onclick="openPopup('p2')"><h3>2. Zarejestruj paragon</h3><p>Zachowaj dowód zakupu.</p></div>
-<div class="step" onclick="openPopup('p3')"><h3>3. Wypełnij formularz</h3><p>Podaj dane i zgłoś się.</p></div>
-<div class="step" onclick="openPopup('p4')"><h3>4. Wygraj</h3><p>Losowanie nagród.</p></div>
-</div>
-</section>
+<div class="overlay"></div>
 
-<section class="section">
-<h2>Nagrody</h2>
-<div class="prizes">
-<div class="prize"><h3>Audi A3</h3><img src="https://pngimg.com/uploads/audi/audi_PNG1741.png"></div>
-<div class="prize"><h3>iPhone 15 Pro Max</h3><img src="https://pngimg.com/uploads/iphone15/iphone15_PNG27.png"></div>
-<div class="prize"><h3>10 000 zł</h3></div>
-</div>
-</section>
+<div class="light light1"></div>
+<div class="light light2"></div>
 
-<section id="formularz" class="section">
-<div class="form-box">
-<h2>Formularz zgłoszeniowy</h2>
+<div class="smoke"></div>
+
+<img src="https://pngimg.com/uploads/football_player/football_player_PNG90.png" class="player player-left">
+
+<img src="https://pngimg.com/uploads/football_player/football_player_PNG111.png" class="player player-right">
+
+<div class="hero-content">
+
+<div class="hero-text">
+
+<h1>Wielka Loteria Kibiców</h1>
+
+<p>Weź udział w wydarzeniu i wygraj nagrody oraz spotkanie z zawodnikami.</p>
+
+<div class="counter">
+Zgłoszeń: <span id="count">0</span>
+</div>
+
+<div class="timer">
+Losowanie za: <span id="timer">00:00:00</span>
+</div>
+
+</div>
+
+<div class="form-card">
+
+<h3>Weź udział w loterii</h3>
+
 <form id="form">
+
 <input type="text" placeholder="Imię i nazwisko" required>
+
 <input type="email" placeholder="Email" required>
+
 <input type="tel" placeholder="Telefon" required>
-<select>
-<option>Polska</option>
-<option>Niemcy</option>
-<option>Czechy</option>
-</select>
-<label><input type="checkbox" required> Akceptuję regulamin</label>
-<label><input type="checkbox"> Zgoda marketingowa</label>
-<button type="submit">Wyślij zgłoszenie</button>
+
+<label>
+<input type="checkbox" required> Akceptuję regulamin
+</label>
+
+<label>
+<input type="checkbox"> Zgoda marketingowa
+</label>
+
+<button type="submit">Zarejestruj się</button>
+
 </form>
+
 </div>
+
+</div>
+
 </section>
 
 <section class="section">
-<h2>Tablica zwycięzców</h2>
-<div class="winners">
-<div class="winner"><strong>Michał K.</strong><p>Warszawa</p><p>Nagroda: 10 000 zł</p></div>
-<div class="winner"><strong>Anna P.</strong><p>Kraków</p><p>Nagroda: iPhone</p></div>
-<div class="winner"><strong>Piotr W.</strong><p>Gdańsk</p><p>Nagroda: Audi A3</p></div>
+
+<h2>Jak wziąć udział</h2>
+
+<div class="steps">
+
+<div class="step">1. Kup produkt</div>
+<div class="step">2. Zarejestruj paragon</div>
+<div class="step">3. Wypełnij formularz</div>
+<div class="step">4. Wygraj nagrodę</div>
+
 </div>
+
+</section>
+
+<section class="section">
+
+<h2>Nagrody</h2>
+
+<div class="prizes">
+
+<div class="prize">
+<h3>Audi A3</h3>
+<img src="https://pngimg.com/uploads/audi/audi_PNG1741.png">
+</div>
+
+<div class="prize">
+<h3>iPhone 15 Pro Max</h3>
+<img src="https://pngimg.com/uploads/iphone15/iphone15_PNG27.png">
+</div>
+
+<div class="prize">
+<h3>Bilety VIP</h3>
+</div>
+
+</div>
+
+</section>
+
+<section class="section">
+
+<h2>Tablica zwycięzców</h2>
+
+<div class="winners">
+
+<div class="winner">Jan K. – Warszawa</div>
+<div class="winner">Piotr M. – Poznań</div>
+<div class="winner">Anna W. – Gdańsk</div>
+
+</div>
+
 </section>
 
 <footer>
-© 2026 Wielka Loteria Premium | Regulamin | Polityka prywatności
+
+© Loteria Kibiców | Regulamin | Polityka prywatności
+
 </footer>
 
 <div class="modal" id="success">
+
 <div class="modal-content">
+
 <h3>🎉 Zgłoszenie wysłane!</h3>
+
 <p>Twoje zgłoszenie bierze udział w losowaniu.</p>
+
 <button onclick="closePopup()">Zamknij</button>
+
 </div>
+
 </div>
 
 <script>
-// popup kroki
-function openPopup(id){alert('Tutaj możesz dodać szczegóły kroku.');}
-// popup po wysłaniu
-const form=document.getElementById('form');
-form.addEventListener('submit',function(e){
-e.preventDefault();
-document.getElementById('success').style.display='flex';
-form.reset();
-confettiAnimation();
-});
 
-// zamknięcie popup
-function closePopup(){document.getElementById('success').style.display='none';}
+/* FORM POPUP */
 
-// licznik zgłoszeń
-let count=0;
-const counterSpan=document.getElementById('counterNumber');
-setInterval(()=>{if(count<150000){count+=Math.floor(Math.random()*50);counterSpan.textContent=count;}},1000);
+const form=document.getElementById("form")
 
-// odliczanie do losowania
-let endDate=new Date();
-endDate.setDate(endDate.getDate()+7);
+form.addEventListener("submit",function(e){
+e.preventDefault()
+document.getElementById("success").style.display="flex"
+})
+
+function closePopup(){
+document.getElementById("success").style.display="none"
+}
+
+/* COUNTER */
+
+let count=0
+
+setInterval(()=>{
+if(count<150000){
+count+=Math.floor(Math.random()*30)
+document.getElementById("count").textContent=count
+}
+},1000)
+
+/* TIMER */
+
+let end=new Date()
+end.setDate(end.getDate()+7)
+
 function updateTimer(){
-let now=new Date();
-let diff=endDate-now;
-if(diff<0){document.getElementById('timer').textContent='00:00:00';return;}
-let h=Math.floor(diff/1000/60/60);let m=Math.floor((diff/1000/60)%60);let s=Math.floor((diff/1000)%60);
-document.getElementById('timer').textContent=(`${h}`.padStart(2,'0')+':'+`${m}`.padStart(2,'0')+':'+`${s}`.padStart(2,'0'));
-}
-setInterval(updateTimer,1000);
-updateTimer();
 
-// konfetti po wysłaniu
-function confettiAnimation(){
-for(let i=0;i<150;i++){
-let conf=document.createElement('div');
-conf.className='confetti-piece';
-conf.style.left=Math.random()*window.innerWidth+'px';
-conf.style.background=`hsl(${Math.random()*360},80%,60%)`;
-document.body.appendChild(conf);
-setTimeout(()=>{conf.remove();},3000);
+let now=new Date()
+let diff=end-now
+
+let h=Math.floor(diff/1000/60/60)
+let m=Math.floor(diff/1000/60%60)
+let s=Math.floor(diff/1000%60)
+
+document.getElementById("timer").textContent=
+`${h}`.padStart(2,"0")+":"+
+`${m}`.padStart(2,"0")+":"+
+`${s}`.padStart(2,"0")
+
 }
-}
+
+setInterval(updateTimer,1000)
+updateTimer()
+
 </script>
 
 </body>
