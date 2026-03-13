@@ -1,239 +1,166 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wielka Loteria Legii</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-body{background:#05070f;color:#fff;overflow-x:hidden;line-height:1.6;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz zgłoszeniowy Legia Warszawa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-/* HERO */
-.hero{
-min-height:90vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-position:relative;
-overflow:hidden;
-padding:0 20px;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #004225 0%, #006400 50%, #008000 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-/* Stadion w tle */
-.hero::before{
-content:"";
-position:absolute;
-inset:0;
-background:url('https://images.pexels.com/photos/3621104/pexels-photo-3621104.jpeg') center/cover no-repeat;
-z-index:-2;
-filter:brightness(0.5);
-}
-.hero::after{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85));
-z-index:-1;
-}
+        .formularz {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 66, 37, 0.3);
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+        }
 
-/* Piłkarze w tle */
-.player{
-position:absolute;
-bottom:0;
-height:80%;
-opacity:0.4;
-z-index:0;
-}
+        .formularz h1 {
+            background: linear-gradient(135deg, #DC143C, #B22222);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
 
-.player-left{left:0;}
-.player-right{right:0;}
+        .pole {
+            margin-bottom: 25px;
+            position: relative;
+        }
 
-/* Hero content */
-.hero-content{
-position:relative;
-z-index:2;
-max-width:900px;
-width:100%;
-display:flex;
-flex-direction:column;
-align-items:center;
-padding:60px 20px;
-}
+        .pole label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #004225;
+            font-size: 16px;
+        }
 
-.hero h1{
-font-size:48px;
-text-align:center;
-margin-bottom:20px;
-line-height:1.2;
-background:linear-gradient(90deg,#ffffff,#1f8f4d,#d62828);
--webkit-background-clip:text;
-color:transparent;
-}
+        .pole input,
+        .pole textarea {
+            width: 100%;
+            height: 50px;
+            padding: 0 20px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
 
-.hero p{
-margin-bottom:30px;
-font-size:18px;
-color:#ccc;
-text-align:center;
-max-width:700px;
-}
+        .pole textarea {
+            height: 150px;
+            resize: vertical;
+            padding: 20px;
+        }
 
-/* FORMULARZ w hero */
-.form-hero{
-background:linear-gradient(145deg,#0f3d2e,#071e16);
-border-radius:40px;
-padding:40px;
-width:100%;
-max-width:600px;
-box-shadow:0 0 30px rgba(0,0,0,.6),0 0 60px rgba(31,143,77,.3);
-display:flex;
-flex-direction:column;
-gap:15px;
-}
+        .pole input:focus,
+        .pole textarea:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+        }
 
-.form-hero input,
-.form-hero textarea{
-padding:14px;
-border-radius:12px;
-border:none;
-background:#071e16;
-color:#fff;
-font-size:14px;
-width:100%;
-}
+        .zalacznik::before {
+            content: '☁️';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            pointer-events: none;
+        }
 
-.form-hero input:focus,
-.form-hero textarea:focus{
-outline:none;
-box-shadow:0 0 10px #1f8f4d;
-}
+        button {
+            width: 100%;
+            height: 55px;
+            background: linear-gradient(135deg, #DC143C, #B22222);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
+            margin-top: 10px;
+        }
 
-.form-hero textarea{min-height:120px;}
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(220, 20, 60, 0.5);
+        }
 
-.submit-btn{
-padding:16px;
-border:none;
-border-radius:30px;
-background:linear-gradient(135deg,#1f8f4d,#d62828);
-font-weight:600;
-font-size:15px;
-cursor:pointer;
-transition:.3s;
-}
+        button:active {
+            transform: translateY(0);
+        }
 
-.submit-btn:hover{transform:translateY(-3px);}
-
-/* Checkbox */
-.checkbox{
-display:flex;
-align-items:center;
-font-size:13px;
-color:#bbb;
-}
-.checkbox input{margin-right:10px;}
-
-/* SECTIONS */
-section{padding:80px 25px;max-width:1200px;margin:auto;}
-.section-title{text-align:center;font-size:36px;margin-bottom:60px;}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:25px;}
-.step{background:#0c0f1c;padding:35px;border-radius:14px;border:1px solid #ffffff10;transition:.3s;}
-.step:hover{transform:translateY(-6px);border:1px solid #1f8f4d55;}
-.step h3{margin-bottom:10px;color:#1f8f4d;}
-.prizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;}
-.prize{background:#0c0f1c;padding:35px;border-radius:14px;text-align:center;border:1px solid #ffffff10;transition:.3s;}
-.prize:hover{transform:translateY(-6px);border:1px solid #1f8f4d55;}
-.prize img{width:100%;border-radius:10px;margin-bottom:15px;}
-.prize h4{color:#1f8f4d;margin-bottom:5px;}
-
-/* POPUP */
-.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:#000000aa;display:flex;justify-content:center;align-items:center;visibility:hidden;opacity:0;transition:.3s;}
-.popup.active{visibility:visible;opacity:1;}
-.popup-box{background:#0c0f1c;padding:40px;border-radius:14px;text-align:center;max-width:400px;}
-
-/* FOOTER */
-footer{padding:40px;text-align:center;font-size:14px;color:#aaa;border-top:1px solid #ffffff10;margin-top:80px;}
-
-@media(max-width:700px){
-.hero h1{font-size:36px;}
-.hero-content{padding:40px 10px;}
-.form-hero{padding:30px;}
-}
-</style>
+        @media (max-width: 480px) {
+            .formularz {
+                padding: 30px 25px;
+                margin: 10px;
+            }
+            
+            .formularz h1 {
+                font-size: 24px;
+                padding: 18px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<header>
-<div class="logo">LEGIA WARSZAWA – Loteria</div>
-<nav>
-<a href="#">Start</a>
-<a href="#">Zasady</a>
-<a href="#">Nagrody</a>
-<a href="#form">Formularz</a>
-</nav>
-</header>
-
-<section class="hero">
-<img src="https://pngimg.com/uploads/football_player/football_player_PNG111.png" class="player player-left">
-<img src="https://pngimg.com/uploads/football_player/football_player_PNG90.png" class="player player-right">
-<div class="hero-content">
-<h1>Wielka Loteria Kibiców</h1>
-<p>Weź udział i zgarnij nagrody w konkursie z piłkarzami Legii Warszawa!</p>
-<div class="form-hero" id="form">
-<form id="contestForm">
-<input type="text" placeholder="Imię i nazwisko" required>
-<input type="email" placeholder="Email" required>
-<input type="tel" placeholder="Telefon" required>
-<textarea placeholder="Twoja odpowiedź konkursowa..." required></textarea>
-<label class="checkbox"><input type="checkbox" required> Akceptuję regulamin</label>
-<label class="checkbox"><input type="checkbox"> Zgoda marketingowa</label>
-<button class="submit-btn" type="submit">Wyślij zgłoszenie</button>
-</form>
-</div>
-</div>
-</section>
-
-<section>
-<h2 class="section-title">Jak wziąć udział</h2>
-<div class="steps">
-<div class="step"><h3>1. Wymyśl odpowiedź</h3><p>Napisz swoją propozycję lub uzasadnienie udziału.</p></div>
-<div class="step"><h3>2. Wypełnij formularz</h3><p>Podaj dane kontaktowe i odpowiedź konkursową.</p></div>
-<div class="step"><h3>3. Wygraj nagrodę</h3><p>Najlepsze odpowiedzi zostaną nagrodzone.</p></div>
-</div>
-</section>
-
-<section>
-<h2 class="section-title">Nagrody</h2>
-<div class="prizes">
-<div class="prize"><img src="https://pngimg.com/uploads/audi/audi_PNG1741.png"><h4>Audi A3</h4><p>Nagroda główna</p></div>
-<div class="prize"><img src="https://pngimg.com/uploads/iphone15/iphone15_PNG27.png"><h4>iPhone 15 Pro Max</h4><p>Nagroda specjalna</p></div>
-<div class="prize"><img src="https://picsum.photos/400/250"><h4>Bilety VIP</h4><p>Nagroda dodatkowa</p></div>
-</div>
-</section>
-
-<footer>
-© 2026 LEGIA WARSZAWA – Konkurs promocyjny
-</footer>
-
-<div class="popup" id="popup">
-<div class="popup-box">
-<h3>Dziękujemy!</h3>
-<p>Twoje zgłoszenie zostało wysłane.</p>
-</div>
-</div>
-
-<script>
-function scrollToForm(){document.getElementById("form").scrollIntoView({behavior:"smooth"});}
-const form=document.getElementById("contestForm");
-const popup=document.getElementById("popup");
-form.addEventListener("submit",function(e){
-e.preventDefault();
-popup.classList.add("active");
-form.reset();
-});
-popup.addEventListener("click",()=>popup.classList.remove("active"));
-</script>
+    <form class="formularz" action="#" method="POST">
+        <h1>Formularz zgłoszeniowy</h1>
+        
+        <div class="pole">
+            <label>Imię i nazwisko</label>
+            <input type="text" name="imie" required>
+        </div>
+        
+        <div class="pole">
+            <label>Email</label>
+            <input type="email" name="email" required>
+        </div>
+        
+        <div class="pole">
+            <label>Numer telefonu</label>
+            <input type="tel" name="telefon" required>
+        </div>
+        
+        <div class="pole zalacznik">
+            <label>Załącz paragon</label>
+            <input type="file" name="paragon" accept="image/*,.pdf">
+        </div>
+        
+        <div class="pole">
+            <label>Napisz dlaczego chcesz Dzień z Czystą Energią</label>
+            <textarea name="wiadomosc" placeholder="Opisz swoje motywy..." required></textarea>
+        </div>
+        
+        <button type="submit">Prześlij</button>
+    </form>
 </body>
 </html>
