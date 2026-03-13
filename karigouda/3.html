@@ -10,33 +10,129 @@
 body{background:#05070f;color:#fff;overflow-x:hidden;line-height:1.6;}
 
 /* HERO */
-.hero{min-height:90vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px;position:relative;overflow:hidden;}
-.hero::before{content:"";position:absolute;inset:0;background:url('https://images.pexels.com/photos/3621104/pexels-photo-3621104.jpeg') center/cover no-repeat;z-index:-2;filter:brightness(0.5);}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85));z-index:-1;}
-.hero h1{font-size:56px;line-height:1.1;max-width:900px;background:linear-gradient(90deg,#fff,#1f8f4d,#d62828);-webkit-background-clip:text;color:transparent;animation:fadeUp 1s ease;}
-.hero p{margin-top:20px;color:#cfcfcf;max-width:600px;font-size:18px;}
-.cta{margin-top:35px;padding:16px 40px;font-size:16px;border:none;border-radius:40px;background:linear-gradient(135deg,#1f8f4d,#d62828);color:white;font-weight:600;cursor:pointer;box-shadow:0 10px 30px #1f8f4d55;transition:.3s;}
-.cta:hover{transform:translateY(-4px);box-shadow:0 15px 40px #1f8f4d99;}
+.hero{
+min-height:90vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+position:relative;
+overflow:hidden;
+padding:0 20px;
+}
 
-/* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+/* Stadion w tle */
+.hero::before{
+content:"";
+position:absolute;
+inset:0;
+background:url('https://images.pexels.com/photos/3621104/pexels-photo-3621104.jpeg') center/cover no-repeat;
+z-index:-2;
+filter:brightness(0.5);
+}
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85));
+z-index:-1;
+}
 
-/* PLAYERS */
-.player{position:absolute;bottom:0;height:80%;opacity:0;z-index:3;animation:playerEnter 1.3s forwards;}
-.player-left{left:0;animation-delay:.5s;}
-.player-right{right:0;animation-delay:.7s;}
-@keyframes playerEnter{0%{opacity:0;transform:translateY(120px);}100%{opacity:1;transform:translateY(0);}}
+/* Piłkarze w tle */
+.player{
+position:absolute;
+bottom:0;
+height:80%;
+opacity:0.4;
+z-index:0;
+}
 
-/* FORMULARZ PREMIUM */
-.form-stadium{max-width:700px;margin:50px auto;padding:50px;border-radius:40px;background:linear-gradient(145deg,#0f3d2e,#071e16);position:relative;box-shadow:0 0 40px rgba(0,0,0,.6),0 0 60px rgba(31,143,77,.3);}
-.form-stadium:before{content:"";position:absolute;inset:-3px;background:linear-gradient(135deg,#1f8f4d,#d62828,#fff);border-radius:45px;z-index:-1;filter:blur(20px);}
-.form-stadium form{display:grid;gap:18px;position:relative;z-index:1;}
-.form-stadium input, .form-stadium textarea{padding:14px;border-radius:12px;border:none;background:#071e16;color:#fff;font-size:14px;}
-.form-stadium textarea{min-height:120px;}
-.form-stadium input:focus, .form-stadium textarea:focus{outline:none;box-shadow:0 0 8px #1f8f4d;}
-.submit-btn{padding:16px;border:none;border-radius:30px;background:linear-gradient(135deg,#1f8f4d,#d62828);font-weight:600;font-size:15px;cursor:pointer;transition:.3s;}
+.player-left{left:0;}
+.player-right{right:0;}
+
+/* Hero content */
+.hero-content{
+position:relative;
+z-index:2;
+max-width:900px;
+width:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+padding:60px 20px;
+}
+
+.hero h1{
+font-size:48px;
+text-align:center;
+margin-bottom:20px;
+line-height:1.2;
+background:linear-gradient(90deg,#ffffff,#1f8f4d,#d62828);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+.hero p{
+margin-bottom:30px;
+font-size:18px;
+color:#ccc;
+text-align:center;
+max-width:700px;
+}
+
+/* FORMULARZ w hero */
+.form-hero{
+background:linear-gradient(145deg,#0f3d2e,#071e16);
+border-radius:40px;
+padding:40px;
+width:100%;
+max-width:600px;
+box-shadow:0 0 30px rgba(0,0,0,.6),0 0 60px rgba(31,143,77,.3);
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.form-hero input,
+.form-hero textarea{
+padding:14px;
+border-radius:12px;
+border:none;
+background:#071e16;
+color:#fff;
+font-size:14px;
+width:100%;
+}
+
+.form-hero input:focus,
+.form-hero textarea:focus{
+outline:none;
+box-shadow:0 0 10px #1f8f4d;
+}
+
+.form-hero textarea{min-height:120px;}
+
+.submit-btn{
+padding:16px;
+border:none;
+border-radius:30px;
+background:linear-gradient(135deg,#1f8f4d,#d62828);
+font-weight:600;
+font-size:15px;
+cursor:pointer;
+transition:.3s;
+}
+
 .submit-btn:hover{transform:translateY(-3px);}
-.checkbox{display:flex;align-items:center;font-size:13px;color:#bbb;}
+
+/* Checkbox */
+.checkbox{
+display:flex;
+align-items:center;
+font-size:13px;
+color:#bbb;
+}
 .checkbox input{margin-right:10px;}
 
 /* SECTIONS */
@@ -60,7 +156,11 @@ section{padding:80px 25px;max-width:1200px;margin:auto;}
 /* FOOTER */
 footer{padding:40px;text-align:center;font-size:14px;color:#aaa;border-top:1px solid #ffffff10;margin-top:80px;}
 
-@media(max-width:700px){.hero h1{font-size:36px}}
+@media(max-width:700px){
+.hero h1{font-size:36px;}
+.hero-content{padding:40px 10px;}
+.form-hero{padding:30px;}
+}
 </style>
 </head>
 <body>
@@ -78,9 +178,21 @@ footer{padding:40px;text-align:center;font-size:14px;color:#aaa;border-top:1px s
 <section class="hero">
 <img src="https://pngimg.com/uploads/football_player/football_player_PNG111.png" class="player player-left">
 <img src="https://pngimg.com/uploads/football_player/football_player_PNG90.png" class="player player-right">
+<div class="hero-content">
 <h1>Wielka Loteria Kibiców</h1>
 <p>Weź udział i zgarnij nagrody w konkursie z piłkarzami Legii Warszawa!</p>
-<button class="cta" onclick="scrollToForm()">WEŹ UDZIAŁ</button>
+<div class="form-hero" id="form">
+<form id="contestForm">
+<input type="text" placeholder="Imię i nazwisko" required>
+<input type="email" placeholder="Email" required>
+<input type="tel" placeholder="Telefon" required>
+<textarea placeholder="Twoja odpowiedź konkursowa..." required></textarea>
+<label class="checkbox"><input type="checkbox" required> Akceptuję regulamin</label>
+<label class="checkbox"><input type="checkbox"> Zgoda marketingowa</label>
+<button class="submit-btn" type="submit">Wyślij zgłoszenie</button>
+</form>
+</div>
+</div>
 </section>
 
 <section>
@@ -101,21 +213,6 @@ footer{padding:40px;text-align:center;font-size:14px;color:#aaa;border-top:1px s
 </div>
 </section>
 
-<section id="form">
-<h2 class="section-title">Formularz zgłoszeniowy</h2>
-<div class="form-stadium">
-<form id="contestForm">
-<input type="text" placeholder="Imię i nazwisko" required>
-<input type="email" placeholder="Email" required>
-<input type="tel" placeholder="Telefon" required>
-<textarea placeholder="Twoja odpowiedź konkursowa..." required></textarea>
-<label class="checkbox"><input type="checkbox" required> Akceptuję regulamin konkursu</label>
-<label class="checkbox"><input type="checkbox"> Zgoda marketingowa</label>
-<button class="submit-btn" type="submit">Wyślij zgłoszenie</button>
-</form>
-</div>
-</section>
-
 <footer>
 © 2026 LEGIA WARSZAWA – Konkurs promocyjny
 </footer>
@@ -131,9 +228,12 @@ footer{padding:40px;text-align:center;font-size:14px;color:#aaa;border-top:1px s
 function scrollToForm(){document.getElementById("form").scrollIntoView({behavior:"smooth"});}
 const form=document.getElementById("contestForm");
 const popup=document.getElementById("popup");
-form.addEventListener("submit",function(e){e.preventDefault();popup.classList.add("active");form.reset();});
+form.addEventListener("submit",function(e){
+e.preventDefault();
+popup.classList.add("active");
+form.reset();
+});
 popup.addEventListener("click",()=>popup.classList.remove("active"));
 </script>
-
 </body>
 </html>
