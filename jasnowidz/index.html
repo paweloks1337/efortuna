@@ -3,202 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jasnowidz Fortuny</title>
+    <title>🔮 JASNOWIDZ FORTUNY</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style> body { background: linear-gradient(to right, #8b5cf6, #ec4899); } </style>
+    <style>
+        :root { --gold: #FFD700; --black: #1a1a1a; --dark: #0f0f0f; }
+        body { background: linear-gradient(135deg, var(--black) 0%, #333 100%); color: var(--gold); font-family: 'Arial Black', Arial; }
+        .glow { text-shadow: 0 0 20px var(--gold); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+        .deadline { background: linear-gradient(90deg, red, orange); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: countblink 1s infinite; }
+        @keyframes countblink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .crystal { background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%); box-shadow: 0 0 50px rgba(255,215,0,0.5); }
+        .correct { background: #10b981 !important; box-shadow: 0 0 20px #10b981 !important; }
+        .wrong { background: #ef4444 !important; box-shadow: 0 0 20px #ef4444 !important; }
+    </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div id="loginScreen" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
-        <h1 class="text-3xl font-bold mb-6 text-purple-600">🔮 Jasnowidz Fortuny</h1>
-        <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4] mb-4">Zaloguj Discord</button>
-        <div id="status" class="text-sm text-gray-600">Kliknij żeby zagrać!</div>
-    </div>
-
-    <div id="homeScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
-        <h2 class="text-2xl mb-4 text-green-600">✅ ZALOGOWANY!</h2>
-        <h3 class="text-xl mb-6">Witaj <span id="username" class="font-bold"></span></h3>
-        <button onclick="startQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg font-bold w-full mb-4 hover:bg-green-600">🎱 GRAJ!</button>
-        <button onclick="adminPanel()" class="bg-blue-500 text-white py-3 px-8 rounded-lg font-bold w-full hover:bg-blue-600">⚙️ Admin</button>
-        <button onclick="logout()" class="bg-red-500 text-white py-2 px-4 rounded w-full mt-4 text-sm">Wyloguj</button>
-    </div>
-
-    <!-- QUIZ + ADMIN jak wcześniej - skraca się -->
-    <div id="quizScreen" class="hidden fixed inset-0 bg-white p-4 overflow-auto">
-        <div class="max-w-2xl mx-auto">
-            <h2 class="text-2xl mb-6">Pytanie <span id="qNum">1</span>/<span id="totalQ">0</span> | Punkty: <span id="score">0</span></h2>
-            <div id="question" class="text-xl p-6 bg-purple-50 rounded-xl mb-6"></div>
-            <div id="options" class="space-y-3 mb-6"></div>
-            <button id="nextBtn" onclick="nextQuestion()" class="w-full bg-purple-500 text-white py-3 rounded-lg font-bold hidden">Dalej</button>
-            <div id="result" class="hidden">
-                <h3 class="text-3xl mb-6">Wynik: <span id="finalScore">0</span> pkt!</h3>
-                <table class="w-full border-collapse border">
-                    <thead><tr><th>Pytanie</th><th>Poprawna?</th></tr></thead>
-                    <tbody id="resultsTable"></tbody>
-                </table>
-                <button onclick="resetQuiz()" class="w-full bg-green-500 text-white py-3 rounded-lg mt-6">Jeszcze raz</button>
-            </div>
+<body class="min-h-screen p-4">
+    <!-- LOADING -->
+    <div id="loading" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="crystal p-8 rounded-2xl text-center">
+            <div class="text-6xl mb-4">🔮</div>
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-gold mx-auto mb-4"></div>
+            <p class="text-2xl">Ładowanie Jasnowidza...</p>
         </div>
     </div>
 
-    <div id="adminScreen" class="hidden fixed inset-0 bg-white p-4 overflow-auto">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-2xl mb-6">Panel Admin</h2>
-            <div id="questionsList" class="mb-6"></div>
-            <input id="newQ" placeholder="Pytanie" class="w-full p-3 border rounded mb-2">
-            <input id="optA" placeholder="A" class="w-full p-2 border rounded mb-1 block w-1/3 inline-block">
-            <input id="optB" placeholder="B" class="w-full p-2 border rounded mb-1 block w-1/3 inline-block">
-            <input id="optC" placeholder="C" class="w-full p-2 border rounded mb-2 block w-1/3 inline-block">
-            <select id="correctOpt" class="w-full p-2 border rounded mb-2"><option>A</option><option>B</option><option>C</option></select>
-            <button onclick="addQuestion()" class="bg-green-500 text-white py-2 px-6 rounded w-full">Dodaj</button>
-            <button onclick="backHome()" class="bg-gray-500 text-white py-2 px-6 rounded w-full mt-2">Wróć</button>
+    <!-- LOGIN -->
+    <div id="loginScreen" class="max-w-md mx-auto mt-20">
+        <div class="crystal p-12 rounded-3xl text-center shadow-2xl">
+            <div class="text-6xl mb-8 glow">🔮</div>
+            <h1 class="text-4xl font-black mb-8 glow">JASNOWIDZ FORTUNY</h1>
+            <button id="discordLogin" class="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-4 px-8 rounded-2xl font-black text-xl hover:from-yellow-500 hover:shadow-gold shadow-2xl mb-6">
+                ⚡ ZALOGUJ DISCORD
+            </button>
+            <p id="status" class="text-gold text-lg">Gotowy do wróżenia przyszłości...</p>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="hidden max-w-4xl mx-auto mt-8">
+        <!-- USER INFO -->
+        <div class="crystal p-6 rounded-2xl mb-8 text-center">
+            <img id="avatar" class="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-gold">
+            <h2 id="username" class="text-3xl font-black glow mb-2"></h2>
+            <div class="flex gap-4 justify-center text-xl">
+                <div>Punkty: <span id="userPoints" class="font-black text-2xl glow">0</span></div>
+                | <div>Skuteczność: <span id="accuracy" class="font-black text-2xl glow">0%</span></div>
+            </div>
+        </div>
+
+        <!-- JASNOWIDZ LIST -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div id="questionsList"></div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button onclick="adminLogin()" class="bg-gradient-to-r from-yellow-500 to-yellow-700 text-black py-4 px-8 rounded-2xl font-black text-xl hover:shadow-gold shadow-lg">
+                🔐 PANEL ADMIN
+            </button>
+            <button onclick="logout()" class="bg-gradient-to-r from-gray-600 to-gray-800 text-white py-4 px-8 rounded-2xl font-black text-xl hover:from-gray-700">
+                🚪 Wyloguj
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="adminLoginScreen" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-40">
+        <div class="crystal p-12 rounded-3xl text-center max-w-md w-full mx-4">
+            <div class="text-5xl mb-8">🔐</div>
+            <h2 class="text-3xl font-black mb-8">PANEL ADMIN</h2>
+            <input id="adminPass" type="password" placeholder="Hasło admin..." class="w-full p-4 text-xl rounded-2xl border-2 border-gold bg-black text-gold mb-6 text-center">
+            <button onclick="checkAdmin()" class="w-full bg-gradient-to-r from-red-500 to-yellow-500 text-black py-4 px-8 rounded-2xl font-black text-xl hover:shadow-gold shadow-2xl">
+                WEJDŹ DO PANELU
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="hidden fixed inset-0 bg-black bg-opacity-95 flex flex-col z-50 overflow-auto p-4">
+        <div class="crystal p-8 rounded-3xl mb-8 max-w-4xl mx-auto w-full">
+            <h1 class="text-4xl font-black text-center mb-8 glow">⚙️ PANEL ADMINISTRATORA</h1>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- ADD QUESTION -->
+                <div>
+                    <h3 class="text-2xl font-black mb-6 text-center">➕ DODAJ JASNOWIDZA</h3>
+                    <input id="adminQ" placeholder="Pytanie jasnowidza..." class="w-full p-4 rounded-xl border-2 border-gold bg-black text-gold mb-4 text-lg">
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <input id="optA" placeholder="Opcja A" class="p-3 rounded-xl border-gold bg-black text-gold">
+                        <input id="optB" placeholder="Opcja B" class="p-3 rounded-xl border-gold bg-black text-gold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <input id="optC" placeholder="Opcja C" class="p-3 rounded-xl border-gold bg-black text-gold">
+                        <input id="optD" placeholder="Opcja D" class="p-3 rounded-xl border-gold bg-black text-gold">
+                    </div>
+                    <input id="deadline" type="datetime-local" class="w-full p-3 rounded-xl border-gold bg-black text-gold mb-4">
+                    <button onclick="addQuestion()" class="w-full bg-gradient-to-r from-green-500 to-yellow-500 text-black py-4 rounded-xl font-black text-lg">➕ DODAJ</button>
+                </div>
+
+                <!-- STATS -->
+                <div>
+                    <h3 class="text-2xl font-black mb-6 text-center">📊 STATYSTYKI ODPOWIEDZI</h3>
+                    <div id="statsPanel" class="space-y-4"></div>
+                </div>
+            </div>
+            <button onclick="closeAdmin()" class="w-full bg-gradient-to-r from-gray-600 to-gray-800 text-white py-4 rounded-xl font-black text-xl mt-8">🚪 WYJDŹ</button>
         </div>
     </div>
 
     <script>
+        const ADMIN_PASS = 'cwel@123';
         const CLIENT_ID = '1483233223013302424';
-        let user = null;
-        let questions = JSON.parse(localStorage.getItem('questions')) || [{q: 'Test?', options: ['A', 'B', 'C'], correct: 'A'}];
-        let currentQ = 0, score = 0, answers = [];
+        let user = null, questions = [], currentQ = 0, isAdmin = false;
 
-        // SUPER PROSTE LOGOWANIE
-        function tryAutoLogin() {
-            // Sprawdź localStorage
-            const savedUser = localStorage.getItem('jasnowidz_user');
-            if (savedUser) {
-                user = JSON.parse(savedUser);
-                document.getElementById('username').textContent = user.username;
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('homeScreen').classList.remove('hidden');
-                return true;
-            }
-            return false;
+        // START
+        window.onload = init;
+
+        function init() {
+            document.getElementById('loading').classList.remove('hidden');
+            loadData();
+            checkAuth();
+            setTimeout(() => document.getElementById('loading').classList.add('hidden'), 2000);
         }
 
-        // Login Discord
-        document.getElementById('discordLogin').onclick = () => {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
-        };
+        function loadData() {
+            try {
+                user = JSON.parse(localStorage.getItem('jasnowidz_user'));
+                questions = JSON.parse(localStorage.getItem('questions')) || [];
+                if (user) showDashboard();
+            } catch(e) {}
+        }
 
-        // Po powrocie z Discord
-        window.onload = () => {
+        function checkAuth() {
             const hash = window.location.hash.substring(1);
             const params = new URLSearchParams(hash);
             const token = params.get('access_token');
-            
             if (token) {
-                fetch('https://discord.com/api/users/@me', {
-                    headers: {Authorization: `Bearer ${token}`}
-                }).then(r => r.json()).then(data => {
+                fetch('https://discord.com/api/users/@me', {headers: {Authorization: `Bearer ${token}`}})
+                .then(r => r.json()).then(data => {
                     user = data;
                     localStorage.setItem('jasnowidz_user', JSON.stringify(user));
-                    document.getElementById('username').textContent = user.username;
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('homeScreen').classList.remove('hidden');
+                    showDashboard();
                     window.history.replaceState({}, '', window.location.pathname);
                 });
-            } else {
-                tryAutoLogin();
             }
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
+            document.getElementById('username').textContent = user.username;
+            updateUserStats();
+            renderQuestions();
+        }
+
+        function updateUserStats() {
+            const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
+            const total = Object.keys(userAnswers).length;
+            const correct = Object.values(userAnswers).filter(v => v).length;
+            document.getElementById('userPoints').textContent = correct;
+            document.getElementById('accuracy').textContent = total ? Math.round(correct/total*100) + '%' : '0%';
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsList');
+            container.innerHTML = questions.map((q, i) => {
+                const now = new Date();
+                const deadline = new Date(q.deadline);
+                const expired = now > deadline;
+                const userAnswer = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}')[i];
+                
+                return `
+                    <div class="crystal p-6 rounded-2xl relative group">
+                        <div class="deadline text-2xl font-black mb-4 text-center ${!expired ? 'animate-pulse' : ''}">
+                            ${expired ? '⏰ ROZSTRZYGNIĘTE' : formatTime(deadline)}
+                        </div>
+                        <h3 class="text-xl font-black mb-4">${q.question}</h3>
+                        <div class="space-y-2 mb-6">
+                            ${q.options.map((opt, j) => `
+                                <button class="w-full p-4 rounded-xl border-2 border-gold hover:bg-gold hover:bg-opacity-20 flex items-center gap-3 group-hover:scale-105 transition-all ${userAnswer === j ? (q.correct === j ? 'correct' : 'wrong') : ''} ${expired ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    onclick="${expired || userAnswer !== undefined ? '' : `answerQuestion(${i}, ${j})`}">
+                                    <span>${String.fromCharCode(65+j)}.</span> ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        ${userAnswer !== undefined ? `<div class="text-center text-lg font-black mt-4 ${userAnswer === q.correct ? 'text-green-400 glow' : 'text-red-400'}">Twoja odpowiedź: ${String.fromCharCode(65+userAnswer)}</div>` : ''}
+                        ${expired && q.correct !== undefined ? `<div class="text-center text-2xl font-black mt-4 text-green-400 glow">✅ POPRAWNA: ${String.fromCharCode(65+q.correct)}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function answerQuestion(qid, optid) {
+            const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
+            userAnswers[qid] = optid;
+            localStorage.setItem(`user_${user.id}_answers`, JSON.stringify(userAnswers));
+            renderQuestions();
+            updateUserStats();
+        }
+
+        function formatTime(date) {
+            const now = new Date();
+            const diff = date - now;
+            if (diff < 0) return 'EXPIRED';
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            return `${h}h ${m}m`;
+        }
+
+        // ADMIN
+        function adminLogin() {
+            document.getElementById('adminLoginScreen').classList.remove('hidden');
+        }
+
+        function checkAdmin() {
+            if (document.getElementById('adminPass').value === ADMIN_PASS) {
+                isAdmin = true;
+                document.getElementById('adminLoginScreen').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                renderAdminStats();
+            } else {
+                alert('❌ BŁĘDNE HASŁO!');
+            }
+        }
+
+        function renderAdminStats() {
+            const container = document.getElementById('statsPanel');
+            container.innerHTML = questions.map((q, i) => {
+                const votes = {};
+                for (let uid in localStorage) {
+                    if (uid.startsWith('user_') && uid.endsWith('_answers')) {
+                        try {
+                            const answers = JSON.parse(localStorage.getItem(uid));
+                            if (answers[i] !== undefined) {
+                                votes[answers[i]] = (votes[answers[i]] || 0) + 1;
+                            }
+                        } catch(e) {}
+                    }
+                }
+                return `
+                    <div class="p-4 bg-white bg-opacity-10 rounded-xl">
+                        <h4 class="font-black text-xl mb-2">${q.question}</h4>
+                        <div class="space-y-1">
+                            ${q.options.map((opt, j) => `<div>G${String.fromCharCode(65+j)}: ${votes[j] || 0} głosów</div>`).join('')}
+                        </div>
+                        ${q.correct !== undefined ? `<div class="mt-2 font-black text-green-400">✅ POPRAWNA: ${String.fromCharCode(65+q.correct)}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addQuestion() {
+            const newQ = {
+                question: document.getElementById('adminQ').value,
+                options: [document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value, document.getElementById('optD').value].filter(o => o),
+                deadline: document.getElementById('deadline').value,
+                correct: undefined
+            };
+            if (newQ.question && newQ.options.length >= 2 && newQ.deadline) {
+                questions.push(newQ);
+                localStorage.setItem('questions', JSON.stringify(questions));
+                renderQuestions();
+                renderAdminStats();
+                clearAdminForm();
+            }
+        }
+
+        function setCorrectAnswer(qid, optid) {
+            questions[qid].correct = optid;
+            localStorage.setItem('questions', JSON.stringify(questions));
+            renderQuestions();
+            renderAdminStats();
+        }
+
+        function deleteQuestion(qid) {
+            questions.splice(qid, 1);
+            localStorage.setItem('questions', JSON.stringify(questions));
+            renderQuestions();
+            renderAdminStats();
+        }
+
+        function clearAdminForm() {
+            document.getElementById('adminQ').value = '';
+            ['optA','optB','optC','optD'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('deadline').value = '';
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            isAdmin = false;
+        }
+
+        document.getElementById('discordLogin').onclick = () => {
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
         };
 
         function logout() {
             localStorage.removeItem('jasnowidz_user');
             location.reload();
         }
-
-        // QUIZ
-        function startQuiz() {
-            document.getElementById('homeScreen').classList.add('hidden');
-            document.getElementById('quizScreen').classList.remove('hidden');
-            currentQ = 0; score = 0; answers = [];
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const q = questions[currentQ];
-            document.getElementById('qNum').textContent = currentQ + 1;
-            document.getElementById('totalQ').textContent = questions.length;
-            document.getElementById('question').textContent = q.q;
-            const opts = document.getElementById('options');
-            opts.innerHTML = '';
-            ['A','B','C'].forEach((let,i) => {
-                const btn = document.createElement('button');
-                btn.textContent = `${let}: ${q.options[i]}`;
-                btn.className = 'w-full p-4 border rounded-lg hover:bg-purple-100';
-                btn.onclick = () => selectOption(let);
-                opts.appendChild(btn);
-            });
-        }
-
-        function selectOption(selected) {
-            answers[currentQ] = selected === questions[currentQ].correct;
-            document.querySelectorAll('#options button').forEach(b => b.disabled = true);
-            document.getElementById('nextBtn').classList.remove('hidden');
-        }
-
-        function nextQuestion() {
-            if (answers[currentQ]) score++;
-            document.getElementById('score').textContent = score;
-            currentQ++;
-            if (currentQ < questions.length) showQuestion();
-            else showResult();
-        }
-
-        function showResult() {
-            document.getElementById('finalScore').textContent = score;
-            const table = document.getElementById('resultsTable');
-            table.innerHTML = '';
-            questions.forEach((q,i) => {
-                const row = table.insertRow();
-                row.innerHTML = `<td>${q.q}</td><td>${answers[i] ? '✅' : '❌'}</td>`;
-            });
-            document.getElementById('result').classList.remove('hidden');
-        }
-
-        function resetQuiz() {
-            document.getElementById('quizScreen').classList.add('hidden');
-            document.getElementById('homeScreen').classList.remove('hidden');
-        }
-
-        // ADMIN
-        function adminPanel() {
-            document.getElementById('homeScreen').classList.add('hidden');
-            document.getElementById('adminScreen').classList.remove('hidden');
-            showQuestionsList();
-        }
-
-        function showQuestionsList() {
-            document.getElementById('questionsList').innerHTML = questions.map((q,i) => 
-                `<div class="p-4 bg-gray-100 rounded mb-2">${q.q} | ${q.options.join(', ')} | <span class="text-green-600">${q.correct}</span> 
-                <button onclick="deleteQuestion(${i})" class="bg-red-500 text-white py-1 px-3 rounded ml-2 text-sm">Usuń</button></div>`
-            ).join('');
-        }
-
-        function addQuestion() {
-            const q = document.getElementById('newQ').value;
-            const opts = [document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value];
-            const correct = document.getElementById('correctOpt').value;
-            if (q && opts.every(o => o)) {
-                questions.push({q, options: opts, correct});
-                localStorage.setItem('questions', JSON.stringify(questions));
-                showQuestionsList();
-                document.getElementById('newQ').value = '';
-                ['optA','optB','optC'].forEach(id => document.getElementById(id).value = '');
-            }
-        }
-
-        function deleteQuestion(i) {
-            questions.splice(i, 1);
-            localStorage.setItem('questions', JSON.stringify(questions));
-            showQuestionsList();
-        }
-
-        function backHome() {
-            document.getElementById('adminScreen').classList.add('hidden');
-            document.getElementById('homeScreen').classList.remove('hidden');
-        }
-
-        document.getElementById('totalQ').textContent = questions.length;
     </script>
 </body>
 </html>
