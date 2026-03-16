@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head><title>Callback</title></head>
-<body style="text-align:center;padding:50px;">
-    <h1>🔮 Autoryzacja OK!</h1>
-    <p>Token zapisany, możesz zamknąć.</p>
+<head>
+    <title>Przekierowuję...</title>
     <script>
+        // Pobierz token z URL i zapisz
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
         const token = params.get('access_token');
+        
         if (token) {
-            window.opener.localStorage.setItem('discord_token', token);
-            console.log('✅ Token OK:', token.substring(0,20)+'...');
+            // ZAPISZ UŻYTKOWNIKA NATYCHMIAST
+            fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then(r => r.json()).then(user => {
+                localStorage.setItem('jasnowidz_user', JSON.stringify(user));
+                // PRZEKIERUJ NA GŁÓWNA STRONĘ
+                window.location.href = 'https://dcranking.pl/jasnowidz/';
+            }).catch(() => {
+                window.location.href = 'https://dcranking.pl/jasnowidz/';
+            });
         } else {
-            console.error('❌ Brak tokenu!');
-            document.body.innerHTML += '<p style="color:red;">BŁĄD: Brak tokenu!</p>';
+            window.location.href = 'https://dcranking.pl/jasnowidz/';
         }
-        setTimeout(() => window.close(), 2000);
     </script>
+</head>
+<body style="text-align:center; padding:50px; font-family:Arial;">
+    <h1>🔮 Przekierowuję do Jasnowidza...</h1>
+    <p>Token zapisany - ładowanie użytkownika (2s)</p>
 </body>
 </html>
