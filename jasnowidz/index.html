@@ -67,7 +67,7 @@
     <script>
         // Discord config - ZMIEŃ NA SWOJE!
         const CLIENT_ID = 'TWÓJ_DISCORD_CLIENT_ID'; // Z Developer Portal
-        const REDIRECT_URI = window.location.origin + '/discord-callback.html'; // Stwórz plik callback.html z token detector (patrz niżej)
+        const REDIRECT_URI = window.location.origin + '/jasnowidz/discord-callback.html'; // Stwórz plik callback.html z token detector (patrz niżej)
 
         let user = null;
         let questions = JSON.parse(localStorage.getItem('questions')) || [
@@ -80,7 +80,7 @@
         // Discord Login (prosty popup z biblioteką-like)
         document.getElementById('discordLogin').addEventListener('click', () => {
             const params = new URLSearchParams({
-                client_id: CLIENT_ID,
+                client_id: 1483233223013302424,
                 redirect_uri: REDIRECT_URI,
                 response_type: 'token',
                 scope: 'identify'
