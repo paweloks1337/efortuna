@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html>
-<body>
-    <script src="https://discord.com/api/oauth2/token-detector.js"></script> <!-- Prosty detector z repo -->
+<head><title>Callback</title></head>
+<body style="text-align:center;padding:50px;">
+    <h1>🔮 Autoryzacja OK!</h1>
+    <p>Token zapisany, możesz zamknąć.</p>
     <script>
-        window.opener.localStorage.setItem('discord_token', new URLSearchParams(window.location.hash.substring(1)).get('access_token'));
-        window.close();
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const token = params.get('access_token');
+        if (token) {
+            window.opener.localStorage.setItem('discord_token', token);
+            console.log('✅ Token OK:', token.substring(0,20)+'...');
+        } else {
+            console.error('❌ Brak tokenu!');
+            document.body.innerHTML += '<p style="color:red;">BŁĄD: Brak tokenu!</p>';
+        }
+        setTimeout(() => window.close(), 2000);
     </script>
 </body>
 </html>
