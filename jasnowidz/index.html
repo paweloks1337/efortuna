@@ -66,7 +66,7 @@
 
     <script>
         // Discord config - ZMIEŃ NA SWOJE!
-        const CLIENT_ID = 'TWÓJ_DISCORD_CLIENT_ID'; // Z Developer Portal
+        const CLIENT_ID = '1483233223013302424'; // Z Developer Portal
         const REDIRECT_URI = window.location.origin + '/jasnowidz/discord-callback.html'; // Stwórz plik callback.html z token detector (patrz niżej)
 
         let user = null;
@@ -81,8 +81,8 @@
         document.getElementById('discordLogin').addEventListener('click', () => {
             const params = new URLSearchParams({
                 client_id: 1483233223013302424,
-                redirect_uri: REDIRECT_URI,
-                response_type: 'token',
+                redirect_uri: https://discord.com/oauth2/authorize?client_id=1483233223013302424&response_type=code&redirect_uri=https%3A%2F%2Fdcranking.pl%2Fjasnowidz%2Fdiscord-callback.html&scope=identify,
+                response_type: '7U08XiseXyPDMTW6ASN5Y8-fFysNLLW2',
                 scope: 'identify'
             });
             const popup = window.open(`https://discord.com/api/oauth2/authorize?${params}`, 'discord', 'width=500,height=600');
