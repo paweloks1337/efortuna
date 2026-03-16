@@ -8,126 +8,109 @@
     <style> body { background: linear-gradient(to right, #8b5cf6, #ec4899); } </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
-    <!-- Login -->
-    <div id="loginScreen" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
-        <h1 class="text-3xl font-bold text-center mb-6 text-purple-600">🔮 Jasnowidz Fortuny</h1>
-        <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4]">Zaloguj Discord</button>
-        <p id="status" class="mt-4 text-sm text-center text-gray-600">Gotowy do gry!</p>
+    <div id="loginScreen" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold mb-6 text-purple-600">🔮 Jasnowidz Fortuny</h1>
+        <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4] mb-4">Zaloguj Discord</button>
+        <div id="status" class="text-sm text-gray-600">Kliknij żeby zagrać!</div>
     </div>
 
-    <!-- Home -->
     <div id="homeScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
-        <img id="avatar" class="w-20 h-20 rounded-full mx-auto mb-4" src="">
-        <h2 class="text-2xl mb-4">Witaj, <span id="username"></span>!</h2>
-        <button onclick="startQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg font-bold mb-4 w-full hover:bg-green-600">🎱 Graj w Jasnowidza</button>
-        <button onclick="adminPanel()" class="bg-blue-500 text-white py-3 px-8 rounded-lg font-bold w-full hover:bg-blue-600">⚙️ Panel Admin</button>
-        <button onclick="logout()" class="bg-gray-500 text-white py-2 px-4 rounded mt-4 w-full text-sm">Wyloguj</button>
+        <h2 class="text-2xl mb-4 text-green-600">✅ ZALOGOWANY!</h2>
+        <h3 class="text-xl mb-6">Witaj <span id="username" class="font-bold"></span></h3>
+        <button onclick="startQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg font-bold w-full mb-4 hover:bg-green-600">🎱 GRAJ!</button>
+        <button onclick="adminPanel()" class="bg-blue-500 text-white py-3 px-8 rounded-lg font-bold w-full hover:bg-blue-600">⚙️ Admin</button>
+        <button onclick="logout()" class="bg-red-500 text-white py-2 px-4 rounded w-full mt-4 text-sm">Wyloguj</button>
     </div>
 
-    <!-- Quiz -->
-    <div id="quizScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-2xl w-full mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl">Pytanie <span id="qNum">1</span>/<span id="totalQ">0</span></h2>
-            <div class="text-right">Punkty: <span id="score">0</span></div>
-        </div>
-        <div id="question" class="text-xl p-6 bg-purple-50 rounded-xl mb-6 min-h-[100px]"></div>
-        <div id="options" class="space-y-3 mb-6"></div>
-        <button id="nextBtn" onclick="nextQuestion()" class="w-full bg-purple-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-purple-600 hidden">➡️ Dalej</button>
-        <div id="result" class="hidden text-center">
-            <h3 class="text-3xl mb-6">Wynik: <span id="finalScore">0</span>/<span id="totalQResult">0</span></h3>
-            <div class="bg-green-100 p-4 rounded-lg mb-4">Dostałeś <span id="coinsEarned">0</span> coinów! 💰</div>
-            <table class="w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
-                <thead><tr class="bg-gray-200"><th class="p-3">Pytanie</th><th class="p-3">Twoja odp.</th><th class="p-3">Poprawna</th></tr></thead>
-                <tbody id="resultsTable"></tbody>
-            </table>
-            <button onclick="resetQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg mt-6 w-full hover:bg-green-600">🎮 Jeszcze raz</button>
-        </div>
-    </div>
-
-    <!-- Admin -->
-    <div id="adminScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full mx-auto">
-        <h2 class="text-2xl mb-6 flex items-center"><span>⚙️</span> Panel Admin</h2>
-        <div id="questionsList" class="mb-8 max-h-96 overflow-y-auto space-y-3"></div>
-        <div class="bg-gray-50 p-6 rounded-xl">
-            <h3 class="font-bold mb-4">➕ Dodaj nowe pytanie</h3>
-            <input id="newQ" placeholder="Wpisz pytanie..." class="w-full p-3 border rounded-lg mb-3">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                <input id="optA" placeholder="Opcja A" class="p-3 border rounded-lg">
-                <input id="optB" placeholder="Opcja B" class="p-3 border rounded-lg">
-                <input id="optC" placeholder="Opcja C" class="p-3 border rounded-lg">
+    <!-- QUIZ + ADMIN jak wcześniej - skraca się -->
+    <div id="quizScreen" class="hidden fixed inset-0 bg-white p-4 overflow-auto">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-2xl mb-6">Pytanie <span id="qNum">1</span>/<span id="totalQ">0</span> | Punkty: <span id="score">0</span></h2>
+            <div id="question" class="text-xl p-6 bg-purple-50 rounded-xl mb-6"></div>
+            <div id="options" class="space-y-3 mb-6"></div>
+            <button id="nextBtn" onclick="nextQuestion()" class="w-full bg-purple-500 text-white py-3 rounded-lg font-bold hidden">Dalej</button>
+            <div id="result" class="hidden">
+                <h3 class="text-3xl mb-6">Wynik: <span id="finalScore">0</span> pkt!</h3>
+                <table class="w-full border-collapse border">
+                    <thead><tr><th>Pytanie</th><th>Poprawna?</th></tr></thead>
+                    <tbody id="resultsTable"></tbody>
+                </table>
+                <button onclick="resetQuiz()" class="w-full bg-green-500 text-white py-3 rounded-lg mt-6">Jeszcze raz</button>
             </div>
-            <select id="correctOpt" class="w-full p-3 border rounded-lg mb-3">
-                <option>A</option><option>B</option><option>C</option>
-            </select>
-            <button onclick="addQuestion()" class="w-full bg-green-500 text-white py-3 px-6 rounded-lg font-bold hover:bg-green-600">➕ DODAJ PYTANIE</button>
         </div>
-        <button onclick="backHome()" class="w-full bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 mt-4">🏠 Wróć</button>
+    </div>
+
+    <div id="adminScreen" class="hidden fixed inset-0 bg-white p-4 overflow-auto">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-2xl mb-6">Panel Admin</h2>
+            <div id="questionsList" class="mb-6"></div>
+            <input id="newQ" placeholder="Pytanie" class="w-full p-3 border rounded mb-2">
+            <input id="optA" placeholder="A" class="w-full p-2 border rounded mb-1 block w-1/3 inline-block">
+            <input id="optB" placeholder="B" class="w-full p-2 border rounded mb-1 block w-1/3 inline-block">
+            <input id="optC" placeholder="C" class="w-full p-2 border rounded mb-2 block w-1/3 inline-block">
+            <select id="correctOpt" class="w-full p-2 border rounded mb-2"><option>A</option><option>B</option><option>C</option></select>
+            <button onclick="addQuestion()" class="bg-green-500 text-white py-2 px-6 rounded w-full">Dodaj</button>
+            <button onclick="backHome()" class="bg-gray-500 text-white py-2 px-6 rounded w-full mt-2">Wróć</button>
+        </div>
     </div>
 
     <script>
-        // KONFIGURACJA (ZMIENIAJ TYLKO CLIENT_ID!)
         const CLIENT_ID = '1483233223013302424';
-        const REDIRECT_URI = 'https://dcranking.pl/jasnowidz/discord-callback.html';
+        let user = null;
+        let questions = JSON.parse(localStorage.getItem('questions')) || [{q: 'Test?', options: ['A', 'B', 'C'], correct: 'A'}];
+        let currentQ = 0, score = 0, answers = [];
 
-        let user = null, questions = [], currentQ = 0, score = 0, answers = [], userCoins = 0;
-
-        // ŁADUJ DANE UŻYTKOWNIKA Z LOCALSTORAGE
-        function loadUserData() {
-            try {
-                user = JSON.parse(localStorage.getItem('jasnowidz_user'));
-                userCoins = parseInt(localStorage.getItem('jasnowidz_coins') || '0');
-                questions = JSON.parse(localStorage.getItem('questions')) || [
-                    {q: 'Kto wygra następny mecz?', options: ['Legia', 'Lech', 'Remis'], correct: 'A'},
-                    {q: 'Ile goli padnie?', options: ['Ponad 2.5', 'Poniżej 2.5', 'Dokładnie 2'], correct: 'B'}
-                ];
-                if (user) {
-                    showHome();
-                    document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                }
-            } catch(e) {}
+        // SUPER PROSTE LOGOWANIE
+        function tryAutoLogin() {
+            // Sprawdź localStorage
+            const savedUser = localStorage.getItem('jasnowidz_user');
+            if (savedUser) {
+                user = JSON.parse(savedUser);
+                document.getElementById('username').textContent = user.username;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('homeScreen').classList.remove('hidden');
+                return true;
+            }
+            return false;
         }
 
-        // Discord Login
+        // Login Discord
         document.getElementById('discordLogin').onclick = () => {
-            const params = new URLSearchParams({client_id: CLIENT_ID, redirect_uri: REDIRECT_URI, response_type: 'token', scope: 'identify'});
-            window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
         };
 
-        // SPRAWDŹ AUTORYZACJĘ PO POWROCIE
-        function checkAuth() {
+        // Po powrocie z Discord
+        window.onload = () => {
             const hash = window.location.hash.substring(1);
             const params = new URLSearchParams(hash);
             const token = params.get('access_token');
+            
             if (token) {
-                fetch('https://discord.com/api/users/@me', {headers: {Authorization: `Bearer ${token}`}})
-                .then(r => r.json())
-                .then(data => {
+                fetch('https://discord.com/api/users/@me', {
+                    headers: {Authorization: `Bearer ${token}`}
+                }).then(r => r.json()).then(data => {
                     user = data;
                     localStorage.setItem('jasnowidz_user', JSON.stringify(user));
-                    localStorage.setItem('jasnowidz_coins', '0');
-                    showHome();
+                    document.getElementById('username').textContent = user.username;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('homeScreen').classList.remove('hidden');
                     window.history.replaceState({}, '', window.location.pathname);
-                }).catch(() => location.reload());
+                });
+            } else {
+                tryAutoLogin();
             }
-        }
-
-        function showHome() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('homeScreen').classList.remove('hidden');
-            document.getElementById('username').textContent = user.username;
-        }
+        };
 
         function logout() {
             localStorage.removeItem('jasnowidz_user');
-            localStorage.removeItem('jasnowidz_coins');
             location.reload();
         }
 
         // QUIZ
         function startQuiz() {
-            currentQ = 0; score = 0; answers = [];
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('quizScreen').classList.remove('hidden');
+            currentQ = 0; score = 0; answers = [];
             showQuestion();
         }
 
@@ -138,23 +121,18 @@
             document.getElementById('question').textContent = q.q;
             const opts = document.getElementById('options');
             opts.innerHTML = '';
-            ['A','B','C'].forEach((let, i) => {
+            ['A','B','C'].forEach((let,i) => {
                 const btn = document.createElement('button');
-                btn.className = 'w-full p-4 border-2 rounded-xl hover:bg-purple-50 font-semibold transition-all';
                 btn.textContent = `${let}: ${q.options[i]}`;
+                btn.className = 'w-full p-4 border rounded-lg hover:bg-purple-100';
                 btn.onclick = () => selectOption(let);
                 opts.appendChild(btn);
             });
-            document.getElementById('nextBtn').classList.add('hidden');
-            document.getElementById('result').classList.add('hidden');
         }
 
         function selectOption(selected) {
             answers[currentQ] = selected === questions[currentQ].correct;
-            document.querySelectorAll('#options button').forEach((btn,i) => {
-                btn.disabled = true;
-                if (['A','B','C'][i] === questions[currentQ].correct) btn.style.background = '#10b981';
-            });
+            document.querySelectorAll('#options button').forEach(b => b.disabled = true);
             document.getElementById('nextBtn').classList.remove('hidden');
         }
 
@@ -168,16 +146,11 @@
 
         function showResult() {
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('totalQResult').textContent = questions.length;
-            document.getElementById('coinsEarned').textContent = score * 10;
-            userCoins += score * 10;
-            localStorage.setItem('jasnowidz_coins', userCoins);
-            
             const table = document.getElementById('resultsTable');
             table.innerHTML = '';
             questions.forEach((q,i) => {
                 const row = table.insertRow();
-                row.innerHTML = `<td class="p-3">${q.q.substring(0,30)}...</td><td class="p-3">${answers[i] ? '✅' : '❌'}</td><td class="p-3 font-bold">${q.correct}</td>`;
+                row.innerHTML = `<td>${q.q}</td><td>${answers[i] ? '✅' : '❌'}</td>`;
             });
             document.getElementById('result').classList.remove('hidden');
         }
@@ -192,37 +165,31 @@
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('adminScreen').classList.remove('hidden');
             showQuestionsList();
-            localStorage.setItem('questions', JSON.stringify(questions));
         }
 
         function showQuestionsList() {
-            document.getElementById('questionsList').innerHTML = questions.map((q,i) => `
-                <div class="bg-gray-100 p-4 rounded-xl flex flex-wrap items-center gap-3">
-                    <div class="flex-1">
-                        <strong>${q.q}</strong><br>
-                        <small>${q.options.join(' | ')} → <span class="text-green-600 font-bold">${q.correct}</span></small>
-                    </div>
-                    <button onclick="deleteQuestion(${i})" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 whitespace-nowrap">🗑️ Usuń</button>
-                </div>
-            `).join('') || '<p class="text-gray-500 p-8 text-center">Brak pytań - dodaj pierwsze!</p>';
+            document.getElementById('questionsList').innerHTML = questions.map((q,i) => 
+                `<div class="p-4 bg-gray-100 rounded mb-2">${q.q} | ${q.options.join(', ')} | <span class="text-green-600">${q.correct}</span> 
+                <button onclick="deleteQuestion(${i})" class="bg-red-500 text-white py-1 px-3 rounded ml-2 text-sm">Usuń</button></div>`
+            ).join('');
         }
 
         function addQuestion() {
-            const newQ = {
-                q: document.getElementById('newQ').value,
-                options: [document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value],
-                correct: document.getElementById('correctOpt').value
-            };
-            if (newQ.q.trim() && newQ.options.every(o => o.trim())) {
-                questions.push(newQ);
+            const q = document.getElementById('newQ').value;
+            const opts = [document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value];
+            const correct = document.getElementById('correctOpt').value;
+            if (q && opts.every(o => o)) {
+                questions.push({q, options: opts, correct});
+                localStorage.setItem('questions', JSON.stringify(questions));
                 showQuestionsList();
                 document.getElementById('newQ').value = '';
                 ['optA','optB','optC'].forEach(id => document.getElementById(id).value = '');
-            } else alert('Wypełnij wszystkie pola!');
+            }
         }
 
         function deleteQuestion(i) {
             questions.splice(i, 1);
+            localStorage.setItem('questions', JSON.stringify(questions));
             showQuestionsList();
         }
 
@@ -231,9 +198,6 @@
             document.getElementById('homeScreen').classList.remove('hidden');
         }
 
-        // START
-        loadUserData();
-        checkAuth();
         document.getElementById('totalQ').textContent = questions.length;
     </script>
 </body>
