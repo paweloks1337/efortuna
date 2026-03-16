@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jasnowidz Fortuny</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(to right, #8b5cf6, #ec4899); }
+        .magic-ball { animation: glow 2s infinite; }
+        @keyframes glow { 0% { box-shadow: 0 0 20px #fff; } 50% { box-shadow: 0 0 50px #a855f7; } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Login Discord -->
+    <div id="loginScreen" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
+        <h1 class="text-3xl font-bold text-center mb-6 text-purple-600">Jasnowidz Fortuny</h1>
+        <p class="text-center mb-8">Zaloguj przez Discord, by grać!</p>
+        <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4] transition">Zaloguj Discord</button>
+        <p id="userInfo" class="mt-4 hidden text-center font-bold"></p>
+    </div>
+
+    <!-- Home -->
+    <div id="homeScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+        <h2 class="text-2xl mb-4">Witaj, <span id="username"></span>!</h2>
+        <button onclick="startQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg font-bold mb-4 hover:bg-green-600">Graj w Jasnowidza</button>
+        <button onclick="adminPanel()" class="bg-blue-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-blue-600">Panel Admin</button>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quizScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-2xl w-full">
+        <div class="flex justify-between mb-6">
+            <h2>Pytanie <span id="qNum">1</span>/<span id="totalQ">0</span></h2>
+            <div>Punkty: <span id="score">0</span></div>
+        </div>
+        <div id="question" class="text-xl mb-6 p-4 bg-purple-100 rounded-lg"></div>
+        <div id="options" class="space-y-3 mb-6"></div>
+        <button id="nextBtn" onclick="nextQuestion()" class="bg-purple-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-purple-600 hidden">Dalej</button>
+        <div id="result" class="hidden">
+            <h3 class="text-2xl mb-4">Twój wynik: <span id="finalScore">0</span> pkt!</h3>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead><tr><th class="border p-2">Pytanie</th><th class="border p-2">Poprawna?</th></tr></thead>
+                <tbody id="resultsTable"></tbody>
+            </table>
+            <button onclick="resetQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg mt-4">Jeszcze raz</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full">
+        <h2 class="text-2xl mb-6">Panel Admin - Dodaj pytania</h2>
+        <div id="questionsList" class="mb-6"></div>
+        <div class="bg-gray-100 p-6 rounded-lg">
+            <h3>Dodaj nowe pytanie</h3>
+            <input id="newQ" placeholder="Pytanie" class="w-full p-2 border mb-2 rounded">
+            <input id="optA" placeholder="Opcja A" class="w-full p-2 border mb-2 rounded block">
+            <input id="optB" placeholder="Opcja B" class="w-full p-2 border mb-2 rounded block">
+            <input id="optC" placeholder="Opcja C" class="w-full p-2 border mb-2 rounded block">
+            <select id="correctOpt" class="w-full p-2 border mb-2 rounded">
+                <option>A</option><option>B</option><option>C</option>
+            </select>
+            <button onclick="addQuestion()" class="bg-green-500 text-white py-2 px-6 rounded hover:bg-green-600">Dodaj</button>
+        </div>
+        <button onclick="backHome()" class="bg-gray-500 text-white py-2 px-6 rounded hover:bg-gray-600">Wróć</button>
+    </div>
+
+    <script>
+        // Discord config - ZMIEŃ NA SWOJE!
+        const CLIENT_ID = 'TWÓJ_DISCORD_CLIENT_ID'; // Z Developer Portal
+        const REDIRECT_URI = window.location.origin + '/discord-callback.html'; // Stwórz plik callback.html z token detector (patrz niżej)
+
+        let user = null;
+        let questions = JSON.parse(localStorage.getItem('questions')) || [
+            {q: 'Kto wygra następny mecz?', options: ['A: Tak', 'B: Nie', 'C: Remis'], correct: 'A'}
+        ];
+        let currentQ = 0;
+        let score = 0;
+        let answers = [];
+
+        // Discord Login (prosty popup z biblioteką-like)
+        document.getElementById('discordLogin').addEventListener('click', () => {
+            const params = new URLSearchParams({
+                client_id: CLIENT_ID,
+                redirect_uri: REDIRECT_URI,
+                response_type: 'token',
+                scope: 'identify'
+            });
+            const popup = window.open(`https://discord.com/api/oauth2/authorize?${params}`, 'discord', 'width=500,height=600');
+            
+            // Sprawdź token po zamknięciu
+            const checkClosed = setInterval(() => {
+                if (popup.closed) {
+                    clearInterval(checkClosed);
+                    // Zakładamy, że token jest w localStorage po callback (prosty hack)
+                    const token = localStorage.getItem('discord_token');
+                    if (token) {
+                        fetch(`https://discord.com/api/users/@me`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        }).then(res => res.json()).then(data => {
+                            user = data;
+                            document.getElementById('loginScreen').classList.add('hidden');
+                            document.getElementById('homeScreen').classList.remove('hidden');
+                            document.getElementById('username').textContent = data.username;
+                            localStorage.removeItem('discord_token');
+                        });
+                    }
+                }
+            }, 500);
+        });
+
+        // Quiz functions
+        function startQuiz() {
+            currentQ = 0; score = 0; answers = [];
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('qNum').textContent = currentQ + 1;
+            document.getElementById('totalQ').textContent = questions.length;
+            document.getElementById('question').textContent = q.q;
+            const opts = document.getElementById('options');
+            opts.innerHTML = '';
+            ['A', 'B', 'C'].forEach((let, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-4 border rounded-lg hover:bg-purple-100';
+                btn.textContent = `${let}: ${q.options[i]}`;
+                btn.onclick = () => selectOption(let);
+                opts.appendChild(btn);
+            });
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('result').classList.add('hidden');
+        }
+
+        function selectOption(selected) {
+            answers[currentQ] = selected === questions[currentQ].correct;
+            document.querySelectorAll('#options button').forEach(btn => btn.disabled = true);
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (answers[currentQ]) score++;
+            document.getElementById('score').textContent = score;
+            currentQ++;
+            if (currentQ < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('finalScore').textContent = score;
+            const table = document.getElementById('resultsTable');
+            table.innerHTML = '';
+            questions.forEach((q, i) => {
+                const row = table.insertRow();
+                row.innerHTML = `<td>Pytanie ${i+1}</td><td>${answers[i] ? '✅' : '❌'}</td>`;
+            });
+            document.getElementById('result').classList.remove('hidden');
+        }
+
+        // Admin
+        function adminPanel() {
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.remove('hidden');
+            showQuestionsList();
+        }
+
+        function showQuestionsList() {
+            const list = document.getElementById('questionsList');
+            list.innerHTML = questions.map((q, i) => `
+                <div class="bg-gray-100 p-4 mb-4 rounded-lg">
+                    <strong>Pytanie ${i+1}:</strong> ${q.q}<br>
+                    Opcje: ${q.options.join(', ')}<br>
+                    Poprawna: ${q.correct}<br>
+                    <button onclick="deleteQuestion(${i})" class="bg-red-500 text-white py-1 px-3 rounded text-sm">Usuń</button>
+                </div>
+            `).join('');
+        }
+
+        function addQuestion() {
+            const newQ = {
+                q: document.getElementById('newQ').value,
+                options: [document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value],
+                correct: document.getElementById('correctOpt').value
+            };
+            if (newQ.q && newQ.options.every(o => o)) {
+                questions.push(newQ);
+                localStorage.setItem('questions', JSON.stringify(questions));
+                showQuestionsList();
+                // Wyczyść form
+                document.getElementById('newQ').value = '';
+                ['optA', 'optB', 'optC'].forEach(id => document.getElementById(id).value = '');
+            } else {
+                alert('Wypełnij wszystkie pola!');
+            }
+        }
+
+        function deleteQuestion(i) {
+            questions.splice(i, 1);
+            localStorage.setItem('questions', JSON.stringify(questions));
+            showQuestionsList();
+        }
+
+        function backHome() { 
+            document.getElementById('adminScreen').classList.add('hidden');
+            document.getElementById('homeScreen').classList.remove('hidden');
+        }
+
+        function resetQuiz() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('homeScreen').classList.remove('hidden');
+        }
+
+        // Ładuj pytania przy starcie
+        document.getElementById('totalQ').textContent = questions.length;
+    </script>
+</body>
+</html>
