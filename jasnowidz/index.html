@@ -7,28 +7,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: linear-gradient(to right, #8b5cf6, #ec4899); }
-        .magic-ball { animation: glow 2s infinite; }
-        @keyframes glow { 0% { box-shadow: 0 0 20px #fff; } 50% { box-shadow: 0 0 50px #a855f7; } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Loading -->
+    <div id="loadingScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+        <p>Ładowanie...</p>
+    </div>
+
     <!-- Login Discord -->
     <div id="loginScreen" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
         <h1 class="text-3xl font-bold text-center mb-6 text-purple-600">Jasnowidz Fortuny</h1>
-        <p class="text-center mb-8">Zaloguj przez Discord, by grać!</p>
-        <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4] transition">Zaloguj Discord</button>
-        <p id="userInfo" class="mt-4 hidden text-center font-bold"></p>
-        <div id="debug" class="mt-4 text-sm text-gray-600"></div>
+        <p class="text-center mb-8">Zaloguj przez Discord!</p>
+        <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4] transition">🔗 Zaloguj Discord</button>
+        <div id="status" class="mt-4 text-sm text-gray-600 text-center"></div>
     </div>
 
     <!-- Home -->
     <div id="homeScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
         <h2 class="text-2xl mb-4">Witaj, <span id="username"></span>!</h2>
-        <button onclick="startQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg font-bold mb-4 hover:bg-green-600">Graj w Jasnowidza</button>
-        <button onclick="adminPanel()" class="bg-blue-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-blue-600">Panel Admin</button>
+        <button onclick="startQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg font-bold mb-4 hover:bg-green-600 w-full">Graj w Jasnowidza</button>
+        <button onclick="adminPanel()" class="bg-blue-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-blue-600 w-full">Panel Admin</button>
     </div>
 
-    <!-- Quiz -->
+    <!-- Quiz i Admin - TAKIE SAME jak wcześniej -->
     <div id="quizScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-2xl w-full">
         <div class="flex justify-between mb-6">
             <h2>Pytanie <span id="qNum">1</span>/<span id="totalQ">0</span></h2>
@@ -36,37 +39,36 @@
         </div>
         <div id="question" class="text-xl mb-6 p-4 bg-purple-100 rounded-lg"></div>
         <div id="options" class="space-y-3 mb-6"></div>
-        <button id="nextBtn" onclick="nextQuestion()" class="bg-purple-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-purple-600 hidden">Dalej</button>
+        <button id="nextBtn" onclick="nextQuestion()" class="bg-purple-500 text-white py-3 px-8 rounded-lg font-bold hover:bg-purple-600 hidden w-full">Dalej</button>
         <div id="result" class="hidden">
             <h3 class="text-2xl mb-4">Twój wynik: <span id="finalScore">0</span> pkt!</h3>
             <table class="w-full border-collapse border border-gray-300">
                 <thead><tr><th class="border p-2">Pytanie</th><th class="border p-2">Poprawna?</th></tr></thead>
                 <tbody id="resultsTable"></tbody>
             </table>
-            <button onclick="resetQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg mt-4">Jeszcze raz</button>
+            <button onclick="resetQuiz()" class="bg-green-500 text-white py-3 px-8 rounded-lg mt-4 w-full">Jeszcze raz</button>
         </div>
     </div>
 
-    <!-- Admin Panel -->
     <div id="adminScreen" class="hidden bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full">
-        <h2 class="text-2xl mb-6">Panel Admin - Dodaj pytania</h2>
+        <h2 class="text-2xl mb-6">Panel Admin</h2>
         <div id="questionsList" class="mb-6"></div>
         <div class="bg-gray-100 p-6 rounded-lg">
-            <h3>Dodaj nowe pytanie</h3>
+            <h3>Dodaj pytanie</h3>
             <input id="newQ" placeholder="Pytanie" class="w-full p-2 border mb-2 rounded">
-            <input id="optA" placeholder="Opcja A" class="w-full p-2 border mb-2 rounded block">
-            <input id="optB" placeholder="Opcja B" class="w-full p-2 border mb-2 rounded block">
-            <input id="optC" placeholder="Opcja C" class="w-full p-2 border mb-2 rounded block">
+            <input id="optA" placeholder="Opcja A" class="w-full p-2 border mb-2 rounded">
+            <input id="optB" placeholder="Opcja B" class="w-full p-2 border mb-2 rounded">
+            <input id="optC" placeholder="Opcja C" class="w-full p-2 border mb-2 rounded">
             <select id="correctOpt" class="w-full p-2 border mb-2 rounded">
                 <option>A</option><option>B</option><option>C</option>
             </select>
-            <button onclick="addQuestion()" class="bg-green-500 text-white py-2 px-6 rounded hover:bg-green-600">Dodaj</button>
+            <button onclick="addQuestion()" class="bg-green-500 text-white py-2 px-6 rounded hover:bg-green-600 w-full mt-2">Dodaj</button>
         </div>
-        <button onclick="backHome()" class="bg-gray-500 text-white py-2 px-6 rounded hover:bg-gray-600">Wróć</button>
+        <button onclick="backHome()" class="bg-gray-500 text-white py-2 px-6 rounded hover:bg-gray-600 w-full mt-2">Wróć</button>
     </div>
 
     <script>
-        // Discord config - ZMIEŃ TYLKO TE 2 LINIJKI!
+        // KONFIGURACJA - ZMIENIAJ TYLKO TE 2!
         const CLIENT_ID = '1483233223013302424';
         const REDIRECT_URI = 'https://dcranking.pl/jasnowidz/discord-callback.html';
 
@@ -74,18 +76,10 @@
         let questions = JSON.parse(localStorage.getItem('questions')) || [
             {q: 'Kto wygra następny mecz?', options: ['Tak', 'Nie', 'Remis'], correct: 'A'}
         ];
-        let currentQ = 0;
-        let score = 0;
-        let answers = [];
+        let currentQ = 0, score = 0, answers = [];
 
-        function log(msg) {
-            console.log(msg);
-            document.getElementById('debug').innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
-        }
-
-        // Discord Login - NAPRAWIONE
+        // MOBILNY LOGIN - przekierowanie zamiast popup
         document.getElementById('discordLogin').addEventListener('click', () => {
-            log('1. Kliknięto login...');
             const params = new URLSearchParams({
                 client_id: CLIENT_ID,
                 redirect_uri: REDIRECT_URI,
@@ -93,63 +87,43 @@
                 scope: 'identify'
             });
             const authUrl = `https://discord.com/api/oauth2/authorize?${params.toString()}`;
-            log('2. Otwieram URL: ' + authUrl.substring(0, 80) + '...');
-            
-            const popup = window.open(authUrl, 'discord-auth', 'width=500,height=600,scrollbars=no');
-            
-            if (!popup) {
-                alert('❌ BLOKADA POPUPÓW! Wyłącz blokadę popupów w przeglądarce dla tej strony.');
-                return;
-            }
-            
-            log('3. Popup otwarty, czekam na zamknięcie...');
-            
-            const checkClosed = setInterval(() => {
-                try {
-                    if (popup.closed) {
-                        clearInterval(checkClosed);
-                        log('4. Popup zamknięty, sprawdzam token...');
-                        const token = localStorage.getItem('discord_token');
-                        if (token) {
-                            log('5. Token znaleziony! Loguję...');
-                            fetchUser(token);
-                            localStorage.removeItem('discord_token');
-                        } else {
-                            log('❌ Brak tokenu! Sprawdź czy callback.html istnieje.');
-                        }
-                    }
-                } catch(e) {
-                    log('Błąd: ' + e.message);
-                }
-            }, 1000);
+            document.getElementById('status').textContent = 'Przekierowuję do Discord...';
+            window.location.href = authUrl;
         });
 
-        async function fetchUser(token) {
-            try {
-                log('6. Pobieram dane użytkownika...');
-                const res = await fetch('https://discord.com/api/users/@me', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error(`Błąd ${res.status}: ${res.statusText}`);
-                const data = await res.json();
-                user = data;
+        // SPRAWDŹ TOKEN PO POWROCIE
+        function checkAuth() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const token = params.get('access_token');
+            
+            if (token) {
+                document.getElementById('loadingScreen').classList.remove('hidden');
                 document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('homeScreen').classList.remove('hidden');
-                document.getElementById('username').textContent = data.username;
-                log('✅ ZALOGOWANO: ' + data.username);
-                document.getElementById('debug').innerHTML = ''; // Wyczyść debug
-            } catch(e) {
-                log('❌ BŁĄD LOGOWANIA: ' + e.message);
-                alert('Błąd logowania: ' + e.message + '
-
-Sprawdź:
-1. Client ID
-2. Redirect URI w Discord Developer
-3. Plik discord-callback.html');
+                document.getElementById('status').textContent = 'Loguję użytkownika...';
+                
+                fetch('https://discord.com/api/users/@me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    user = data;
+                    document.getElementById('username').textContent = data.username;
+                    document.getElementById('homeScreen').classList.remove('hidden');
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('status').textContent = `Zalogowano: ${data.username}`;
+                    // Czyść URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                })
+                .catch(err => {
+                    document.getElementById('status').textContent = 'Błąd logowania!';
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                });
             }
         }
 
-        // QUIZ FUNCTIONS
+        // Quiz i Admin funkcje (SKRÓCONE - te same co wcześniej)
         function startQuiz() {
             currentQ = 0; score = 0; answers = [];
             document.getElementById('homeScreen').classList.add('hidden');
@@ -185,11 +159,8 @@ Sprawdź:
             if (answers[currentQ]) score++;
             document.getElementById('score').textContent = score;
             currentQ++;
-            if (currentQ < questions.length) {
-                showQuestion();
-            } else {
-                showResult();
-            }
+            if (currentQ < questions.length) showQuestion();
+            else showResult();
         }
 
         function showResult() {
@@ -203,7 +174,11 @@ Sprawdź:
             document.getElementById('result').classList.remove('hidden');
         }
 
-        // ADMIN FUNCTIONS
+        function resetQuiz() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('homeScreen').classList.remove('hidden');
+        }
+
         function adminPanel() {
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('adminScreen').classList.remove('hidden');
@@ -211,13 +186,11 @@ Sprawdź:
         }
 
         function showQuestionsList() {
-            const list = document.getElementById('questionsList');
-            list.innerHTML = questions.map((q, i) => `
+            document.getElementById('questionsList').innerHTML = questions.map((q, i) => `
                 <div class="bg-gray-100 p-4 mb-4 rounded-lg">
-                    <strong>Pytanie ${i+1}:</strong> ${q.q}<br>
-                    Opcje: ${q.options.join(', ')}<br>
-                    Poprawna: ${q.correct}<br>
-                    <button onclick="deleteQuestion(${i})" class="bg-red-500 text-white py-1 px-3 rounded text-sm">Usuń</button>
+                    <strong>${q.q}</strong><br>
+                    ${q.options.join(', ')} | Poprawna: ${q.correct}
+                    <button onclick="deleteQuestion(${i})" class="bg-red-500 text-white py-1 px-3 rounded text-sm ml-2">Usuń</button>
                 </div>
             `).join('');
         }
@@ -233,10 +206,7 @@ Sprawdź:
                 localStorage.setItem('questions', JSON.stringify(questions));
                 showQuestionsList();
                 document.getElementById('newQ').value = '';
-                ['optA', 'optB', 'optC'].forEach(id => document.getElementById(id).value = '');
-                alert('Pytanie dodane!');
-            } else {
-                alert('Wypełnij wszystkie pola!');
+                ['optA','optB','optC'].forEach(id => document.getElementById(id).value = '');
             }
         }
 
@@ -246,19 +216,14 @@ Sprawdź:
             showQuestionsList();
         }
 
-        function backHome() { 
+        function backHome() {
             document.getElementById('adminScreen').classList.add('hidden');
-            document.getElementById('homeScreen').classList.remove('hidden');
-        }
-
-        function resetQuiz() {
-            document.getElementById('quizScreen').classList.add('hidden');
             document.getElementById('homeScreen').classList.remove('hidden');
         }
 
         // START
         document.getElementById('totalQ').textContent = questions.length;
-        log('Strona załadowana. Client ID: ' + CLIENT_ID.substring(0,10) + '...');
+        checkAuth(); // Sprawdź czy wróciłeś z Discord
     </script>
 </body>
 </html>
