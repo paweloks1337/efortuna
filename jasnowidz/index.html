@@ -18,6 +18,7 @@
         <p class="text-center mb-8">Zaloguj przez Discord, by grać!</p>
         <button id="discordLogin" class="w-full bg-[#5865F2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#4752C4] transition">Zaloguj Discord</button>
         <p id="userInfo" class="mt-4 hidden text-center font-bold"></p>
+        <div id="debug" class="mt-4 text-sm text-gray-600"></div>
     </div>
 
     <!-- Home -->
@@ -65,50 +66,90 @@
     </div>
 
     <script>
-        // Discord config - ZMIEŃ NA SWOJE!
-        const CLIENT_ID = '1483233223013302424'; // Z Developer Portal
-        const REDIRECT_URI = window.location.origin + '/jasnowidz/discord-callback.html'; // Stwórz plik callback.html z token detector (patrz niżej)
+        // Discord config - ZMIEŃ TYLKO TE 2 LINIJKI!
+        const CLIENT_ID = '1483233223013302424';
+        const REDIRECT_URI = 'https://dcranking.pl/jasnowidz/discord-callback.html';
 
         let user = null;
         let questions = JSON.parse(localStorage.getItem('questions')) || [
-            {q: 'Kto wygra następny mecz?', options: ['A: Tak', 'B: Nie', 'C: Remis'], correct: 'A'}
+            {q: 'Kto wygra następny mecz?', options: ['Tak', 'Nie', 'Remis'], correct: 'A'}
         ];
         let currentQ = 0;
         let score = 0;
         let answers = [];
 
-        // Discord Login (prosty popup z biblioteką-like)
+        function log(msg) {
+            console.log(msg);
+            document.getElementById('debug').innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+        }
+
+        // Discord Login - NAPRAWIONE
         document.getElementById('discordLogin').addEventListener('click', () => {
+            log('1. Kliknięto login...');
             const params = new URLSearchParams({
-                client_id: 1483233223013302424,
-                redirect_uri: https://discord.com/oauth2/authorize?client_id=1483233223013302424&response_type=code&redirect_uri=https%3A%2F%2Fdcranking.pl%2Fjasnowidz%2Fdiscord-callback.html&scope=identify,
-                response_type: '7U08XiseXyPDMTW6ASN5Y8-fFysNLLW2',
+                client_id: CLIENT_ID,
+                redirect_uri: REDIRECT_URI,
+                response_type: 'token',
                 scope: 'identify'
             });
-            const popup = window.open(`https://discord.com/api/oauth2/authorize?${params}`, 'discord', 'width=500,height=600');
+            const authUrl = `https://discord.com/api/oauth2/authorize?${params.toString()}`;
+            log('2. Otwieram URL: ' + authUrl.substring(0, 80) + '...');
             
-            // Sprawdź token po zamknięciu
+            const popup = window.open(authUrl, 'discord-auth', 'width=500,height=600,scrollbars=no');
+            
+            if (!popup) {
+                alert('❌ BLOKADA POPUPÓW! Wyłącz blokadę popupów w przeglądarce dla tej strony.');
+                return;
+            }
+            
+            log('3. Popup otwarty, czekam na zamknięcie...');
+            
             const checkClosed = setInterval(() => {
-                if (popup.closed) {
-                    clearInterval(checkClosed);
-                    // Zakładamy, że token jest w localStorage po callback (prosty hack)
-                    const token = localStorage.getItem('discord_token');
-                    if (token) {
-                        fetch(`https://discord.com/api/users/@me`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        }).then(res => res.json()).then(data => {
-                            user = data;
-                            document.getElementById('loginScreen').classList.add('hidden');
-                            document.getElementById('homeScreen').classList.remove('hidden');
-                            document.getElementById('username').textContent = data.username;
+                try {
+                    if (popup.closed) {
+                        clearInterval(checkClosed);
+                        log('4. Popup zamknięty, sprawdzam token...');
+                        const token = localStorage.getItem('discord_token');
+                        if (token) {
+                            log('5. Token znaleziony! Loguję...');
+                            fetchUser(token);
                             localStorage.removeItem('discord_token');
-                        });
+                        } else {
+                            log('❌ Brak tokenu! Sprawdź czy callback.html istnieje.');
+                        }
                     }
+                } catch(e) {
+                    log('Błąd: ' + e.message);
                 }
-            }, 500);
+            }, 1000);
         });
 
-        // Quiz functions
+        async function fetchUser(token) {
+            try {
+                log('6. Pobieram dane użytkownika...');
+                const res = await fetch('https://discord.com/api/users/@me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error(`Błąd ${res.status}: ${res.statusText}`);
+                const data = await res.json();
+                user = data;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('homeScreen').classList.remove('hidden');
+                document.getElementById('username').textContent = data.username;
+                log('✅ ZALOGOWANO: ' + data.username);
+                document.getElementById('debug').innerHTML = ''; // Wyczyść debug
+            } catch(e) {
+                log('❌ BŁĄD LOGOWANIA: ' + e.message);
+                alert('Błąd logowania: ' + e.message + '
+
+Sprawdź:
+1. Client ID
+2. Redirect URI w Discord Developer
+3. Plik discord-callback.html');
+            }
+        }
+
+        // QUIZ FUNCTIONS
         function startQuiz() {
             currentQ = 0; score = 0; answers = [];
             document.getElementById('homeScreen').classList.add('hidden');
@@ -162,7 +203,7 @@
             document.getElementById('result').classList.remove('hidden');
         }
 
-        // Admin
+        // ADMIN FUNCTIONS
         function adminPanel() {
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('adminScreen').classList.remove('hidden');
@@ -191,9 +232,9 @@
                 questions.push(newQ);
                 localStorage.setItem('questions', JSON.stringify(questions));
                 showQuestionsList();
-                // Wyczyść form
                 document.getElementById('newQ').value = '';
                 ['optA', 'optB', 'optC'].forEach(id => document.getElementById(id).value = '');
+                alert('Pytanie dodane!');
             } else {
                 alert('Wypełnij wszystkie pola!');
             }
@@ -215,8 +256,9 @@
             document.getElementById('homeScreen').classList.remove('hidden');
         }
 
-        // Ładuj pytania przy starcie
+        // START
         document.getElementById('totalQ').textContent = questions.length;
+        log('Strona załadowana. Client ID: ' + CLIENT_ID.substring(0,10) + '...');
     </script>
 </body>
 </html>
