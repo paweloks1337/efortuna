@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <script src="https://discord.com/api/oauth2/token-detector.js"></script> <!-- Prosty detector z repo -->
+    <script>
+        window.opener.localStorage.setItem('discord_token', new URLSearchParams(window.location.hash.substring(1)).get('access_token'));
+        window.close();
+    </script>
+</body>
+</html>
