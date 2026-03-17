@@ -126,6 +126,12 @@
     </div>
 
     <script>
+        // 🔥 TYLKO TO WCLEJ NA POCZĄTEK <script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('discordLogin').onclick = function() {
+        window.location.href = `https://discord.com/api/oauth2/authorize?client_id=1483233223013302424&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
+    }
+});
         const ADMIN_PASS = 'cwel@123';
         const CLIENT_ID = '1483233223013302424';
         let user = null, questions = [], isAdmin = false;
