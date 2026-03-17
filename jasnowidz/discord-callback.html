@@ -1,31 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Przekierowuję...</title>
-    <script>
-        // Pobierz token z URL i zapisz
-        const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
-        const token = params.get('access_token');
-        
-        if (token) {
-            // ZAPISZ UŻYTKOWNIKA NATYCHMIAST
-            fetch('https://discord.com/api/users/@me', {
-                headers: { Authorization: `Bearer ${token}` }
-            }).then(r => r.json()).then(user => {
-                localStorage.setItem('jasnowidz_user', JSON.stringify(user));
-                // PRZEKIERUJ NA GŁÓWNA STRONĘ
-                window.location.href = 'https://dcranking.pl/jasnowidz/';
-            }).catch(() => {
-                window.location.href = 'https://dcranking.pl/jasnowidz/';
-            });
-        } else {
-            window.location.href = 'https://dcranking.pl/jasnowidz/';
-        }
-    </script>
+<meta charset="UTF-8">
+<title>Logowanie...</title>
 </head>
-<body style="text-align:center; padding:50px; font-family:Arial;">
-    <h1>🔮 Przekierowuję do Jasnowidza...</h1>
-    <p>Token zapisany - ładowanie użytkownika (2s)</p>
+<body style="background:#111;color:white;text-align:center;padding-top:50px;font-family:sans-serif;">
+
+<h2>🔄 Logowanie...</h2>
+
+<script>
+const hash = window.location.hash.substring(1);
+if(hash){
+    localStorage.setItem('discord_token', hash);
+}
+
+// przekierowanie do głównej strony
+window.location.href = "/jasnowidz/";
+</script>
+
 </body>
 </html>
