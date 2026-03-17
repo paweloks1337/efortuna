@@ -169,75 +169,62 @@
             document.getElementById('username').textContent = user.username;
             loadQuestions();
             updateUserStats();
-            renderQuestions();
-            
-            // Check for complete results
-            const allAnswered = questions.filter(q => q.correct !== undefined).length === questions.length && questions.length > 0;
-            if (allAnswered) {
-                const resultsSection = document.getElementById('playerResultsSection');
-                if (!document.getElementById('playerResults')) {
-                    resultsSection.innerHTML = `
-                        <div class="p-8 bg-gradient-to-br from-emerald-600 via-blue-600 to-purple-600 rounded-3xl shadow-2xl mb-12">
-                            <h3 class="text-3xl font-black text-white mb-6 text-center">🏆 PEŁNE WYNIKI</h3>
-                            <p class="text-xl text-yellow-300 mb-8 text-center">${questions.length} pytań • ${calculateTotalPlayers()} graczy</p>
-                            <div id="playerResults" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-                        </div>
-                    `;
-                    resultsSection.classList.remove('hidden');
-                    renderPlayerResults();
-                }
-            }
-        }
-
-        function loadQuestions() {
-            questions = JSON.parse(localStorage.getItem('questions')) || [];
-        }
-
-        function updateUserStats() {
-            const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
-            let total = 0, correct = 0;
-            for (let qid in userAnswers) {
-                const q = questions[qid];
-                if (q && q.correct !== undefined && userAnswers[qid] === q.correct) {
-                    correct++;
-                }
-                total++;
-            }
-            document.getElementById('userPoints').textContent = correct;
-            document.getElementById('accuracy').textContent = total ? Math.round(correct/total*100) + '%' : '0%';
-        }
-
-        function renderQuestions() {
-            document.getElementById('questionsList').innerHTML = questions.map((q, i) => {
-                const now = new Date();
-                const deadline = new Date(q.deadline);
-                const expired = now > deadline;
-                const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
-                const userAnswer = userAnswers[i];
-                const showAnswer = expired || q.correct !== undefined;
-                
-                return `
-                    <div class="card p-8 rounded-2xl hover:shadow-2xl transition-all group">
-                        <div class="text-xl font-bold mb-6 text-center pb-2 border-b border-yellow-500/50 ${expired ? 'deadline-expired' : 'deadline-active'}">
-                            ${expired ? '✅ ROZSTRZYGNIĘTE' : formatTime(deadline)}
-                        </div>
-                        <h3 class="text-xl font-bold mb-6 text-center">${q.question}</h3>
-                        <div class="space-y-3 mb-8">
-                            ${q.options.map((opt, j) => `
-                                <div class="p-4 rounded-xl border-2 border-gray-600 hover:border-yellow-400 group-hover:scale-[1.02] transition-all cursor-pointer 
-                                        ${showAnswer && userAnswer === j ? (q.correct === j ? 'correct' : 'wrong') : ''}
-                                        ${showAnswer ? 'opacity-70 cursor-not-allowed' : ''}" 
-                                     onclick="${showAnswer ? '' : `answerQuestion(${i}, ${j})`}">  
-                                    <div class="font-bold text-lg">${String.fromCharCode(65+j)}: ${opt}</div>
+            function renderQuestions() {
+    document.getElementById('questionsList').innerHTML = questions.map((q, i) => {
+        const now = new Date();
+        const deadline = new Date(q.deadline);
+        const expired = now > deadline;
+        const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
+        const userAnswer = userAnswers[i];
+        const showAnswer = expired || q.correct !== undefined;
+        
+        return `
+            <div class="card p-8 rounded-2xl hover:shadow-2xl transition-all group">
+                <div class="text-xl font-bold mb-6 text-center pb-2 border-b border-yellow-500/50 ${expired ? 'deadline-expired' : 'deadline-active'}">
+                    ${expired ? '✅ ROZSTRZYGNIĘTE' : formatTime(deadline)}
+                </div>
+                <h3 class="text-xl font-bold mb-6 text-center">${q.question}</h3>
+                <div class="space-y-3 mb-8">
+                    ${q.options.map((opt, j) => {
+                        const isSelected = userAnswer === j;
+                        const isCorrectAnswer = showAnswer && q.correct === j;
+                        const isWrongAnswer = showAnswer && isSelected && q.correct !== j;
+                        
+                        let classes = 'p-4 rounded-xl border-2 border-gray-600 hover:border-yellow-400 group-hover:scale-[1.02] transition-all cursor-pointer';
+                        
+                        // 🆕 STAŁE ZAZNACZENIE DLA AKTYWNYCH PYTAŃ
+                        if (!showAnswer && isSelected) {
+                            classes += ' bg-yellow-500/30 border-yellow-400 ring-4 ring-yellow-400/50 scale-105 shadow-lg';
+                        }
+                        // Poprawne/wrong dla rozstrzygniętych
+                        else if (isCorrectAnswer) {
+                            classes += ' correct';
+                        }
+                        else if (isWrongAnswer) {
+                            classes += ' wrong';
+                        }
+                        else if (showAnswer) {
+                            classes += ' opacity-70 cursor-not-allowed';
+                        }
+                        
+                        const onclick = showAnswer ? '' : `answerQuestion(${i}, ${j})`;
+                        
+                        return `
+                            <div class="${classes}" onclick="${onclick}">
+                                <div class="font-bold text-lg flex items-center justify-between">
+                                    <span>${String.fromCharCode(65+j)}: ${opt}</span>
+                                    ${!showAnswer && isSelected ? '<span class="text-yellow-800 font-bold text-sm ml-2">✓ WYBRANO</span>' : ''}
                                 </div>
-                            `).join('')}
-                        </div>
-                        ${showAnswer && userAnswer !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 ${userAnswer === q.correct ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">Twoja: ${String.fromCharCode(65+userAnswer)}</div>` : ''}
-                        ${q.correct !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 bg-emerald-600 text-white">✅ Poprawna: ${String.fromCharCode(65+q.correct)}</div>` : ''}
-                    </div>
-                `;
-            }).join('') || '<div class="col-span-full text-center py-20 text-gray-400 text-xl">Brak aktywnych pytań jasnowidza</div>';
-        }
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                ${showAnswer && userAnswer !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 ${userAnswer === q.correct ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">Twoja: ${String.fromCharCode(65+userAnswer)}</div>` : ''}
+                ${q.correct !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 bg-emerald-600 text-white">✅ Poprawna: ${String.fromCharCode(65+q.correct)}</div>` : ''}
+            </div>
+        `;
+    }).join('') || '<div class="col-span-full text-center py-20 text-gray-400 text-xl">Brak aktywnych pytań jasnowidza</div>';
+}
 
         function answerQuestion(qid, optid) {
             const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
