@@ -393,6 +393,42 @@ if (questions.filter(q => q.correct !== undefined).length === questions.length &
             localStorage.removeItem('jasnowidz_user');
             location.reload();
         }
+        function calculateTotalPlayers() {
+    let total = 0;
+    for (let uid in localStorage) {
+        if (uid.includes('user_') && uid.includes('_answers')) total++;
+    }
+    return total;
+}
+
+function renderPlayerResults() {
+    const results = {};
+    let totalQuestions = questions.length;
+    
+    // Policz wyniki graczy
+    for (let uid in localStorage) {
+        if (uid.includes('user_') && uid.includes('_answers')) {
+            try {
+                const answers = JSON.parse(localStorage.getItem(uid));
+                let correctCount = 0;
+                for (let qid in answers) {
+                    const q = questions[qid];
+                    if (q && q.correct !== undefined && answers[qid] === q.correct) {
+                        correctCount++;
+                    }
+                }
+                results[correctCount] = (results[correctCount] || 0) + 1;
+            } catch(e) {}
+        }
+    }
+    
+    document.getElementById('playerResults').innerHTML = Array.from({length: totalQuestions+1}, (_, i) => `
+        <div class="p-6 bg-white/10 backdrop-blur-xl rounded-2xl text-center hover:bg-white/20 hover:scale-105 transition-all shadow-xl">
+            <div class="text-3xl font-black text-yellow-300 mb-3">${i}/${totalQuestions}</div>
+            <div class="text-2xl font-bold text-white">${results[i] || 0} graczy</div>
+        </div>
+    `).join('');
+}
     </script>
 </body>
 </html>
