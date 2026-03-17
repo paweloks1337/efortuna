@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Logowanie...</title>
+    <title>Discord Callback</title>
+    <script>
+        window.onload = function() {
+            // Parsuj token z URL hash
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                const token = params.get('access_token');
+                const expires_in = params.get('expires_in');
+                
+                if (token) {
+                    // Przekieruj z tokenem do głównej strony
+                    window.location.href = `index.html#access_token=${token}${expires_in ? '&expires_in=' + expires_in : ''}`;
+                    return;
+                }
+            }
+            
+            // Błąd - przekieruj do głównej
+            window.location.href = 'index.html';
+        }
+    </script>
 </head>
-<body style="background:#111;color:white;text-align:center;padding-top:50px;font-family:sans-serif;">
-
-<h2>🔄 Logowanie...</h2>
-
-<script>
-const hash = window.location.hash.substring(1);
-if(hash){
-    localStorage.setItem('discord_token', hash);
-}
-
-// przekierowanie do głównej strony
-window.location.href = "/jasnowidz/";
-</script>
-
+<body>
+    <p>Ładowanie...</p>
 </body>
 </html>
