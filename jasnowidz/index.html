@@ -205,22 +205,25 @@
         });
 
         function fetchUserFromToken(token) {
-            fetch('https://discord.com/api/users/@me', {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            .then(r => r.json())
-            .then(data => {
-                user = data;
-                localStorage.setItem('jasnowidz_user', JSON.stringify(user));
-                showDashboard();
-                window.history.replaceState({}, '', window.location.pathname);
-            })
-            .catch(err => {
-                console.error('Discord login failed:', err);
-                document.getElementById('status').textContent = 'Błąd logowania. Spróbuj ponownie.';
-            });
-        }
-
+    fetch('https://discord.com/api/users/@me', {
+        headers: {Authorization: `Bearer ${token}`}
+    })
+    .then(r => r.json())
+    .then(data => {
+        user = data;
+        
+        // 🆕 ZAPISUJ DANE USERA pod kluczem _user
+        localStorage.setItem(`user_${user.id}_user`, JSON.stringify(user));
+        localStorage.setItem('jasnowidz_user', JSON.stringify(user));
+        
+        showDashboard();
+        window.history.replaceState({}, '', window.location.pathname);
+    })
+    .catch(err => {
+        console.error('Discord login failed:', err);
+        document.getElementById('status').textContent = 'Błąd logowania. Spróbuj ponownie.';
+    });
+}
         function showDashboard() {
             if (!user) return;
             document.getElementById('loginScreen').classList.add('hidden');
