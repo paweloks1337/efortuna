@@ -130,15 +130,19 @@
         const CLIENT_ID = '1483233223013302424';
         let user = null, questions = [], isAdmin = false;
 
-        // Discord Login
-        document.getElementById('discordLogin').onclick = function(e) {
-    e.preventDefault();
-    console.log('🚀 Przekierowuję do Discord...');
-    const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
-    console.log('🔗 URL:', discordUrl);
-    window.location.href = discordUrl;
-};
-
+        // MOBILE + PC - TA SAMA KARTA
+document.addEventListener('DOMContentLoaded', function() {
+    const discordBtn = document.getElementById('discordLogin');
+    discordBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const CLIENT_ID = '1483233223013302424';
+        window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
+    });
+    discordBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        discordBtn.click();
+    }, { passive: false });
+});
         // Initialize
         window.onload = function() {
             const hash = window.location.hash.substring(1);
