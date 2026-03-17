@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔮 Jasnowidz Fortuny</title>
+<title>🔮 JASNOWIDZ FORTUNY</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: white; font-family: system-ui, sans-serif; }
-.card { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(251,191,36,0.3); }
+.card { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(251, 191, 36, 0.3); }
 .deadline-active { color: #F59E0B; font-weight: 700; }
 .deadline-expired { color: #6B7280; }
-.correct { background: rgba(34,197,94,0.3) !important; border-color: #10B981 !important; }
-.wrong { background: rgba(239,68,68,0.3) !important; border-color: #EF4444 !important; }
+.correct { background: rgba(34, 197, 94, 0.3) !important; border-color: #10B981 !important; }
+.wrong { background: rgba(239, 68, 68, 0.3) !important; border-color: #EF4444 !important; }
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -21,14 +21,15 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
   <div class="card p-8 rounded-2xl shadow-2xl">
     <div class="text-5xl mb-8 text-center">🔮</div>
     <h1 class="text-3xl font-bold text-center mb-8">Jasnowidz Fortuny</h1>
-    <button id="discordLogin" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-4 px-6 rounded-xl font-bold text-lg mb-6 shadow-lg hover:shadow-xl transition-all">Zaloguj przez Discord</button>
+    <button id="discordLogin" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-4 px-6 rounded-xl font-bold text-lg mb-6 shadow-lg hover:shadow-xl transition-all">
+      Zaloguj przez Discord
+    </button>
     <p id="status" class="text-center text-gray-300 text-sm">Kliknij aby rozpocząć wróżenie</p>
   </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden max-w-6xl mx-auto">
-
   <div class="card p-8 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center md:items-start">
     <img id="avatar" class="w-24 h-24 rounded-full ring-4 ring-yellow-400">
     <div class="text-center md:text-left flex-1">
@@ -43,8 +44,24 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
   <div id="questionsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"></div>
 
   <div class="buttons-container flex flex-col sm:flex-row gap-4 justify-center">
-    <button onclick="adminLogin()" class="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-4 px-10 rounded-xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">🔐 Panel Admin</button>
-    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-10 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl transition-all">Wyloguj</button>
+    <button onclick="adminLogin()" class="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-4 px-10 rounded-xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">
+      🔐 Panel Admin
+    </button>
+    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-10 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl transition-all">
+      Wyloguj
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLoginScreen" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4">
+  <div class="card p-10 rounded-3xl max-w-md w-full mx-4 shadow-2xl">
+    <div class="text-4xl mb-8 text-center">🔐</div>
+    <h2 class="text-3xl font-bold text-center mb-8">Panel Admin</h2>
+    <input id="adminPass" type="password" placeholder="Wpisz hasło admina" class="w-full p-5 rounded-2xl border-2 border-yellow-500 bg-gray-900 text-white text-xl mb-8 text-center focus:outline-none focus:border-yellow-400">
+    <button onclick="checkAdmin()" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-5 px-8 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all">
+      WEJDŹ DO PANELU
+    </button>
   </div>
 </div>
 
@@ -54,10 +71,10 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
     <div class="card p-10 rounded-3xl mb-12 shadow-2xl">
       <h1 class="text-4xl font-bold text-center mb-12">⚙️ PANEL ADMINISTRATORA</h1>
 
-      <!-- DODAJ PYTANIE -->
+      <!-- ADD NEW QUESTION -->
       <div class="mb-12 p-8 bg-gradient-to-r from-gray-800 to-gray-900 rounded-3xl">
         <h3 class="text-2xl font-bold mb-8 text-center">➕ DODAJ NOWE PYTANIE</h3>
-        <input id="adminQ" placeholder="Treść pytania" class="w-full p-5 rounded-2xl border-2 border-yellow-400 bg-gray-900 text-white mb-6 text-lg focus:outline-none">
+        <input id="adminQ" placeholder="Np. Kto wygra Legia vs Lech?" class="w-full p-5 rounded-2xl border-2 border-yellow-400 bg-gray-900 text-white mb-6 text-lg focus:outline-none">
         <div class="grid grid-cols-2 gap-4 mb-6">
           <input id="optA" placeholder="Opcja A" class="p-4 rounded-xl border-2 border-gray-600 bg-gray-900 text-white focus:border-yellow-400">
           <input id="optB" placeholder="Opcja B" class="p-4 rounded-xl border-2 border-gray-600 bg-gray-900 text-white focus:border-yellow-400">
@@ -67,156 +84,185 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
           <input id="optD" placeholder="Opcja D (opcjonalne)" class="p-4 rounded-xl border-2 border-gray-600 bg-gray-900 text-white focus:border-yellow-400">
         </div>
         <input id="deadline" type="datetime-local" class="w-full p-4 rounded-xl border-2 border-gray-600 bg-gray-900 text-white mb-6 focus:border-yellow-400">
-        <button onclick="addQuestion()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 text-white py-4 px-8 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">➕ DODAJ PYTANIE</button>
+        <button onclick="addQuestion()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 text-white py-4 px-8 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">
+          ➕ DODAJ PYTANIE
+        </button>
       </div>
 
       <div id="adminQuestionsList" class="space-y-6 max-h-96 overflow-y-auto"></div>
-
+      <div id="resultsDistribution" class="mb-12"></div>
+      <div id="playerRankingSection">
+        <h3 class="text-2xl font-bold mb-8 text-center">👥 LISTA GRACZY I ICH WYNIKI</h3>
+        <div id="playerRanking" class="space-y-4 max-h-96 overflow-y-auto"></div>
+      </div>
     </div>
     <div class="text-center">
-      <button onclick="closeAdmin()" class="bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 text-white py-4 px-12 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">🚪 ZAMKNIJ PANEL</button>
+      <button onclick="closeAdmin()" class="bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 text-white py-4 px-12 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">
+        🚪 ZAMKNIJ PANEL
+      </button>
     </div>
   </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwYD1eZv_MJPQBt6QxI8EfG7OTwFUKEKkGz8U-XHsxvxHO9bZiNoCzF0kdkMEajEUGJ5A/exec";
-const ADMIN_PASS = "zmienToNaCosTrudnego123!";
-const ADMIN_IDS = ["1192231948173709453"];
+// 🔥 KONFIGURACJA
+const CLIENT_ID = '1483233223013302424';
+const ADMIN_IDS = ['1192231948173709453'];
+const ADMIN_PASS = 'zmienToNaCosTrudnego123!';
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbwYD1eZv_MJPQBt6QxI8EfG7OTwFUKEKkGz8U-XHsxvxHO9bZiNoCzF0kdkMEajEUGJ5A/exec';
+
 let user = null, questions = [];
 
-// ===== LOGIN =====
-document.getElementById("discordLogin").onclick = async function() {
-  const client_id = "1483233223013302424";
-  const redirect_uri = window.location.origin + window.location.pathname;
-  window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`;
-};
+// =================== LOGIN DISCORD ===================
+document.addEventListener('DOMContentLoaded', () => {
+  const discordBtn = document.getElementById('discordLogin');
+  discordBtn.onclick = e => {
+    e.preventDefault();
+    const redirect_uri = "https://dcranking.pl/jasnowidz/discord-callback.html";
+    window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`;
+  };
 
-// ===== FETCH USER =====
-async function fetchUserFromToken(token) {
-  const res = await fetch("https://discord.com/api/users/@me", { headers:{Authorization: `Bearer ${token}`}});
-  const data = await res.json();
-  user = data;
-  localStorage.setItem("jasnowidz_user", JSON.stringify(user));
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    const params = new URLSearchParams(hash);
+    const token = params.get('access_token');
+    if (token) fetchUserFromToken(token);
+  } else {
+    const savedUser = localStorage.getItem('jasnowidz_user');
+    if (savedUser) {
+      user = JSON.parse(savedUser);
+      showDashboard();
+    }
+  }
+});
 
-  // dodaj do arkusza
-  fetch(API_URL,{
-    method:"POST",
-    body: JSON.stringify({action:"addUser", id:user.id, username:user.username, avatar:user.avatar})
-  });
-
-  showDashboard();
-  window.history.replaceState({}, '', window.location.pathname);
+function fetchUserFromToken(token) {
+  fetch('https://discord.com/api/users/@me', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  .then(r => r.json())
+  .then(data => {
+    user = data;
+    localStorage.setItem('jasnowidz_user', JSON.stringify(user));
+    addUserToSheet();
+    showDashboard();
+    window.history.replaceState({}, '', window.location.pathname);
+  })
+  .catch(() => document.getElementById('status').textContent = 'Błąd logowania. Spróbuj ponownie.');
 }
 
-// ===== SHOW DASHBOARD =====
+// =================== SHOW DASHBOARD ===================
 function showDashboard() {
-  if(!user) return;
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
-  document.getElementById("avatar").src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
-  document.getElementById("username").textContent = user.username || user.global_name || "Użytkownik";
+  if (!user) return;
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
+  document.getElementById('username').textContent = user.username || user.global_name || 'Użytkownik';
   loadQuestions();
 }
 
-// ===== LOAD QUESTIONS =====
-async function loadQuestions() {
-  const res = await fetch(`${API_URL}?sheet=Questions`);
-  const data = await res.json();
-  questions = data.slice(1).map((row,i)=>({
-    question: row[0],
-    options: row.slice(1,5).filter(Boolean),
-    correct: row[5]?parseInt(row[5]):undefined,
-    deadline: row[6]||null,
-    index:i
-  }));
-  renderQuestions();
-  setInterval(renderQuestions,1000); // live update odliczania
+// =================== GOOGLE SHEETS ===================
+async function addUserToSheet() {
+  await fetch(SHEET_API, {
+    method: 'POST',
+    body: JSON.stringify({ action: "addUser", id: user.id, username: user.username, avatar: user.avatar })
+  });
 }
 
-// ===== RENDER QUESTIONS =====
-function renderQuestions(){
-  const container = document.getElementById("questionsList");
-  const now = new Date();
-  container.innerHTML = questions.map(q=>{
-    const deadline = q.deadline ? new Date(q.deadline) : null;
-    const expired = deadline && now>deadline;
+async function loadQuestions() {
+  const res = await fetch(`${SHEET_API}?sheet=Questions`);
+  const data = await res.json();
+  questions = data.slice(1).map(row => ({
+    question: row[0],
+    options: row.slice(1,5).filter(o => o),
+    correct: row[5] !== "" ? parseInt(row[5]) : undefined,
+    deadline: row[6] || new Date().toISOString()
+  }));
+  renderQuestions();
+}
+
+// =================== RENDER QUESTIONS + ANSWERS ===================
+function renderQuestions() {
+  const container = document.getElementById('questionsList');
+  container.innerHTML = questions.map((q,i) => {
+    const now = new Date();
+    const deadline = new Date(q.deadline);
+    const expired = now > deadline;
     return `
-      <div class="card p-8 rounded-2xl hover:shadow-2xl transition-all">
-        <div class="text-xl font-bold mb-6 text-center ${expired?"deadline-expired":"deadline-active"}">
-          ${deadline? (expired?"✅ ROZSTRZYGNIĘTE":timeLeft(deadline)) : ""}
+      <div class="card p-8 rounded-2xl hover:shadow-2xl transition-all group">
+        <div class="text-xl font-bold mb-6 text-center pb-2 border-b border-yellow-500/50 ${expired ? 'deadline-expired' : 'deadline-active'}">
+          ${expired ? '✅ ROZSTRZYGNIĘTE' : formatTime(deadline)}
         </div>
         <h3 class="text-xl font-bold mb-6 text-center">${q.question}</h3>
         <div class="space-y-3 mb-8">
-          ${q.options.map((opt,j)=>`
-            <div class="p-4 rounded-xl border-2 border-gray-600 hover:border-yellow-400 cursor-pointer"
-                 onclick="${expired||!user?'':'answerQuestion('+q.index+','+j+')'}">
-              <div class="font-bold text-lg">${String.fromCharCode(65+j)}: ${opt}</div>
+          ${q.options.map((opt,j) => `
+            <div class="p-4 rounded-xl border-2 border-gray-600 hover:border-yellow-400 cursor-pointer" ${expired ? '' : `onclick="answerQuestion(${i},${j})"`}>
+              ${String.fromCharCode(65+j)}: ${opt}
             </div>
-          `).join("")}
+          `).join('')}
         </div>
       </div>
     `;
-  }).join("") || "<div class='col-span-full text-center py-20 text-gray-400 text-xl'>Brak pytań</div>";
+  }).join('');
 }
 
-// ===== TIME LEFT =====
-function timeLeft(deadline){
-  const diff = deadline-new Date();
-  if(diff<=0) return "WYGASŁO";
-  const h = Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
-  return `${h}h ${m}m ${s}s`;
+function formatTime(date) {
+  const diff = new Date(date) - new Date();
+  if(diff<0) return "WYGASŁE";
+  const h=Math.floor(diff/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  return `${h}h ${m}m`;
 }
 
-// ===== ANSWER QUESTION =====
-function answerQuestion(qid,optid){
+// =================== ANSWER ===================
+async function answerQuestion(qid,optid) {
   const q = questions[qid];
   const now = new Date();
-  const deadline = q.deadline?new Date(q.deadline):null;
-  if(deadline && now>deadline){alert("Pytanie już zamknięte!"); return;}
-  fetch(API_URL,{
-    method:"POST",
-    body: JSON.stringify({action:"answer", userId:user.id, qid:qid, answer:optid})
+  const deadline = new Date(q.deadline);
+  if(now>deadline) { alert("To pytanie jest już zamknięte!"); return; }
+
+  await fetch(SHEET_API, {
+    method: 'POST',
+    body: JSON.stringify({ action: "answer", userId: user.id, qid, answer: optid })
   });
-  alert("Odpowiedź zapisana!");
+  loadQuestions();
 }
 
-// ===== ADMIN =====
-function adminLogin(){
-  if(!user||!ADMIN_IDS.includes(user.id)){alert("Nie masz uprawnień!");return;}
-  const pass = prompt("Wpisz hasło admina:");
-  if(pass===ADMIN_PASS){
-    document.getElementById("adminPanel").classList.remove("hidden");
-  } else alert("Błędne hasło!");
+// =================== ADMIN ===================
+function adminLogin() {
+  if(!user || !ADMIN_IDS.includes(user.id)) { alert('Nie masz uprawnień do panelu admina!'); return; }
+  document.getElementById('adminLoginScreen').classList.remove('hidden');
 }
 
-function addQuestion(){
-  const q = document.getElementById("adminQ").value.trim();
-  const options = ["optA","optB","optC","optD"].map(id=>document.getElementById(id).value.trim()).filter(Boolean);
-  const deadline = document.getElementById("deadline").value;
-  if(!q||options.length<2||!deadline){alert("Wypełnij wszystkie pola!");return;}
-  fetch(API_URL,{method:"POST",body:JSON.stringify({action:"addQuestion", question:q, options:options})});
-  alert("Pytanie dodane!");
-}
-
-function closeAdmin(){document.getElementById("adminPanel").classList.add("hidden");}
-
-// ===== LOGOUT =====
-function logout(){localStorage.removeItem("jasnowidz_user");location.reload();}
-
-// ===== ON LOAD =====
-window.addEventListener("DOMContentLoaded",()=>{
-  const hash = window.location.hash.substring(1);
-  if(hash){
-    const params = new URLSearchParams(hash);
-    const token = params.get("access_token");
-    if(token) fetchUserFromToken(token);
+function checkAdmin() {
+  if(document.getElementById('adminPass').value === ADMIN_PASS){
+    document.getElementById('adminLoginScreen').classList.add('hidden');
+    document.getElementById('adminPanel').classList.remove('hidden');
   } else {
-    const saved = localStorage.getItem("jasnowidz_user");
-    if(saved){user=JSON.parse(saved);showDashboard();}
+    alert('❌ BŁĘDNE HASŁO!'); document.getElementById('adminPass').value='';
   }
-});
-</script>
+}
 
+function addQuestion() {
+  const newQ = {
+    question: document.getElementById('adminQ').value,
+    options: [
+      document.getElementById('optA').value,
+      document.getElementById('optB').value,
+      document.getElementById('optC').value,
+      document.getElementById('optD').value
+    ].filter(o=>o),
+    deadline: document.getElementById('deadline').value
+  };
+  if(!newQ.question || newQ.options.length<2 || !newQ.deadline) { alert("Wypełnij wszystkie pola!"); return; }
+
+  fetch(SHEET_API, { method:'POST', body:JSON.stringify({ action:"addQuestion", ...newQ }) }).then(()=>loadQuestions());
+}
+
+// =================== UTILS ===================
+function closeAdmin() { document.getElementById('adminPanel').classList.add('hidden'); }
+function logout() { localStorage.removeItem('jasnowidz_user'); location.reload(); }
+
+</script>
 </body>
 </html>
