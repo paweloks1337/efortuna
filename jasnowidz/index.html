@@ -20,6 +20,7 @@
         .deadline-expired { color: #6B7280; }
         .correct { background: rgba(34, 197, 94, 0.3) !important; border-color: #10B981 !important; }
         .wrong { background: rgba(239, 68, 68, 0.3) !important; border-color: #EF4444 !important; }
+        .cheat-detected { border-color: #EF4444 !important; background: rgba(239, 68, 68, 0.5) !important; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -126,124 +127,210 @@
     </div>
 
     <script>
-        // 🔥 TYLKO TO WCLEJ NA POCZĄTEK <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('discordLogin').onclick = function() {
-        window.location.href = `https://discord.com/api/oauth2/authorize?client_id=1483233223013302424&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
-    }
-});
-        const ADMIN_PASS = 'cwel@123';
+        // 🔥 PEŁNY POPRAWIONY KOD Z ANTY-CHEATEM
+        const ADMIN_PASS = 'zmienToNaCosTrudnego123!'; // ZMIEŃ TO!!!
         const CLIENT_ID = '1483233223013302424';
+        const ADMIN_IDS = ['1192231948173709453']; // TWÓJ DISCORD ID
         let user = null, questions = [], isAdmin = false;
 
-        // MOBILE + PC - TA SAMA KARTA
-document.addEventListener('DOMContentLoaded', function() {
-    const discordBtn = document.getElementById('discordLogin');
-    discordBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const CLIENT_ID = '1483233223013302424';
-        window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
-    });
-    discordBtn.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        discordBtn.click();
-    }, { passive: false });
-});
-        // Initialize
-        window.onload = function() {
+        // 🛡️ ANTY-CHEAT: Sprawdź czy localStorage nie został zhakowany
+        function validateLocalStorage() {
+            const keys = Object.keys(localStorage);
+            let cheatDetected = false;
+            
+            keys.forEach(key => {
+                if (key.includes('user_') && !key.includes('_answers') && !key.includes('_user')) {
+                    console.warn('Suspicious localStorage key detected:', key);
+                    cheatDetected = true;
+                }
+            });
+            
+            return !cheatDetected;
+        }
+
+        // 🛡️ WALIDACJA ODPOWIEDZI Z CHECKSUMĄ
+        function saveAnswersWithChecksum(userId, answers) {
+            const raw = JSON.stringify(answers);
+            const checksum = btoa(raw + Date.now()).slice(0, 12);
+            const data = { raw, checksum, timestamp: Date.now() };
+            localStorage.setItem(`user_${userId}_answers`, JSON.stringify(data));
+        }
+
+        function loadAnswersWithChecksum(userId) {
+            try {
+                const data = JSON.parse(localStorage.getItem(`user_${userId}_answers`) || '{}');
+                if (!data.raw || !data.checksum) return {};
+                
+                const expectedChecksum = btoa(data.raw + data.timestamp).slice(0, 12);
+                if (expectedChecksum !== data.checksum) {
+                    console.warn('Cheat detected: checksum mismatch');
+                    localStorage.removeItem(`user_${userId}_answers`);
+                    return {};
+                }
+                
+                return JSON.parse(data.raw);
+            } catch(e) {
+                return {};
+            }
+        }
+
+        // ✅ CZYŚĆ LOGIN - TYLKO JEDEN LISTENER
+        document.addEventListener('DOMContentLoaded', function() {
+            const discordBtn = document.getElementById('discordLogin');
+            discordBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
+            };
+            
+            // Sprawdź token z URL
             const hash = window.location.hash.substring(1);
-            const params = new URLSearchParams(hash);
-            const token = params.get('access_token');
-            
-            if (token) {
-                fetch('https://discord.com/api/users/@me', {
-                    headers: {Authorization: `Bearer ${token}`}
-                }).then(r => r.json()).then(data => {
-                    user = data;
-                    localStorage.setItem('jasnowidz_user', JSON.stringify(user));
-                    showDashboard();
-                    window.history.replaceState({}, '', window.location.pathname);
-                }).catch(() => {
-                    showDashboard();
-                });
-                return;
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                const token = params.get('access_token');
+                if (token) {
+                    fetchUserFromToken(token);
+                    return;
+                }
             }
             
-            const savedUser = localStorage.getItem('jasnowidz_user');
-            if (savedUser) {
-                user = JSON.parse(savedUser);
+            // Załaduj zapisanego usera
+            if (validateLocalStorage()) {
+                const savedUser = localStorage.getItem('jasnowidz_user');
+                if (savedUser) {
+                    user = JSON.parse(savedUser);
+                    showDashboard();
+                }
+            }
+        });
+
+        function fetchUserFromToken(token) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then(r => r.json())
+            .then(data => {
+                user = data;
+                localStorage.setItem('jasnowidz_user', JSON.stringify(user));
                 showDashboard();
-            }
-        };
+                window.history.replaceState({}, '', window.location.pathname);
+            })
+            .catch(err => {
+                console.error('Discord login failed:', err);
+                document.getElementById('status').textContent = 'Błąd logowania. Spróbuj ponownie.';
+            });
+        }
 
         function showDashboard() {
+            if (!user) return;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
-            document.getElementById('username').textContent = user.username;
+            document.getElementById('username').textContent = user.username || user.global_name || 'Użytkownik';
             loadQuestions();
             updateUserStats();
-            function renderQuestions() {
-    document.getElementById('questionsList').innerHTML = questions.map((q, i) => {
-        const now = new Date();
-        const deadline = new Date(q.deadline);
-        const expired = now > deadline;
-        const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
-        const userAnswer = userAnswers[i];
-        const showAnswer = expired || q.correct !== undefined;
-        
-        return `
-            <div class="card p-8 rounded-2xl hover:shadow-2xl transition-all group">
-                <div class="text-xl font-bold mb-6 text-center pb-2 border-b border-yellow-500/50 ${expired ? 'deadline-expired' : 'deadline-active'}">
-                    ${expired ? '✅ ROZSTRZYGNIĘTE' : formatTime(deadline)}
-                </div>
-                <h3 class="text-xl font-bold mb-6 text-center">${q.question}</h3>
-                <div class="space-y-3 mb-8">
-                    ${q.options.map((opt, j) => {
-                        const isSelected = userAnswer === j;
-                        const isCorrectAnswer = showAnswer && q.correct === j;
-                        const isWrongAnswer = showAnswer && isSelected && q.correct !== j;
-                        
-                        let classes = 'p-4 rounded-xl border-2 border-gray-600 hover:border-yellow-400 group-hover:scale-[1.02] transition-all cursor-pointer';
-                        
-                        // 🆕 STAŁE ZAZNACZENIE DLA AKTYWNYCH PYTAŃ
-                        if (!showAnswer && isSelected) {
-                            classes += ' bg-yellow-500/30 border-yellow-400 ring-4 ring-yellow-400/50 scale-105 shadow-lg';
-                        }
-                        // Poprawne/wrong dla rozstrzygniętych
-                        else if (isCorrectAnswer) {
-                            classes += ' correct';
-                        }
-                        else if (isWrongAnswer) {
-                            classes += ' wrong';
-                        }
-                        else if (showAnswer) {
-                            classes += ' opacity-70 cursor-not-allowed';
-                        }
-                        
-                        const onclick = showAnswer ? '' : `answerQuestion(${i}, ${j})`;
-                        
-                        return `
-                            <div class="${classes}" onclick="${onclick}">
-                                <div class="font-bold text-lg flex items-center justify-between">
-                                    <span>${String.fromCharCode(65+j)}: ${opt}</span>
-                                    ${!showAnswer && isSelected ? '<span class="text-yellow-800 font-bold text-sm ml-2">✓ WYBRANO</span>' : ''}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                ${showAnswer && userAnswer !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 ${userAnswer === q.correct ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">Twoja: ${String.fromCharCode(65+userAnswer)}</div>` : ''}
-                ${q.correct !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 bg-emerald-600 text-white">✅ Poprawna: ${String.fromCharCode(65+q.correct)}</div>` : ''}
-            </div>
-        `;
-    }).join('') || '<div class="col-span-full text-center py-20 text-gray-400 text-xl">Brak aktywnych pytań jasnowidza</div>';
-}
+        }
 
+        function loadQuestions() {
+            questions = JSON.parse(localStorage.getItem('questions') || '[]');
+            renderQuestions();
+        }
+
+        function updateUserStats() {
+            const userAnswers = loadAnswersWithChecksum(user.id);
+            let correct = 0, total = 0;
+            
+            questions.forEach((q, i) => {
+                if (q.correct !== undefined && userAnswers[i] !== undefined) {
+                    total++;
+                    if (userAnswers[i] === q.correct) correct++;
+                }
+            });
+            
+            document.getElementById('userPoints').textContent = correct;
+            document.getElementById('accuracy').textContent = total > 0 ? Math.round(correct / total * 100) + '%' : '0%';
+        }
+
+        function renderQuestions() {
+            document.getElementById('questionsList').innerHTML = questions.map((q, i) => {
+                const now = new Date();
+                const deadline = new Date(q.deadline);
+                const expired = now > deadline;
+                const userAnswers = loadAnswersWithChecksum(user.id);
+                const userAnswer = userAnswers[i];
+                const showAnswer = expired || q.correct !== undefined;
+                
+                return `
+                    <div class="card p-8 rounded-2xl hover:shadow-2xl transition-all group">
+                        <div class="text-xl font-bold mb-6 text-center pb-2 border-b border-yellow-500/50 ${expired ? 'deadline-expired' : 'deadline-active'}">
+                            ${expired ? '✅ ROZSTRZYGNIĘTE' : formatTime(deadline)}
+                        </div>
+                        <h3 class="text-xl font-bold mb-6 text-center">${q.question}</h3>
+                        <div class="space-y-3 mb-8">
+                            ${q.options.map((opt, j) => {
+                                const isSelected = userAnswer === j;
+                                const isCorrectAnswer = showAnswer && q.correct === j;
+                                const isWrongAnswer = showAnswer && isSelected && q.correct !== j;
+                                
+                                let classes = 'p-4 rounded-xl border-2 border-gray-600 hover:border-yellow-400 group-hover:scale-[1.02] transition-all cursor-pointer';
+                                
+                                if (!showAnswer && isSelected) {
+                                    classes += ' bg-yellow-500/30 border-yellow-400 ring-4 ring-yellow-400/50 scale-105 shadow-lg';
+                                }
+                                else if (isCorrectAnswer) {
+                                    classes += ' correct';
+                                }
+                                else if (isWrongAnswer) {
+                                    classes += ' wrong';
+                                }
+                                else if (showAnswer) {
+                                    classes += ' opacity-70 cursor-not-allowed';
+                                }
+                                
+                                const onclick = showAnswer ? '' : `answerQuestion(${i}, ${j})`;
+                                
+                                return `
+                                    <div class="${classes}" onclick="${onclick}">
+                                        <div class="font-bold text-lg flex items-center justify-between">
+                                            <span>${String.fromCharCode(65+j)}: ${opt}</span>
+                                            ${!showAnswer && isSelected ? '<span class="text-yellow-800 font-bold text-sm ml-2">✓ WYBRANO</span>' : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${showAnswer && userAnswer !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 ${userAnswer === q.correct ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">Twoja: ${String.fromCharCode(65+userAnswer)}</div>` : ''}
+                        ${q.correct !== undefined ? `<div class="text-center p-3 rounded-xl font-bold text-xl mt-4 bg-emerald-600 text-white">✅ Poprawna: ${String.fromCharCode(65+q.correct)}</div>` : ''}
+                    </div>
+                `;
+            }).join('') || '<div class="col-span-full text-center py-20 text-gray-400 text-xl">Brak aktywnych pytań jasnowidza</div>';
+        }
+
+        // 🛡️ ZABEZPIECZONA FUNKCJA ODPOWIEDZI
         function answerQuestion(qid, optid) {
-            const userAnswers = JSON.parse(localStorage.getItem(`user_${user.id}_answers`) || '{}');
+            const q = questions[qid];
+            if (!q) return;
+            
+            const now = new Date();
+            const deadline = new Date(q.deadline);
+            
+            // 🔒 BLOKADA PO DEADLINE
+            if (now > deadline) {
+                alert('To pytanie jest już zamknięte!');
+                renderQuestions();
+                return;
+            }
+            
+            const userAnswers = loadAnswersWithChecksum(user.id);
+            
+            // 🔒 JEDNA ODPOWIEDŹ NA PYTANIE - BRAK ZMIAN
+            if (userAnswers[qid] !== undefined) {
+                alert('Odpowiedź na to pytanie już została zapisana i nie można jej zmienić!');
+                return;
+            }
+            
             userAnswers[qid] = optid;
-            localStorage.setItem(`user_${user.id}_answers`, JSON.stringify(userAnswers));
+            saveAnswersWithChecksum(user.id, userAnswers);
             renderQuestions();
             updateUserStats();
         }
@@ -259,6 +346,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // ========== ADMIN FUNCTIONS ==========
         function adminLogin() {
+            if (!user || !ADMIN_IDS.includes(user.id)) {
+                alert('Nie masz uprawnień do panelu admina!');
+                return;
+            }
             document.getElementById('adminLoginScreen').classList.remove('hidden');
         }
 
@@ -278,18 +369,18 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let uid in localStorage) {
                 if (uid.includes('user_') && uid.includes('_answers')) {
                     try {
-                        const rawData = localStorage.getItem(uid);
-                        const answers = JSON.parse(rawData);
+                        const answersData = JSON.parse(localStorage.getItem(uid));
+                        const rawAnswers = JSON.parse(answersData.raw);
                         const userDataKey = uid.replace('_answers', '_user');
                         const userData = JSON.parse(localStorage.getItem(userDataKey) || '{}');
                         
                         let correctCount = 0;
                         let totalAnswered = 0;
-                        for (let qid in answers) {
+                        for (let qid in rawAnswers) {
                             const q = questions[qid];
                             if (q && q.correct !== undefined) {
                                 totalAnswered++;
-                                if (answers[qid] === q.correct) correctCount++;
+                                if (rawAnswers[qid] === q.correct) correctCount++;
                             }
                         }
                         
@@ -322,9 +413,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let uid in localStorage) {
                     if (uid.includes('user_') && uid.includes('_answers')) {
                         try {
-                            const answers = JSON.parse(localStorage.getItem(uid));
-                            if (answers[i] !== undefined) {
-                                votes[answers[i]] = (votes[answers[i]] || 0) + 1;
+                            const answersData = JSON.parse(localStorage.getItem(uid));
+                            const rawAnswers = JSON.parse(answersData.raw);
+                            if (rawAnswers[i] !== undefined) {
+                                votes[rawAnswers[i]] = (votes[rawAnswers[i]] || 0) + 1;
                             }
                         } catch(e) {}
                     }
@@ -411,31 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
-        function renderPlayerResults() {
-            const results = {};
-            const totalQuestions = questions.length;
-            
-            const players = getPlayerData();
-            players.forEach(p => {
-                results[p.score] = (results[p.score] || 0) + 1;
-            });
-            
-            document.getElementById('playerResults').innerHTML = Array.from({length: totalQuestions+1}, (_, i) => `
-                <div class="p-6 bg-white/10 backdrop-blur-xl rounded-2xl text-center hover:bg-white/20 hover:scale-105 transition-all shadow-xl">
-                    <div class="text-3xl font-black text-yellow-300 mb-3">${i}/${totalQuestions}</div>
-                    <div class="text-2xl font-bold text-white">${results[i] || 0} graczy</div>
-                </div>
-            `).join('');
-        }
-
-        function calculateTotalPlayers() {
-            let total = 0;
-            for (let uid in localStorage) {
-                if (uid.includes('user_') && uid.includes('_answers')) total++;
-            }
-            return total;
-        }
-
         function addQuestion() {
             const newQ = {
                 question: document.getElementById('adminQ').value.trim(),
@@ -489,6 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function logout() {
             localStorage.removeItem('jasnowidz_user');
+            localStorage.removeItem(`user_${user?.id}_answers`);
             location.reload();
         }
     </script>
