@@ -562,6 +562,20 @@
             localStorage.removeItem(`user_${user?.id}_answers`);
             location.reload();
         }
-    </script>
+    <button onclick="clearAllData()" class="fixed bottom-20 right-20 bg-red-600 text-white p-4 rounded-full text-xl z-50 shadow-2xl hover:bg-red-500">🧹 WYČYŚĆ DANE</button>
+
+<script>
+function clearAllData() {
+    if (confirm('Wyczyścić WSZYSTKIE stare dane graczy?')) {
+        Object.keys(localStorage).forEach(key => {
+            if (key.includes('user_')) localStorage.removeItem(key);
+        });
+        Object.keys(localStorage).forEach(key => {
+            if (key.includes('questions')) localStorage.removeItem(key);
+        });
+        alert('✅ Dane wyczyszczone! Odśwież stronę.');
+    }
+}
+</script>
 </body>
 </html>
