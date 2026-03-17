@@ -8,182 +8,194 @@
 
 <body class="bg-gray-900 text-white p-6">
 
-<!-- LOGIN -->
-<div id="loginScreen" class="max-w-md mx-auto mt-20 text-center">
-    <button id="discordLogin" class="bg-yellow-500 px-6 py-3 rounded-xl font-bold">
-        Zaloguj przez Discord
-    </button>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden max-w-5xl mx-auto">
-
-<h1 id="username" class="text-3xl font-bold mb-6"></h1>
-
-<div id="questionsList" class="grid gap-6"></div>
-
-<button onclick="adminLogin()" class="mt-8 bg-yellow-500 px-6 py-3 rounded-xl">
-ADMIN
+<div id="loginScreen" class="text-center mt-20">
+<button id="discordLogin" class="bg-yellow-500 px-6 py-3 rounded-xl font-bold">
+Zaloguj przez Discord
 </button>
-
 </div>
 
-<!-- ADMIN -->
-<div id="adminPanel" class="hidden">
-
-<h2 class="text-2xl mb-4">Dodaj pytanie</h2>
-
-<input id="adminQ" placeholder="Pytanie" class="text-black p-2 w-full mb-2">
-<input id="optA" placeholder="A" class="text-black p-2 w-full mb-2">
-<input id="optB" placeholder="B" class="text-black p-2 w-full mb-2">
-<input id="optC" placeholder="C" class="text-black p-2 w-full mb-2">
-<input id="optD" placeholder="D" class="text-black p-2 w-full mb-2">
-
-<button onclick="addQuestion()" class="bg-green-500 px-4 py-2 mt-2">Dodaj</button>
-
+<div id="dashboard" class="hidden max-w-4xl mx-auto">
+<h1 id="username" class="text-3xl mb-6"></h1>
+<div id="questionsList"></div>
 </div>
 
 <script>
 
 // CONFIG
 const CLIENT_ID = '1483233223013302424';
-const REDIRECT_URI = window.location.origin + window.location.pathname;
+const REDIRECT_URI = 'https://dcranking.pl/jasnowidz/discord-callback.html';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5Bn7MZB4qub7S0K507zNzTRkFdIZeg2lR2Q_stpij1LLCqxLnFkMljpsFwWo4s8jYkg/exec';
 
 let user = null;
 let questions = [];
+let answersCache = [];
 
 // LOGIN
 document.getElementById('discordLogin').onclick = () => {
-    window.location.href =
-    `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+window.location.href =
+`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
 };
 
-function handleLogin(){
-    const hash = window.location.hash;
-    if(!hash) return;
+// CALLBACK
+function handleDiscord(){
+const hash = localStorage.getItem('discord_token');
+if(!hash) return;
 
-    const token = new URLSearchParams(hash.substring(1)).get('access_token');
+localStorage.removeItem('discord_token');
 
-    fetch('https://discord.com/api/users/@me',{
-        headers:{Authorization:`Bearer ${token}`}
-    })
-    .then(r=>r.json())
-    .then(data=>{
-        user=data;
-        localStorage.setItem('user',JSON.stringify(user));
+const token = new URLSearchParams(hash).get('access_token');
 
-        fetch(APPS_SCRIPT_URL,{
-            method:'POST',
-            body: JSON.stringify({
-                action:"addUser",
-                id:user.id,
-                username:user.username,
-                avatar:user.avatar
-            })
-        });
+fetch('https://discord.com/api/users/@me',{
+headers:{Authorization:`Bearer ${token}`}
+})
+.then(r=>r.json())
+.then(data=>{
+user=data;
+localStorage.setItem('user',JSON.stringify(user));
 
-        showDashboard();
-    });
+fetch(APPS_SCRIPT_URL,{
+method:'POST',
+body:JSON.stringify({
+action:"addUser",
+id:user.id,
+username:user.username,
+avatar:user.avatar
+})
+});
+
+startApp();
+});
 }
 
-// DASHBOARD
-function showDashboard(){
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
+// START
+function startApp(){
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('dashboard').classList.remove('hidden');
 
-    document.getElementById('username').textContent = user.username;
+document.getElementById('username').textContent = user.username;
 
-    loadQuestions();
+loadAll();
+setInterval(loadAll,5000); // 🔥 live update
+setInterval(updateTimers,1000); // 🔥 countdown
+}
+
+// LOAD ALL
+async function loadAll(){
+await loadQuestions();
+await loadAnswers();
+render();
 }
 
 // LOAD QUESTIONS
 async function loadQuestions(){
-    const res = await fetch(`${APPS_SCRIPT_URL}?sheet=Questions`);
-    const data = await res.json();
+const res = await fetch(`${APPS_SCRIPT_URL}?sheet=Questions`);
+const data = await res.json();
 
-    questions = data.slice(1).map((row,i)=>({
-        id:i,
-        question:row[0],
-        options:[row[1],row[2],row[3],row[4]].filter(x=>x),
-        correct: row[5] !== "" ? Number(row[5]) : null
-    }));
+questions = data.slice(1).map((row,i)=>({
+id:i,
+question:row[0],
+options:[row[1],row[2],row[3],row[4]].filter(x=>x),
+correct: row[5] !== "" ? Number(row[5]) : null,
+deadline: row[6] || null
+}));
+}
 
-    renderQuestions();
+// LOAD ANSWERS
+async function loadAnswers(){
+const res = await fetch(`${APPS_SCRIPT_URL}?sheet=Answers`);
+answersCache = (await res.json()).slice(1);
 }
 
 // RENDER
-function renderQuestions(){
-    document.getElementById('questionsList').innerHTML =
-    questions.map(q=>`
-        <div class="bg-gray-800 p-4 rounded-xl">
-            <h3 class="font-bold mb-2">${q.question}</h3>
+function render(){
+document.getElementById('questionsList').innerHTML =
+questions.map(q=>{
 
-            ${q.options.map((opt,i)=>`
-                <div onclick="answer(${q.id},${i})"
-                class="bg-gray-700 p-2 mb-2 cursor-pointer hover:bg-yellow-500">
-                ${opt}
-                </div>
-            `).join('')}
+const userAnswer = answersCache.find(a =>
+a[0]==user.id && Number(a[1])===q.id
+);
 
-        </div>
-    `).join('');
+return `
+<div class="bg-gray-800 p-4 mb-4 rounded-xl">
+<h3 class="font-bold">${q.question}</h3>
+
+<div id="timer-${q.id}" class="text-sm text-yellow-400 mb-2"></div>
+
+${q.options.map((opt,i)=>{
+const disabled = isLocked(q,userAnswer);
+
+return `
+<div onclick="${disabled ? '' : `answer(${q.id},${i})`}"
+class="p-2 mb-2 rounded cursor-pointer
+${disabled ? 'bg-gray-700' : 'bg-gray-700 hover:bg-yellow-500'}">
+${opt}
+</div>
+`;
+}).join('')}
+
+${userAnswer ? `<div class="text-green-400">Twoja: ${q.options[userAnswer[2]]}</div>` : ''}
+
+</div>
+`;
+}).join('');
+}
+
+// LOCK CHECK
+function isLocked(q,userAnswer){
+const now = new Date();
+return userAnswer || (q.deadline && new Date(q.deadline) < now);
 }
 
 // ANSWER
-function answer(qid,opt){
-    fetch(APPS_SCRIPT_URL,{
-        method:'POST',
-        body: JSON.stringify({
-            action:"answer",
-            userId:user.id,
-            qid,
-            answer:opt
-        })
-    });
+async function answer(qid,opt){
+const q = questions[qid];
 
-    alert("Zapisano!");
+if(isLocked(q)) return alert("Zablokowane!");
+
+await fetch(APPS_SCRIPT_URL,{
+method:'POST',
+body:JSON.stringify({
+action:"answer",
+userId:user.id,
+qid,
+answer:opt
+})
+});
+
+loadAll();
 }
 
-// ADMIN
-function adminLogin(){
-    document.getElementById('adminPanel').classList.toggle('hidden');
+// TIMER
+function updateTimers(){
+questions.forEach(q=>{
+if(!q.deadline) return;
+
+const el = document.getElementById(`timer-${q.id}`);
+if(!el) return;
+
+const diff = new Date(q.deadline) - new Date();
+
+if(diff <= 0){
+el.textContent = "⛔ Zamknięte";
+return;
 }
 
-// ADD QUESTION
-async function addQuestion(){
-    const question = document.getElementById('adminQ').value;
+const m = Math.floor(diff/60000);
+const s = Math.floor((diff%60000)/1000);
 
-    const options = [
-        optA.value,
-        optB.value,
-        optC.value,
-        optD.value
-    ].filter(x=>x);
-
-    await fetch(APPS_SCRIPT_URL,{
-        method:'POST',
-        body: JSON.stringify({
-            action:"addQuestion",
-            question,
-            options
-        })
-    });
-
-    alert("Dodano!");
-    loadQuestions();
+el.textContent = `⏳ ${m}m ${s}s`;
+});
 }
 
-// START
+// INIT
 document.addEventListener('DOMContentLoaded',()=>{
-    const saved = localStorage.getItem('user');
+handleDiscord();
 
-    if(saved){
-        user = JSON.parse(saved);
-        showDashboard();
-    }
-
-    handleLogin();
+const saved = localStorage.getItem('user');
+if(saved){
+user = JSON.parse(saved);
+startApp();
+}
 });
 
 </script>
