@@ -131,9 +131,13 @@
         let user = null, questions = [], isAdmin = false;
 
         // Discord Login
-        document.getElementById('discordLogin').onclick = function() {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
-        };
+        document.getElementById('discordLogin').onclick = function(e) {
+    e.preventDefault();
+    console.log('🚀 Przekierowuję do Discord...');
+    const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=https://dcranking.pl/jasnowidz/discord-callback.html&response_type=token&scope=identify`;
+    console.log('🔗 URL:', discordUrl);
+    window.location.href = discordUrl;
+};
 
         // Initialize
         window.onload = function() {
