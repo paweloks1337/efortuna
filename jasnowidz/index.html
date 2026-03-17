@@ -564,18 +564,24 @@
         }
     <button onclick="clearAllData()" class="fixed bottom-20 right-20 bg-red-600 text-white p-4 rounded-full text-xl z-50 shadow-2xl hover:bg-red-500">🧹 WYČYŚĆ DANE</button>
 
-<script>
-function clearAllData() {
-    if (confirm('Wyczyścić WSZYSTKIE stare dane graczy?')) {
+<button onclick="clearPlayerDataOnly()" class="fixed bottom-20 right-20 bg-red-600 text-white p-4 rounded-full text-xl z-50 shadow-2xl hover:bg-red-500">🧹 WYČYŚĆ INNYCH</button>
+
+
+function clearPlayerDataOnly() {
+    if (confirm('Wyczyścić dane INNYCH graczy? (NIE TWÓJE)')) {
         Object.keys(localStorage).forEach(key => {
-            if (key.includes('user_')) localStorage.removeItem(key);
+            if (key.includes('user_') && !key.includes(`user_${user?.id}`)) {
+                localStorage.removeItem(key);
+            }
         });
         Object.keys(localStorage).forEach(key => {
             if (key.includes('questions')) localStorage.removeItem(key);
         });
-        alert('✅ Dane wyczyszczone! Odśwież stronę.');
+        alert('✅ Dane innych graczy wyczyszczone!');
+        location.reload();
     }
 }
+
 </script>
 </body>
 </html>
