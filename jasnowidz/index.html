@@ -567,7 +567,35 @@
 <button onclick="clearPlayerDataOnly()" class="fixed bottom-20 right-20 bg-red-600 text-white p-4 rounded-full text-xl z-50 shadow-2xl hover:bg-red-500">🧹 WYČYŚĆ INNYCH</button>
 
 
+<!-- 🚨 AWARYJNY START DLA CIEBIE -->
+<button onclick="adminEmergencyStart()" class="fixed bottom-8 left-4 right-4 bg-emerald-600 text-white py-4 px-6 rounded-2xl text-xl font-bold z-50 shadow-2xl hover:bg-emerald-500">🚀 START DLA ADMINA (PAWEŁ)</button>
 
+<script>
+function adminEmergencyStart() {
+    // TWOJE DANE
+    const adminUser = {
+        id: '1192231948173709453',
+        username: 'Paweł Bieniek',
+        global_name: 'Paweł Bieniek',
+        avatar: 'a_defaultAvatarHash'
+    };
+    
+    localStorage.setItem('jasnowidz_user', JSON.stringify(adminUser));
+    localStorage.setItem('user_1192231948173709453_user', JSON.stringify(adminUser));
+    
+    // DODAJ TESTOWE PYTANIE F5
+    const testQuestion = [{
+        question: 'Kto wygra F5?',
+        options: ['Drużyna A', 'Drużyna B', 'Remis', 'Powyżej 2.5 gola'],
+        deadline: new Date(Date.now() + 60*60*1000).toISOString().slice(0,16), // 1h od teraz
+        correct: undefined
+    }];
+    localStorage.setItem('questions', JSON.stringify(testQuestion));
+    
+    alert('✅ JESTEŚ ZALOGOWANY! Dashboard + mecz F5 gotowy!');
+    location.reload();
+}
+</script>
 
 </script>
 </body>
