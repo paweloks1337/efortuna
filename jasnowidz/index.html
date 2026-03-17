@@ -128,7 +128,7 @@
 
     <script>
         // 🔥 PEŁNY POPRAWIONY KOD Z ANTY-CHEATEM
-        const ADMIN_PASS = 'cwel@123'; // ZMIEŃ TO!!!
+        const ADMIN_PASS = 'zmienToNaCosTrudnego123!'; // ZMIEŃ TO!!!
         const CLIENT_ID = '1483233223013302424';
         const ADMIN_IDS = ['1192231948173709453']; // TWÓJ DISCORD ID
         let user = null, questions = [], isAdmin = false;
@@ -205,25 +205,22 @@
         });
 
         function fetchUserFromToken(token) {
-    fetch('https://discord.com/api/users/@me', {
-        headers: {Authorization: `Bearer ${token}`}
-    })
-    .then(r => r.json())
-    .then(data => {
-        user = data;
-        
-        // 🆕 ZAPISUJ DANE USERA pod kluczem _user
-        localStorage.setItem(`user_${user.id}_user`, JSON.stringify(user));
-        localStorage.setItem('jasnowidz_user', JSON.stringify(user));
-        
-        showDashboard();
-        window.history.replaceState({}, '', window.location.pathname);
-    })
-    .catch(err => {
-        console.error('Discord login failed:', err);
-        document.getElementById('status').textContent = 'Błąd logowania. Spróbuj ponownie.';
-    });
-}
+            fetch('https://discord.com/api/users/@me', {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            .then(r => r.json())
+            .then(data => {
+                user = data;
+                localStorage.setItem('jasnowidz_user', JSON.stringify(user));
+                showDashboard();
+                window.history.replaceState({}, '', window.location.pathname);
+            })
+            .catch(err => {
+                console.error('Discord login failed:', err);
+                document.getElementById('status').textContent = 'Błąd logowania. Spróbuj ponownie.';
+            });
+        }
+
         function showDashboard() {
             if (!user) return;
             document.getElementById('loginScreen').classList.add('hidden');
@@ -562,70 +559,6 @@
             localStorage.removeItem(`user_${user?.id}_answers`);
             location.reload();
         }
-    <button onclick="clearAllData()" class="fixed bottom-20 right-20 bg-red-600 text-white p-4 rounded-full text-xl z-50 shadow-2xl hover:bg-red-500">🧹 WYČYŚĆ DANE</button>
-
-<button onclick="clearPlayerDataOnly()" class="fixed bottom-20 right-20 bg-red-600 text-white p-4 rounded-full text-xl z-50 shadow-2xl hover:bg-red-500">🧹 WYČYŚĆ INNYCH</button>
-
-
-<!-- 🚨 AWARYJNY START DLA CIEBIE -->
-<button onclick="adminEmergencyStart()" class="fixed bottom-8 left-4 right-4 bg-emerald-600 text-white py-4 px-6 rounded-2xl text-xl font-bold z-50 shadow-2xl hover:bg-emerald-500">🚀 START DLA ADMINA (PAWEŁ)</button>
-
-
-function adminEmergencyStart() {
-    // TWOJE DANE
-    const adminUser = {
-        id: '1192231948173709453',
-        username: 'paweloks',
-        global_name: 'paweloks',
-        avatar: 'a_defaultAvatarHash'
-    };
-    
-    localStorage.setItem('jasnowidz_user', JSON.stringify(adminUser));
-    localStorage.setItem('user_1192231948173709453_user', JSON.stringify(adminUser));
-    
-    // DODAJ TESTOWE PYTANIE F5
-    const testQuestion = [{
-        question: 'Kto wygra F5?',
-        options: ['Drużyna A', 'Drużyna B', 'Remis', 'Powyżej 2.5 gola'],
-        deadline: new Date(Date.now() + 60*60*1000).toISOString().slice(0,16), // 1h od teraz
-        correct: undefined
-    }];
-    localStorage.setItem('questions', JSON.stringify(testQuestion));
-    
-    alert('✅ JESTEŚ ZALOGOWANY! Dashboard + mecz F5 gotowy!');
-    location.reload();
-}
-<!-- 🚀 AWARYJNY START - DODAJ TYLKO TO -->
-<div id="emergencyPanel" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4 hidden">
-    <div class="card p-12 rounded-3xl max-w-lg w-full mx-4 text-center">
-        <div class="text-6xl mb-8">🚀</div>
-        <h2 class="text-3xl font-bold mb-8">ADMIN START</h2>
-        <button onclick="adminEmergencyStart()" class="w-full bg-emerald-500 text-white py-6 px-8 rounded-2xl font-bold text-2xl mb-6 shadow-2xl">PAWEŁ - START</button>
-    </div>
-</div>
-
-<script>
-function adminEmergencyStart() {
-    localStorage.setItem('jasnowidz_user', JSON.stringify({
-        id: '1192231948173709453', username: 'paweloks', avatar: 'a_default'
-    }));
-    localStorage.setItem('user_1192231948173709453_user', JSON.stringify({
-        id: '1192231948173709453', username: 'paweloks', avatar: 'a_default'
-    }));
-    localStorage.setItem('questions', JSON.stringify([{
-        question: 'Kto wygra F5?', 
-        options: ['Drużyna A', 'Drużyna B', 'Remis'], 
-        deadline: '2026-03-17T21:00',
-        correct: undefined
-    }]));
-    document.getElementById('emergencyPanel').remove();
-    location.reload();
-}
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('emergencyPanel').classList.remove('hidden');
-});
-</script>
-
-</script>
+    </script>
 </body>
 </html>
