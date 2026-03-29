@@ -69,13 +69,9 @@ color:var(--gold);
 text-align:right;
 }
 
-/* medale */
-
 .gold{ color:#FFD700; font-weight:700;}
 .silver{ color:#C0C0C0; font-weight:700;}
 .bronze{ color:#CD7F32; font-weight:700;}
-
-/* delikatna animacja LED */
 
 .top10{
 animation:softGlow 3s infinite alternate;
@@ -86,10 +82,17 @@ from{ text-shadow:0 0 2px #FFD700;}
 to{ text-shadow:0 0 6px #FFD700;}
 }
 
-/* wyszukiwarka */
-
 #search{
 width:260px;
+padding:10px;
+border-radius:8px;
+border:2px solid var(--red);
+background:black;
+color:white;
+margin-bottom:10px;
+}
+
+#raceSelect{
 padding:10px;
 border-radius:8px;
 border:2px solid var(--red);
@@ -105,7 +108,9 @@ margin-bottom:15px;
 
 <h1>🏎️ Typer F1</h1>
 
-<input id="search" placeholder="🔎 Szukaj nicku...">
+<input id="search" placeholder="🔎 Szukaj nicku..."><br>
+
+<select id="raceSelect"></select>
 
 <div class="container">
 
@@ -128,7 +133,22 @@ margin-bottom:15px;
 
 <script>
 
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRNsDXxRHNMXhq59k1yWSn6uG2N8Zz3S_8eJDD7v-Mq9fyUQkup1LHOBRTdoXoH8pbHMojiTnzoKVeB/pub?output=csv"
+/* 🔥 TU DODAJESZ WYŚCIGI */
+const RACES = {
+"general": {
+  name: "🏁 Klasyfikacja generalna",
+  url: "TU_WKLEJ_LINK_SUMY"
+},
+"australia": {
+  name: "🇦🇺 GP Australii",
+  url: "TU_WKLEJ_LINK"
+},
+"bahrain": {
+  name: "🇧🇭 GP Bahrajnu",
+  url: "TU_WKLEJ_LINK"
+}
+/* dodajesz nowe wyścigi na dole ↓ */
+}
 
 const prizes=[
 "200 zł FREEBET",
@@ -163,7 +183,6 @@ else if(c=="," && !inside){
 result.push(current)
 current=""
 }
-
 else{
 current+=c
 }
@@ -179,16 +198,14 @@ return rows
 }
 
 function parseTime(str){
-
 if(!str) return Infinity
 str=str.replace(" ","T")
 return Date.parse(str)
-
 }
 
-async function loadRanking(){
+async function loadRanking(url){
 
-const res=await fetch(CSV_URL)
+const res=await fetch(url)
 const txt=await res.text()
 
 const rows=parseCSV(txt)
@@ -210,12 +227,7 @@ const pts=parseFloat((r[pointsCol]||"0").replace(",","."))
 const time=parseTime(r[timeCol])
 
 if(!players[nick]){
-
-players[nick]={
-points:0,
-time:time
-}
-
+players[nick]={points:0,time:time}
 }
 
 players[nick].points+=pts
@@ -229,13 +241,8 @@ players[nick].time=time
 const list=Object.entries(players).map(([nick,v])=>({nick,...v}))
 
 list.sort((a,b)=>{
-
-if(b.points!==a.points){
-return b.points-a.points
-}
-
+if(b.points!==a.points) return b.points-a.points
 return a.time-b.time
-
 })
 
 render(list)
@@ -250,19 +257,16 @@ tbody.innerHTML=""
 list.forEach((p,i)=>{
 
 let medal=""
-
 if(i===0) medal="🥇"
 if(i===1) medal="🥈"
 if(i===2) medal="🥉"
 
 let medalClass=""
-
 if(i===0) medalClass="gold"
 if(i===1) medalClass="silver"
 if(i===2) medalClass="bronze"
 
 let top10 = i<10 ? "top10" : ""
-
 let prize = i<10 ? prizes[i] : ""
 
 const tr=document.createElement("tr")
@@ -280,21 +284,42 @@ tbody.appendChild(tr)
 
 }
 
+/* 🔽 SELECT */
+
+const select=document.getElementById("raceSelect")
+
+Object.entries(RACES).forEach(([key,race])=>{
+const opt=document.createElement("option")
+opt.value=key
+opt.textContent=race.name
+select.appendChild(opt)
+})
+
+select.addEventListener("change",e=>{
+const raceKey=e.target.value
+loadRanking(RACES[raceKey].url)
+})
+
+/* 🔎 SEARCH */
+
 document.getElementById("search").addEventListener("input",e=>{
 
 const q=e.target.value.toLowerCase()
 
 document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
-
 const nick=tr.children[1].textContent.toLowerCase()
-
 tr.style.display = nick.includes(q) ? "" : "none"
-
 })
 
 })
 
-loadRanking()
+/* 🚀 AUTO NAJNOWSZY WYŚCIG */
+
+const keys = Object.keys(RACES)
+const latestRace = keys[keys.length - 1]
+
+select.value = latestRace
+loadRanking(RACES[latestRace].url)
 
 </script>
 
