@@ -101,7 +101,6 @@ color:white;
 margin-bottom:15px;
 }
 
-/* 🔥 LOADER */
 .loader{
 border:4px solid rgba(255,255,255,0.1);
 border-top:4px solid var(--red);
@@ -124,14 +123,13 @@ margin:10px auto;
 
 <h1>🏎️ Typer F1</h1>
 
+<!-- TYLKO JEDEN INPUT I SELECT -->
 <input id="search" placeholder="🔎 Szukaj nicku..."><br>
-
 <select id="raceSelect"></select>
 
 <div class="container">
 
 <table id="ranking">
-
 <thead>
 <tr>
 <th>#</th>
@@ -140,16 +138,14 @@ margin:10px auto;
 <th style="text-align:right">Nagroda</th>
 </tr>
 </thead>
-
 <tbody></tbody>
-
 </table>
 
 </div>
 
 <script>
 
-/* 🔥 WYŚCIGI */
+/* 🔹 WYŚCIGI */
 const RACES = {
 "chiny": {
   name: "🇨🇳 GP Chiny",
@@ -160,14 +156,12 @@ const RACES = {
   url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNsDXxRHNMXhq59k1yWSn6uG2N8Zz3S_8eJDD7v-Mq9fyUQkup1LHOBRTdoXoH8pbHMojiTnzoKVeB/pub?output=csv"
 }
 }
-
-/* dodajesz nowe na dole */
-
 const prizes=[
 "200 zł FREEBET","100 zł FREEBET","100 zł FREEBET","50 zł FREEBET","50 zł FREEBET",
 "5000 COINS","5000 COINS","5000 COINS","5000 COINS","5000 COINS"
 ]
 
+/* Parsowanie CSV */
 function parseCSV(text){
 const rows=[]
 const lines=text.split(/\r?\n/)
@@ -193,59 +187,45 @@ str=str.replace(" ","T")
 return Date.parse(str)
 }
 
+/* ŁADOWANIE RANKINGU */
 async function loadRanking(url){
 
 const tbody=document.querySelector("#ranking tbody")
-
-/* 🔥 LOADER */
 tbody.innerHTML = `<tr><td colspan="4"><div class="loader"></div></td></tr>`
 
 try{
-
 const res=await fetch(url)
-
 if(!res.ok){
 tbody.innerHTML = "<tr><td colspan='4'>Błąd ładowania</td></tr>"
 return
 }
-
 const txt=await res.text()
-
 if(txt.startsWith("<")){
 tbody.innerHTML = "<tr><td colspan='4'>Zły link (nie CSV)</td></tr>"
 return
 }
 
 const rows=parseCSV(txt)
-
 const head=rows[0].map(x=>x.toLowerCase())
 
 const timeCol=head.findIndex(h=>h.includes("sygnatura"))
 const discordCol=head.findIndex(h=>h.includes("discord"))
 const pointsCol=head.findIndex(h=>h.includes("suma"))
 
-if(discordCol === -1 || pointsCol === -1){
+if(discordCol===-1 || pointsCol===-1){
 tbody.innerHTML = "<tr><td colspan='4'>Złe kolumny</td></tr>"
 return
 }
 
 const players={}
-
 rows.slice(1).forEach(r=>{
 const nick=(r[discordCol]||"").trim()
 if(!nick) return
 const pts=parseFloat((r[pointsCol]||"0").replace(",","."))
 const time=parseTime(r[timeCol])
-
-if(!players[nick]){
-players[nick]={points:0,time:time}
-}
-
+if(!players[nick]){ players[nick]={points:0,time:time} }
 players[nick].points+=pts
-
-if(time<players[nick].time){
-players[nick].time=time
-}
+if(time<players[nick].time){ players[nick].time=time }
 })
 
 const list=Object.entries(players).map(([nick,v])=>({nick,...v}))
@@ -263,58 +243,41 @@ tbody.innerHTML = "<tr><td colspan='4'>Błąd danych</td></tr>"
 
 }
 
+/* RENDEROWANIE TABELI */
 function render(list){
-
 const tbody=document.querySelector("#ranking tbody")
 tbody.innerHTML=""
-
 list.forEach((p,i)=>{
-
-let medal=""
-if(i===0) medal="🥇"
-if(i===1) medal="🥈"
-if(i===2) medal="🥉"
-
-let medalClass=""
-if(i===0) medalClass="gold"
-if(i===1) medalClass="silver"
-if(i===2) medalClass="bronze"
-
-let top10 = i<10 ? "top10" : ""
-let prize = i<10 ? prizes[i] : ""
+let medal="", medalClass="", top10="", prize=""
+if(i===0){ medal="🥇"; medalClass="gold" }
+else if(i===1){ medal="🥈"; medalClass="silver" }
+else if(i===2){ medal="🥉"; medalClass="bronze" }
+if(i<10){ top10="top10"; prize=prizes[i]||"" }
 
 const tr=document.createElement("tr")
-
 tr.innerHTML=`
 <td class="${medalClass} ${top10}">${medal} ${i+1}</td>
 <td class="nick ${top10}">${p.nick}</td>
 <td class="points ${top10}">${Math.round(p.points)}</td>
 <td class="prize ${top10}">${prize}</td>
 `
-
 tbody.appendChild(tr)
-
 })
-
 }
 
-/* SELECT */
-
+/* SELECT WYŚCIGÓW */
 const select=document.getElementById("raceSelect")
-
 Object.entries(RACES).forEach(([key,race])=>{
 const opt=document.createElement("option")
 opt.value=key
 opt.textContent=race.name
 select.appendChild(opt)
 })
-
 select.addEventListener("change",e=>{
 loadRanking(RACES[e.target.value].url)
 })
 
-/* SEARCH */
-
+/* WYSZUKIWARKA */
 document.getElementById("search").addEventListener("input",e=>{
 const q=e.target.value.toLowerCase()
 document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
@@ -323,349 +286,9 @@ tr.style.display = nick.includes(q) ? "" : "none"
 })
 })
 
-/* AUTO NAJNOWSZY */
-
+/* AUTOMATYCZNIE NAJNOWSZY WYŚCIG */
 const keys = Object.keys(RACES)
-const latestRace = keys[keys.length - 1]
-
-select.value = latestRace
-loadRanking(RACES[latestRace].url)
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="pl">
-<head>
-<meta charset="UTF-8">
-<title>🏎️ Typer F1</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-<style>
-
-:root{
---red:#E10600;
---gold:#FFD700;
---bg:#0e0e0e;
---panel:#1a1a1a;
---green:#00FF88;
-}
-
-body{
-margin:0;
-font-family:Poppins;
-background:linear-gradient(#000,#111);
-color:white;
-text-align:center;
-}
-
-h1{
-color:var(--red);
-text-shadow:0 0 10px var(--red);
-margin:20px 0;
-}
-
-.container{
-max-width:900px;
-margin:30px auto;
-background:var(--panel);
-padding:20px;
-border-radius:14px;
-box-shadow:0 0 20px rgba(0,0,0,0.6);
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-th,td{
-padding:12px;
-border-bottom:1px solid rgba(255,255,255,0.05);
-}
-
-th{
-color:var(--red);
-}
-
-.nick{
-font-weight:600;
-}
-
-.points{
-color:var(--green);
-font-weight:700;
-text-align:right;
-}
-
-.prize{
-font-weight:600;
-color:var(--gold);
-text-align:right;
-}
-
-.gold{ color:#FFD700; font-weight:700;}
-.silver{ color:#C0C0C0; font-weight:700;}
-.bronze{ color:#CD7F32; font-weight:700;}
-
-.top10{
-animation:softGlow 3s infinite alternate;
-}
-
-@keyframes softGlow{
-from{ text-shadow:0 0 2px #FFD700;}
-to{ text-shadow:0 0 6px #FFD700;}
-}
-
-#search{
-width:260px;
-padding:10px;
-border-radius:8px;
-border:2px solid var(--red);
-background:black;
-color:white;
-margin-bottom:10px;
-}
-
-#raceSelect{
-padding:10px;
-border-radius:8px;
-border:2px solid var(--red);
-background:black;
-color:white;
-margin-bottom:15px;
-}
-
-/* 🔥 LOADER */
-.loader{
-border:4px solid rgba(255,255,255,0.1);
-border-top:4px solid var(--red);
-border-radius:50%;
-width:30px;
-height:30px;
-animation:spin 1s linear infinite;
-margin:10px auto;
-}
-
-@keyframes spin{
-0%{ transform:rotate(0deg);}
-100%{ transform:rotate(360deg);}
-}
-
-</style>
-</head>
-
-<body>
-
-<h1>🏎️ Typer F1</h1>
-
-<input id="search" placeholder="🔎 Szukaj nicku..."><br>
-
-<select id="raceSelect"></select>
-
-<div class="container">
-
-<table id="ranking">
-
-<thead>
-<tr>
-<th>#</th>
-<th>Nick Discord</th>
-<th style="text-align:right">Suma PKT</th>
-<th style="text-align:right">Nagroda</th>
-</tr>
-</thead>
-
-<tbody></tbody>
-
-</table>
-
-</div>
-
-<script>
-
-/* 🔥 WYŚCIGI */
-const RACES = {
-
-"chiny": {
-  name: "🇨🇳 GP Chiny",
-  url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNsDXxRHNMXhq59k1yWSn6uG2N8Zz3S_8eJDD7v-Mq9fyUQkup1LHOBRTdoXoH8pbHMojiTnzoKVeB/pub?output=csv"
-}
-  "chiny": {
-  name: "🇯🇵 GP Japonia",
-  url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNsDXxRHNMXhq59k1yWSn6uG2N8Zz3S_8eJDD7v-Mq9fyUQkup1LHOBRTdoXoH8pbHMojiTnzoKVeB/pub?output=csv"
-}
-  }
-}
-
-/* dodajesz nowe na dole */
-
-const prizes=[
-"200 zł FREEBET","100 zł FREEBET","100 zł FREEBET","50 zł FREEBET","50 zł FREEBET",
-"5000 COINS","5000 COINS","5000 COINS","5000 COINS","5000 COINS"
-]
-
-function parseCSV(text){
-const rows=[]
-const lines=text.split(/\r?\n/)
-lines.forEach(line=>{
-const result=[]
-let current=""
-let inside=false
-for(let i=0;i<line.length;i++){
-const c=line[i]
-if(c=='"'){ inside=!inside }
-else if(c=="," && !inside){ result.push(current); current="" }
-else{ current+=c }
-}
-result.push(current)
-rows.push(result)
-})
-return rows
-}
-
-function parseTime(str){
-if(!str) return Infinity
-str=str.replace(" ","T")
-return Date.parse(str)
-}
-
-async function loadRanking(url){
-
-const tbody=document.querySelector("#ranking tbody")
-
-/* 🔥 LOADER */
-tbody.innerHTML = `<tr><td colspan="4"><div class="loader"></div></td></tr>`
-
-try{
-
-const res=await fetch(url)
-
-if(!res.ok){
-tbody.innerHTML = "<tr><td colspan='4'>Błąd ładowania</td></tr>"
-return
-}
-
-const txt=await res.text()
-
-if(txt.startsWith("<")){
-tbody.innerHTML = "<tr><td colspan='4'>Zły link (nie CSV)</td></tr>"
-return
-}
-
-const rows=parseCSV(txt)
-
-const head=rows[0].map(x=>x.toLowerCase())
-
-const timeCol=head.findIndex(h=>h.includes("sygnatura"))
-const discordCol=head.findIndex(h=>h.includes("discord"))
-const pointsCol=head.findIndex(h=>h.includes("suma"))
-
-if(discordCol === -1 || pointsCol === -1){
-tbody.innerHTML = "<tr><td colspan='4'>Złe kolumny</td></tr>"
-return
-}
-
-const players={}
-
-rows.slice(1).forEach(r=>{
-const nick=(r[discordCol]||"").trim()
-if(!nick) return
-const pts=parseFloat((r[pointsCol]||"0").replace(",","."))
-const time=parseTime(r[timeCol])
-
-if(!players[nick]){
-players[nick]={points:0,time:time}
-}
-
-players[nick].points+=pts
-
-if(time<players[nick].time){
-players[nick].time=time
-}
-})
-
-const list=Object.entries(players).map(([nick,v])=>({nick,...v}))
-
-list.sort((a,b)=>{
-if(b.points!==a.points) return b.points-a.points
-return a.time-b.time
-})
-
-render(list)
-
-}catch(e){
-tbody.innerHTML = "<tr><td colspan='4'>Błąd danych</td></tr>"
-}
-
-}
-
-function render(list){
-
-const tbody=document.querySelector("#ranking tbody")
-tbody.innerHTML=""
-
-list.forEach((p,i)=>{
-
-let medal=""
-if(i===0) medal="🥇"
-if(i===1) medal="🥈"
-if(i===2) medal="🥉"
-
-let medalClass=""
-if(i===0) medalClass="gold"
-if(i===1) medalClass="silver"
-if(i===2) medalClass="bronze"
-
-let top10 = i<10 ? "top10" : ""
-let prize = i<10 ? prizes[i] : ""
-
-const tr=document.createElement("tr")
-
-tr.innerHTML=`
-<td class="${medalClass} ${top10}">${medal} ${i+1}</td>
-<td class="nick ${top10}">${p.nick}</td>
-<td class="points ${top10}">${Math.round(p.points)}</td>
-<td class="prize ${top10}">${prize}</td>
-`
-
-tbody.appendChild(tr)
-
-})
-
-}
-
-/* SELECT */
-
-const select=document.getElementById("raceSelect")
-
-Object.entries(RACES).forEach(([key,race])=>{
-const opt=document.createElement("option")
-opt.value=key
-opt.textContent=race.name
-select.appendChild(opt)
-})
-
-select.addEventListener("change",e=>{
-loadRanking(RACES[e.target.value].url)
-})
-
-/* SEARCH */
-
-document.getElementById("search").addEventListener("input",e=>{
-const q=e.target.value.toLowerCase()
-document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
-const nick=tr.children[1].textContent.toLowerCase()
-tr.style.display = nick.includes(q) ? "" : "none"
-})
-})
-
-/* AUTO NAJNOWSZY */
-
-const keys = Object.keys(RACES)
-const latestRace = keys[keys.length - 1]
-
+const latestRace = keys[keys.length-1]
 select.value = latestRace
 loadRanking(RACES[latestRace].url)
 
