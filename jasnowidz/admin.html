@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-black text-white p-6">
+
+<h1 class="text-3xl mb-6">ADMIN</h1>
+
+<div id="panel"></div>
+
+<script>
+const ADMIN_IDS = ['1192231948173709453'];
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbwYD1eZv_MJPQBt6QxI8EfG7OTwFUKEKkGz8U-XHsxvxHO9bZiNoCzF0kdkMEajEUGJ5A/exec';
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if(!user || !ADMIN_IDS.includes(user.id)){
+  document.body.innerHTML = "403";
+}
+
+// ADD QUESTION
+document.getElementById("panel").innerHTML = `
+<input id="match" placeholder="Mecz"><br>
+<input id="q" placeholder="Pytanie"><br>
+<input id="a"><input id="b"><input id="c"><input id="d"><br>
+<input id="deadline" type="datetime-local"><br>
+<input id="points" placeholder="pkt"><br>
+<button onclick="add()">Dodaj</button>
+`;
+
+function add(){
+  fetch(SHEET_API,{
+    method:'POST',
+    body: JSON.stringify({
+      action:"addQuestion",
+      match:document.getElementById("match").value,
+      question:document.getElementById("q").value,
+      options:[
+        a.value,b.value,c.value,d.value
+      ].filter(x=>x),
+      deadline:deadline.value,
+      points:points.value
+    })
+  }).then(()=>alert("OK"));
+}
+</script>
+</body>
+</html>
