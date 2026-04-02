@@ -3,136 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 Typer Dart – Panel Admina</title>
+<title>🏆 Typer Dart - Panel Admin</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-body { background: linear-gradient(135deg, #1a051d 0%, #3c0d2d 100%); color: white; font-family: system-ui, sans-serif; }
-.card { background: rgba(50,0,30,0.85); backdrop-filter: blur(10px); border: 1px solid rgba(239,68,68,0.3); }
-.correct { background: rgba(34,197,94,0.3); border-color: #10B981; }
-.wrong { background: rgba(239,68,68,0.3); border-color: #EF4444; }
-.pending { background: rgba(156,163,175,0.3); border-color: #9CA3AF; }
+body { background: linear-gradient(135deg,#1f1f1f 0%,#2b2b2b 100%); color:white; font-family:system-ui,sans-serif; }
+.card { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); border:1px solid rgba(239,68,68,0.3); }
+input, button { font-family: inherit; }
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
-<div class="max-w-6xl mx-auto">
-  <div class="card p-8 rounded-2xl mb-8 text-center">
-    <h1 class="text-4xl font-bold mb-4">🎯 Typer Dart – Panel Admina</h1>
-    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6">
-      <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-xl font-bold shadow-lg">Wyloguj</button>
-      <button onclick="location.href='/dart/index.html'" class="bg-red-500 hover:bg-red-600 text-black py-3 px-6 rounded-xl font-bold shadow-lg">Dashboard Gracza</button>
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-4xl font-bold mb-8 text-center text-red-500">🏆 Typer Dart - Panel Admin</h1>
+
+  <div class="card p-6 rounded-2xl mb-12">
+    <h2 class="text-2xl font-bold mb-4 text-red-400">➕ Dodaj nowy mecz</h2>
+    <input id="match" placeholder="Np. Littler vs Ratajski" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
+    <input id="question" placeholder="Np. Kto wygra?" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <input id="optA" placeholder="Opcja 1" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
+      <input id="optB" placeholder="Opcja 2" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
+      <input id="optC" placeholder="Opcja 3 (opcjonalnie)" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
+      <input id="optD" placeholder="Opcja 4 (opcjonalnie)" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
     </div>
+    <input id="points" type="number" placeholder="Punkty za poprawną odpowiedź" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
+    <input id="deadline" type="datetime-local" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
+    <button onclick="addQuestion()" class="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all">➕ Dodaj mecz</button>
   </div>
 
-  <!-- Dodawanie pytania -->
-  <div class="card p-6 rounded-2xl mb-8">
-    <h2 class="text-2xl font-bold mb-4 text-center">➕ Dodaj nowe pytanie</h2>
-    <input id="match" placeholder="Np. Littler vs Ratajski" class="w-full p-3 rounded-xl mb-3 bg-gray-900 border-2 border-red-400 text-white">
-    <input id="question" placeholder="Np. Kto wygra?" class="w-full p-3 rounded-xl mb-3 bg-gray-900 border-2 border-red-400 text-white">
-    <div class="grid grid-cols-2 gap-3 mb-3">
-      <input id="optA" placeholder="Opcja A" class="p-2 rounded-xl bg-gray-900 border-2 border-gray-600 text-white">
-      <input id="optB" placeholder="Opcja B" class="p-2 rounded-xl bg-gray-900 border-2 border-gray-600 text-white">
-    </div>
-    <div class="grid grid-cols-2 gap-3 mb-3">
-      <input id="optC" placeholder="Opcja C (opcjonalne)" class="p-2 rounded-xl bg-gray-900 border-2 border-gray-600 text-white">
-      <input id="optD" placeholder="Opcja D (opcjonalne)" class="p-2 rounded-xl bg-gray-900 border-2 border-gray-600 text-white">
-    </div>
-    <input id="points" type="number" placeholder="Punkty" class="w-full p-3 rounded-xl mb-3 bg-gray-900 border-2 border-red-400 text-white">
-    <input id="deadline" type="datetime-local" class="w-full p-3 rounded-xl mb-3 bg-gray-900 border-2 border-red-400 text-white">
-    <button onclick="addQuestion()" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 text-black py-3 rounded-xl font-bold shadow-lg">Dodaj pytanie</button>
-  </div>
-
-  <!-- Lista pytań i ustawianie wyników -->
-  <div id="questionsList" class="space-y-4 mb-8"></div>
-
-  <!-- Ranking -->
-  <div class="card p-6 rounded-2xl mb-8">
-    <h2 class="text-2xl font-bold mb-4 text-center">🏆 Globalny Ranking</h2>
-    <div id="globalRanking" class="overflow-x-auto"></div>
-  </div>
+  <div id="questionsList" class="space-y-4"></div>
 </div>
 
 <script>
 const SHEET_API = 'https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
-let questions=[], answers={}, user=null;
-const ADMIN_IDS=['1192231948173709453'];
+let questions = [];
 
-// ADMIN SESSION
-document.addEventListener('DOMContentLoaded', async ()=>{
-  const saved = localStorage.getItem('typer_user');
-  if(!saved){ alert('Nie jesteś zalogowany'); location.href='/dart/index.html'; return; }
-  user = JSON.parse(saved);
-  if(!ADMIN_IDS.includes(user.id)){ alert('Brak uprawnień'); location.href='/dart/index.html'; return; }
-  loadQuestions();
-  loadGlobalRanking();
-});
-
-// FETCH + SHEET
-async function loadQuestions(){
-  try{
+// Pobierz listę pytań
+async function loadQuestions() {
+  try {
     const res = await fetch(`${SHEET_API}?type=all`);
     const data = await res.json();
     questions = data.questions || [];
-    answers = data.answers || {};
     renderQuestions();
-  }catch(e){ console.error(e);}
+  } catch(e){
+    console.error("Błąd ładowania pytań:", e);
+    alert("Nie udało się pobrać pytań!");
+  }
 }
 
-function renderQuestions(){
+// Wyświetl pytania
+function renderQuestions() {
   const container = document.getElementById('questionsList');
-  container.innerHTML = questions.map(q=>{
-    const userAnswers = Object.entries(answers).map(([uid,qs])=>{
-      const a=qs[q.id]; return a!==undefined ? {uid,a} : null;
-    }).filter(x=>x);
-    const answerText = userAnswers.map(u=>`${u.uid}: ${u.a}`).join(', ') || 'Brak typów';
-    return `<div class="card p-4 rounded-xl">
-      <h3 class="font-bold mb-2">${q.match} – ${q.question}</h3>
-      <div class="mb-2 text-sm">Typy użytkowników: ${answerText}</div>
-      <div class="flex flex-wrap gap-2">
-        ${q.options.map((opt,j)=>{
-          return `<button onclick="setCorrect(${q.id},${j})" class="px-3 py-1 rounded-xl bg-gray-900 border-2 border-red-400 hover:bg-red-600">${String.fromCharCode(65+j)}: ${opt}</button>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }).join('');
+  container.innerHTML = '';
+  questions.forEach((q,i) => {
+    const now = new Date();
+    const deadline = new Date(q.deadline);
+    const expired = now > deadline;
+    const card = document.createElement('div');
+    card.className = 'card p-4 rounded-2xl';
+    card.innerHTML = `
+      <h3 class="text-xl font-bold mb-2">${q.match}</h3>
+      <p class="mb-2">${q.question}</p>
+      <div class="flex flex-wrap gap-2 mb-2">${q.options.map((o,j)=>`<span class="px-2 py-1 border rounded-xl ${expired ? 'bg-gray-700 text-gray-300' : 'bg-gray-900 text-white'}">[${j+1}] ${o}</span>`).join('')}</div>
+      <div class="text-sm text-gray-300">Deadline: ${new Date(q.deadline).toLocaleString()} | Punkty: ${q.points}</div>
+    `;
+    container.appendChild(card);
+  });
 }
 
-// ADD QUESTION
+// Dodaj pytanie
 async function addQuestion(){
   const newQ = {
-    match:document.getElementById('match').value,
-    question:document.getElementById('question').value,
-    options:[document.getElementById('optA').value,document.getElementById('optB').value,document.getElementById('optC').value,document.getElementById('optD').value].filter(o=>o),
+    match: document.getElementById('match').value,
+    question: document.getElementById('question').value,
+    options: [
+      document.getElementById('optA').value,
+      document.getElementById('optB').value,
+      document.getElementById('optC').value,
+      document.getElementById('optD').value
+    ].filter(o=>o),
     points: parseInt(document.getElementById('points').value),
     deadline: document.getElementById('deadline').value
   };
-  if(!newQ.match||!newQ.question||newQ.options.length<2||!newQ.points||!newQ.deadline){ alert('Wypełnij wszystkie pola'); return; }
-  await fetch(SHEET_API,{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'addQuestion',...newQ})});
-  loadQuestions();
+
+  if(!newQ.match || !newQ.question || newQ.options.length<2 || !newQ.points || !newQ.deadline){
+    alert("Wypełnij wszystkie pola!");
+    return;
+  }
+
+  try {
+    const res = await fetch(SHEET_API, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:"addQuestion", ...newQ})
+    });
+    const data = await res.json();
+    console.log("Odpowiedź API:", data);
+    if(data.error) alert("Błąd: " + data.error);
+    else{
+      alert("Pytanie dodane!");
+      loadQuestions();
+      // Czyść pola
+      document.getElementById('match').value='';
+      document.getElementById('question').value='';
+      ['optA','optB','optC','optD','points','deadline'].forEach(id=>document.getElementById(id).value='');
+    }
+  } catch(e){
+    console.error("Błąd fetch:", e);
+    alert("Nie udało się dodać pytania!");
+  }
 }
 
-// SET CORRECT
-async function setCorrect(qid,optid){
-  await fetch(SHEET_API,{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'setCorrect',qid,correct:optid})});
-  loadQuestions();
-  loadGlobalRanking();
-}
-
-// RANKING
-async function loadGlobalRanking(){
-  try{
-    const res=await fetch(`${SHEET_API}?type=all`);
-    const data=await res.json();
-    const users=data.users || [];
-    const table = `<table class="w-full text-left"><thead><tr class="border-b-2 border-red-400"><th>Nazwa</th><th>Punkty</th></tr></thead>
-      <tbody>
-      ${users.map(u=>`<tr class="border-b border-gray-600"><td>${u.Username}</td><td>${u.TotalPoints||0}</td></tr>`).join('')}
-      </tbody></table>`;
-    document.getElementById('globalRanking').innerHTML=table;
-  }catch(e){console.error(e);}
-}
-
-function logout(){ localStorage.removeItem('typer_user'); location.href='/dart/index.html'; }
+// Od razu załaduj pytania przy starcie
+loadQuestions();
 </script>
 </body>
 </html>
