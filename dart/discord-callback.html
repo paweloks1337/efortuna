@@ -3,11 +3,16 @@
 <head><meta charset="UTF-8"><title>Discord Callback</title></head>
 <body>
 <script>
-const hash=window.location.hash.substring(1);
-const params=new URLSearchParams(hash);
-const token=params.get('access_token');
-if(token){ localStorage.setItem('typer_token',token); window.location.href='/dart/index.html#access_token='+token; }
-else{ alert('Błąd logowania Discord'); }
+(async()=>{
+  const hash=window.location.hash.substring(1);
+  const params=new URLSearchParams(hash);
+  const token=params.get('access_token'); if(!token)return;
+  const res=await fetch('https://discord.com/api/users/@me',{headers:{Authorization:`Bearer ${token}`}});
+  const data=await res.json();
+  const user={id:data.id,username:data.username,avatar:data.avatar,token};
+  localStorage.setItem('typer_user',JSON.stringify(user));
+  window.location.href='/dart/index.html';
+})();
 </script>
 </body>
 </html>
