@@ -3,16 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔮 Typer Darta</title>
+<title>🎯 Typer Dart</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-body { background: linear-gradient(135deg, #111827, #1f2937); color:white; font-family: system-ui, sans-serif; }
-.card { background: rgba(31,41,55,0.95); backdrop-filter: blur(10px); border:1px solid rgba(251,191,36,0.3); }
-.correct { background: rgba(34,197,94,0.3)!important; border-color:#10B981!important; }
-.wrong { background: rgba(239,68,68,0.3)!important; border-color:#EF4444!important; }
-.waiting { background: rgba(107,114,128,0.3)!important; border-color:#6B7280!important; }
-.deadline-active { color: #F59E0B; font-weight:700; }
-.deadline-expired { color:#6B7280; }
+body { background: linear-gradient(135deg,#1a051d 0%,#3c0d2d 100%); color:white; font-family:system-ui,sans-serif; }
+.card { background: rgba(50,0,30,0.85); backdrop-filter: blur(10px); border:1px solid rgba(239,68,68,0.3); }
+.correct { background: rgba(34,197,94,0.3); border-color: #10B981; }
+.wrong { background: rgba(239,68,68,0.3); border-color: #EF4444; }
+.pending { background: rgba(156,163,175,0.3); border-color: #9CA3AF; }
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -20,130 +18,125 @@ body { background: linear-gradient(135deg, #111827, #1f2937); color:white; font-
 <!-- LOGIN -->
 <div id="loginScreen" class="max-w-md mx-auto mt-16">
   <div class="card p-8 rounded-2xl shadow-2xl text-center">
-    <div class="text-5xl mb-8">🔮</div>
-    <h1 class="text-3xl font-bold mb-8">Typer Darta</h1>
-    <button id="discordLogin" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-4 px-6 rounded-xl font-bold text-lg mb-6 shadow-lg hover:shadow-xl transition-all">
-      Zaloguj przez Discord
-    </button>
+    <h1 class="text-3xl font-bold mb-8">🎯 Typer Dart</h1>
+    <button id="discordLogin" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 text-black py-4 px-6 rounded-xl font-bold text-lg mb-4 shadow-lg">Zaloguj przez Discord</button>
     <p id="status" class="text-gray-300 text-sm">Kliknij aby rozpocząć typowanie</p>
   </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden max-w-6xl mx-auto">
-  <div class="card p-8 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center md:items-start">
-    <img id="avatar" class="w-24 h-24 rounded-full ring-4 ring-yellow-400">
-    <div class="text-center md:text-left flex-1">
+  <div class="card p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center md:items-start">
+    <img id="avatar" class="w-24 h-24 rounded-full ring-4 ring-red-400">
+    <div class="flex-1 text-center md:text-left">
       <h2 id="username" class="text-3xl font-bold mb-4"></h2>
-      <div class="flex flex-wrap gap-8 text-xl">
-        <div>Punkty: <span id="userPoints" class="font-black text-3xl text-yellow-400">0</span></div>
+      <div class="flex flex-wrap gap-6 text-xl justify-center md:justify-start">
+        <div>Punkty: <span id="userPoints" class="font-black text-3xl text-red-400">0</span></div>
+        <div>Skuteczność: <span id="accuracy" class="font-black text-3xl text-red-400">0%</span></div>
       </div>
     </div>
   </div>
 
   <div id="questionsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"></div>
 
-  <div class="flex justify-center gap-4">
-    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-10 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl transition-all">
-      Wyloguj
-    </button>
+  <div class="buttons-container flex justify-center gap-4">
+    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-10 rounded-xl font-bold shadow-lg">Wyloguj</button>
+  </div>
+
+  <div class="card p-6 rounded-2xl mt-8">
+    <h2 class="text-2xl font-bold mb-4 text-center">🏆 Globalny Ranking</h2>
+    <div id="globalRanking" class="overflow-x-auto"></div>
   </div>
 </div>
 
 <script>
-// CONFIG
-const CLIENT_ID = '1483233223013302424';
-const SHEET_API = 'https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
-
-let user = null, questions = [], answers = {};
+const CLIENT_ID='1483233223013302424';
+const SHEET_API='https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
+let user=null, questions=[], answers={};
 
 // LOGIN
-document.getElementById('discordLogin').onclick = e => {
+document.getElementById('discordLogin').onclick=e=>{
   e.preventDefault();
-  const redirect_uri = encodeURIComponent(window.location.origin + '/dart/discord-callback.html');
-  const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`;
-  window.open(url,'_self');
+  const redirect_uri=encodeURIComponent(window.location.origin+'/dart/discord-callback.html');
+  const url=`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`;
+  window.location.href=url;
 };
 
-async function validateSession() {
+// LOAD SESSION
+document.addEventListener('DOMContentLoaded',async()=>{
   const saved = localStorage.getItem('typer_user');
-  if(!saved) return false;
-  const u = JSON.parse(saved);
-  if(u.expires && Date.now() > u.expires){ localStorage.removeItem('typer_user'); return false; }
-  user = u; return true;
-}
+  if(saved){ user=JSON.parse(saved); showDashboard(); loadQuestions(); loadRanking(); }
+});
 
+// SHOW DASHBOARD
 function showDashboard(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
-  document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
-  document.getElementById('username').textContent = user.username;
-  loadQuestions();
+  document.getElementById('avatar').src=`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
+  document.getElementById('username').textContent=user.username;
 }
 
+// LOGOUT
+function logout(){ localStorage.removeItem('typer_user'); location.reload(); }
+
+// LOAD QUESTIONS
 async function loadQuestions(){
-  const res = await fetch(SHEET_API+'?type=all');
-  const data = await res.json();
-  questions = data.questions;
-  answers = data.answers[user.id] || {};
-  renderQuestions();
-  calcPoints();
+  try{
+    const res=await fetch(`${SHEET_API}?type=all`);
+    const data=await res.json();
+    questions=data.questions||[];
+    answers=data.answers||{};
+    renderQuestions();
+  }catch(e){ console.error(e);}
 }
 
+// RENDER QUESTIONS
 function renderQuestions(){
-  const container = document.getElementById('questionsList');
-  container.innerHTML = questions.map((q,i)=>{
-    const now = new Date();
-    const deadline = new Date(q.deadline);
-    const expired = now > deadline;
-    return `<div class="card p-6 rounded-2xl hover:shadow-2xl transition-all">
-      <div class="text-xl font-bold mb-4 text-center pb-2 border-b border-yellow-500/50 ${expired?'deadline-expired':'deadline-active'}">
-        ${expired?'✅ ROZSTRZYGNIĘTE':formatTime(deadline)}
-      </div>
-      <h3 class="text-xl font-bold mb-4 text-center">${q.question}</h3>
-      <div class="space-y-3 mb-4">
-        ${q.options.map((opt,j)=>{
-          let cls='', onclick='';
-          if(!expired){
-            onclick = `onclick="answerQuestion(${i},${j})"`;
-          }
-          if(q.correct!=null){
-            if(answers[i]==j && j==q.correct) cls='correct';
-            else if(answers[i]==j && j!=q.correct) cls='wrong';
-            else cls='waiting';
-          } else cls='waiting';
-          return `<div class="p-4 rounded-xl border-2 border-gray-600 cursor-pointer ${cls}" ${onclick}>${String.fromCharCode(65+j)}: ${opt}</div>`;
-        }).join('')}
+  const container=document.getElementById('questionsList');
+  container.innerHTML=questions.map(q=>{
+    const now=new Date(); const deadline=new Date(q.deadline);
+    const expired=now>deadline;
+    const userAnswer=(answers[user.id]||{})[q.id];
+    return `<div class="card p-4 rounded-xl">
+      <h3 class="font-bold mb-2">${q.match}<br>${q.question}</h3>
+      <div class="mb-2 text-sm">${formatTime(deadline)} | ${expired?'Zamknięte':'Otwarta'}</div>
+      <div class="flex flex-wrap gap-2">
+        ${q.options.map((opt,j)=>`
+          <button onclick="${expired||userAnswer!==undefined?'':'answerQuestion('+q.id+','+j+')'}"
+          class="px-3 py-1 rounded-xl ${userAnswer!==undefined?(userAnswer===q.correct?'correct':'wrong'):expired?'pending':''} border-2 border-gray-600 hover:border-red-400">${String.fromCharCode(65+j)}: ${opt}</button>`).join('')}
       </div>
     </div>`;
   }).join('');
 }
 
-function formatTime(d){
-  const diff = new Date(d)-new Date();
-  if(diff<=0) return "WYGASŁE";
-  const h=Math.floor(diff/3600000);
-  const m=Math.floor((diff%3600000)/60000);
-  const s=Math.floor((diff%60000)/1000);
-  return `${h}h ${m}m ${s}s`;
+// FORMAT TIME
+function formatTime(date){
+  const diff=new Date(date)-new Date();
+  if(diff<0)return "WYGASŁE";
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor(diff%86400000/3600000);
+  const m=Math.floor(diff%3600000/60000);
+  const s=Math.floor(diff%60000/1000);
+  return `${d}d ${h}h ${m}m ${s}s`;
 }
 
+// ANSWER QUESTION
 async function answerQuestion(qid,optid){
   await fetch(SHEET_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'answer',userId:user.id,qid,answer:optid})});
-  answers[qid]=optid;
-  renderQuestions();
-  calcPoints();
+  loadQuestions(); loadRanking();
 }
 
-function calcPoints(){
-  let pts=0;
-  questions.forEach((q,i)=>{
-    if(q.correct!=null && answers[i]==q.correct) pts+=q.points||1;
-  });
-  document.getElementById('userPoints').textContent=pts;
+// RANKING
+async function loadRanking(){
+  try{
+    const res=await fetch(`${SHEET_API}?type=all`);
+    const data=await res.json();
+    const users=data.users||[];
+    const table=`<table class="w-full text-left"><thead><tr class="border-b-2 border-red-400"><th>Nazwa</th><th>Punkty</th></tr></thead>
+      <tbody>${users.map(u=>`<tr class="border-b border-gray-600"><td>${u.Username}</td><td>${u.TotalPoints||0}</td></tr>`).join('')}</tbody></table>`;
+    document.getElementById('globalRanking').innerHTML=table;
+  }catch(e){ console.error(e);}
 }
-
-function logout(){ localStorage.removeItem('typer_user'); location.reload(); }
 </script>
 </body>
 </html>
