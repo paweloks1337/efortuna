@@ -12,10 +12,10 @@ input, button { font-family: inherit; }
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
-
 <div class="max-w-4xl mx-auto">
   <h1 class="text-4xl font-bold mb-8 text-center text-red-500">🏆 Typer Dart - Panel Admin</h1>
 
+  <!-- Dodawanie meczu -->
   <div class="card p-6 rounded-2xl mb-12">
     <h2 class="text-2xl font-bold mb-4 text-red-400">➕ Dodaj nowy mecz</h2>
     <input id="match" placeholder="Np. Littler vs Ratajski" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
@@ -31,11 +31,12 @@ input, button { font-family: inherit; }
     <button onclick="addQuestion()" class="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all">➕ Dodaj mecz</button>
   </div>
 
+  <!-- Lista pytań -->
   <div id="questionsList" class="space-y-4"></div>
 </div>
 
 <script>
-const SHEET_API = 'https://script.google.com/macros/s/AKfycbyZP4GxyEOOThsFl4OQ_9sEaTTLNNIhJWe5kq2Vg7Ds-nZIgYERa0RHJT-L06bt5VZBEQ/exec';
+const SHEET_API = "TU_WKLEJ_URL_Z_APPS_SCRIPT";
 let questions = [];
 
 async function loadQuestions() {
@@ -63,7 +64,7 @@ function renderQuestions() {
       <h3 class="text-xl font-bold mb-2">${q.match}</h3>
       <p class="mb-2">${q.question}</p>
       <div class="flex flex-wrap gap-2 mb-2">${q.options.map((o,j)=>`<span class="px-2 py-1 border rounded-xl ${expired ? 'bg-gray-700 text-gray-300' : 'bg-gray-900 text-white'}">[${j+1}] ${o}</span>`).join('')}</div>
-      <div class="text-sm text-gray-300">Deadline: ${new Date(q.deadline).toLocaleString()} | Punkty: ${q.points}</div>
+      <div class="text-sm text-gray-300">Deadline: ${deadline.toLocaleString()} | Punkty: ${q.points}</div>
     `;
     container.appendChild(card);
   });
@@ -71,6 +72,7 @@ function renderQuestions() {
 
 async function addQuestion(){
   const newQ = {
+    action: "addQuestion",
     match: document.getElementById('match').value,
     question: document.getElementById('question').value,
     options: [
@@ -78,12 +80,12 @@ async function addQuestion(){
       document.getElementById('optB').value,
       document.getElementById('optC').value,
       document.getElementById('optD').value
-    ].filter(o=>o),
-    points: parseInt(document.getElementById('points').value),
-    deadline: document.getElementById('deadline').value
+    ].filter(o => o),
+    deadline: document.getElementById('deadline').value,
+    points: parseInt(document.getElementById('points').value)
   };
 
-  if(!newQ.match || !newQ.question || newQ.options.length<2 || !newQ.points || !newQ.deadline){
+  if(!newQ.match || !newQ.question || newQ.options.length < 2 || !newQ.deadline || !newQ.points){
     alert("Wypełnij wszystkie pola!");
     return;
   }
@@ -91,19 +93,19 @@ async function addQuestion(){
   try {
     const res = await fetch(SHEET_API, {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action:"addQuestion", ...newQ})
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(newQ)
     });
     const data = await res.json();
-    console.log("Odpowiedź API:", data);
-    if(data.error) alert("Błąd: " + data.error);
-    else{
+    if(data.success){
       alert("Pytanie dodane!");
       loadQuestions();
       ['match','question','optA','optB','optC','optD','points','deadline'].forEach(id=>document.getElementById(id).value='');
+    } else {
+      alert("Błąd: " + (data.error || "Nieznany"));
     }
   } catch(e){
-    console.error("Błąd fetch:", e);
+    console.error(e);
     alert("Nie udało się dodać pytania!");
   }
 }
