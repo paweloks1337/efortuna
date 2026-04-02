@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="UTF-8"><title>Discord Callback</title></head>
+<body>
+<script>
+const hash = window.location.hash.substring(1);
+const params = new URLSearchParams(hash);
+const token = params.get('access_token');
+const expires = parseInt(params.get('expires_in')||3600);
+
+async function fetchUser(){
+  if(!token) return alert("Brak tokena Discord!");
+  const res = await fetch('https://discord.com/api/users/@me',{headers:{Authorization:`Bearer ${token}`}});
+  const data = await res.json();
+  const userData = {
+    id:data.id,
+    username:data.username || data.global_name,
+    avatar:data.avatar,
+    token:token,
+    expires:Date.now()+(expires*1000)
+  };
+  localStorage.setItem('typer_user',JSON.stringify(userData));
+  // Dodaj do arkusza
+  await fetch('https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'addUser',id:userData.id,username:userData.username,avatar:userData.avatar})
+  });
+  window.location.href='index.html';
+}
+
+fetchUser();
+</script>
+</body>
+</html>
