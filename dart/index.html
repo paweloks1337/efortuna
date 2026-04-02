@@ -3,18 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔮 JASNOWIDZ FORTUNY</title>
+<title>🔮 Typer Darta</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: white; font-family: system-ui, sans-serif; }
-.card { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(251, 191, 36, 0.3); }
-.deadline-active { color: #F59E0B; font-weight: 700; }
-.deadline-expired { color: #6B7280; }
-.option { cursor:pointer; border:2px solid #374151; padding:1rem; border-radius:1rem; transition: all 0.2s; }
-.option.selected { border-color:#FBBF24; background:rgba(251,191,36,0.2);}
-.option.correct { background: rgba(34,197,94,0.3); border-color:#10B981;}
-.option.wrong { background: rgba(239,68,68,0.3); border-color:#EF4444;}
-.option.pending { background: rgba(107,114,128,0.3); border-color:#6B7280;}
+body { background: linear-gradient(135deg, #111827, #1f2937); color:white; font-family: system-ui, sans-serif; }
+.card { background: rgba(31,41,55,0.95); backdrop-filter: blur(10px); border:1px solid rgba(251,191,36,0.3); }
+.correct { background: rgba(34,197,94,0.3)!important; border-color:#10B981!important; }
+.wrong { background: rgba(239,68,68,0.3)!important; border-color:#EF4444!important; }
+.waiting { background: rgba(107,114,128,0.3)!important; border-color:#6B7280!important; }
+.deadline-active { color: #F59E0B; font-weight:700; }
+.deadline-expired { color:#6B7280; }
 </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -23,11 +21,11 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
 <div id="loginScreen" class="max-w-md mx-auto mt-16">
   <div class="card p-8 rounded-2xl shadow-2xl text-center">
     <div class="text-5xl mb-8">🔮</div>
-    <h1 class="text-3xl font-bold mb-8">Jasnowidz Fortuny</h1>
+    <h1 class="text-3xl font-bold mb-8">Typer Darta</h1>
     <button id="discordLogin" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 text-black py-4 px-6 rounded-xl font-bold text-lg mb-6 shadow-lg hover:shadow-xl transition-all">
       Zaloguj przez Discord
     </button>
-    <p id="status" class="text-gray-300 text-sm">Kliknij aby rozpocząć wróżenie</p>
+    <p id="status" class="text-gray-300 text-sm">Kliknij aby rozpocząć typowanie</p>
   </div>
 </div>
 
@@ -39,7 +37,6 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
       <h2 id="username" class="text-3xl font-bold mb-4"></h2>
       <div class="flex flex-wrap gap-8 text-xl">
         <div>Punkty: <span id="userPoints" class="font-black text-3xl text-yellow-400">0</span></div>
-        <div>Skuteczność: <span id="accuracy" class="font-black text-3xl text-yellow-400">0%</span></div>
       </div>
     </div>
   </div>
@@ -47,10 +44,7 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
   <div id="questionsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"></div>
 
   <div class="flex justify-center gap-4">
-    <button id="saveBtn" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 text-white py-4 px-12 rounded-xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all">
-      💾 ZAPISZ
-    </button>
-    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-12 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl transition-all">
+    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-10 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl transition-all">
       Wyloguj
     </button>
   </div>
@@ -59,117 +53,97 @@ body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: whi
 <script>
 // CONFIG
 const CLIENT_ID = '1483233223013302424';
-const BACKEND = 'https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
 
-let user = null, questions = [], selections = {};
+let user = null, questions = [], answers = {};
 
-// ===== LOGIN =====
-document.addEventListener('DOMContentLoaded', async () => {
-  const btn = document.getElementById('discordLogin');
-  btn.onclick = () => {
-    const redirect_uri = encodeURIComponent(window.location.origin + '/discord-callback.html');
-    window.open(`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`,'_self');
-  }
+// LOGIN
+document.getElementById('discordLogin').onclick = e => {
+  e.preventDefault();
+  const redirect_uri = encodeURIComponent(window.location.origin + '/dart/discord-callback.html');
+  const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`;
+  window.open(url,'_self');
+};
 
-  const hash = window.location.hash.substring(1);
-  if(hash){
-    const params = new URLSearchParams(hash);
-    const token = params.get('access_token');
-    if(token) await fetchUser(token);
-    window.history.replaceState({}, '', window.location.pathname);
-  }
-
-  if(await validateSession()) showDashboard();
-});
-
-async function fetchUser(token){
-  const res = await fetch('https://discord.com/api/users/@me',{
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  const data = await res.json();
-  user = {id:data.id, username:data.username, avatar:data.avatar, token, expires:Date.now()+3600*1000};
-  localStorage.setItem('jasnowidz_user',JSON.stringify(user));
-  showDashboard();
-}
-
-async function validateSession(){
-  const s = localStorage.getItem('jasnowidz_user');
-  if(!s) return false;
-  const u = JSON.parse(s);
-  if(u.expires<Date.now()){ localStorage.removeItem('jasnowidz_user'); return false; }
+async function validateSession() {
+  const saved = localStorage.getItem('typer_user');
+  if(!saved) return false;
+  const u = JSON.parse(saved);
+  if(u.expires && Date.now() > u.expires){ localStorage.removeItem('typer_user'); return false; }
   user = u; return true;
 }
 
 function showDashboard(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
-  document.getElementById('avatar').src=`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
-  document.getElementById('username').textContent=user.username;
+  document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
+  document.getElementById('username').textContent = user.username;
   loadQuestions();
 }
 
-// ===== LOAD QUESTIONS =====
 async function loadQuestions(){
-  const res = await fetch(`${BACKEND}?type=all`);
+  const res = await fetch(SHEET_API+'?type=all');
   const data = await res.json();
   questions = data.questions;
+  answers = data.answers[user.id] || {};
   renderQuestions();
+  calcPoints();
 }
 
 function renderQuestions(){
   const container = document.getElementById('questionsList');
-  selections = {};
   container.innerHTML = questions.map((q,i)=>{
+    const now = new Date();
     const deadline = new Date(q.deadline);
-    const expired = new Date()>deadline;
-    return `<div class="card p-6 rounded-2xl">
-      <div class="text-lg font-bold mb-4 ${expired?'deadline-expired':'deadline-active'}">${expired?'ROZSTRZYGNIĘTE':countdown(deadline)}</div>
-      <h3 class="text-xl font-bold mb-4">${q.match}<br>${q.question}</h3>
-      <div class="space-y-2">
-        ${q.options.map((opt,j)=>`<div class="option ${expired?'pending':''}" data-qid="${i}" data-optid="${j}">${String.fromCharCode(65+j)}: ${opt}</div>`).join('')}
+    const expired = now > deadline;
+    return `<div class="card p-6 rounded-2xl hover:shadow-2xl transition-all">
+      <div class="text-xl font-bold mb-4 text-center pb-2 border-b border-yellow-500/50 ${expired?'deadline-expired':'deadline-active'}">
+        ${expired?'✅ ROZSTRZYGNIĘTE':formatTime(deadline)}
+      </div>
+      <h3 class="text-xl font-bold mb-4 text-center">${q.question}</h3>
+      <div class="space-y-3 mb-4">
+        ${q.options.map((opt,j)=>{
+          let cls='', onclick='';
+          if(!expired){
+            onclick = `onclick="answerQuestion(${i},${j})"`;
+          }
+          if(q.correct!=null){
+            if(answers[i]==j && j==q.correct) cls='correct';
+            else if(answers[i]==j && j!=q.correct) cls='wrong';
+            else cls='waiting';
+          } else cls='waiting';
+          return `<div class="p-4 rounded-xl border-2 border-gray-600 cursor-pointer ${cls}" ${onclick}>${String.fromCharCode(65+j)}: ${opt}</div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
+}
 
-  document.querySelectorAll('.option').forEach(o=>{
-    o.onclick = () => {
-      const qid=o.dataset.qid,optid=o.dataset.optid;
-      if(new Date()>new Date(questions[qid].deadline)) return;
-      selections[qid]=Number(optid);
-      const opts = document.querySelectorAll(`.option[data-qid="${qid}"]`);
-      opts.forEach(x=>x.classList.remove('selected'));
-      o.classList.add('selected');
-    }
+function formatTime(d){
+  const diff = new Date(d)-new Date();
+  if(diff<=0) return "WYGASŁE";
+  const h=Math.floor(diff/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  const s=Math.floor((diff%60000)/1000);
+  return `${h}h ${m}m ${s}s`;
+}
+
+async function answerQuestion(qid,optid){
+  await fetch(SHEET_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'answer',userId:user.id,qid,answer:optid})});
+  answers[qid]=optid;
+  renderQuestions();
+  calcPoints();
+}
+
+function calcPoints(){
+  let pts=0;
+  questions.forEach((q,i)=>{
+    if(q.correct!=null && answers[i]==q.correct) pts+=q.points||1;
   });
+  document.getElementById('userPoints').textContent=pts;
 }
 
-// ===== COUNTDOWN =====
-function countdown(deadline){
-  const now = new Date();
-  const diff = deadline-now;
-  if(diff<=0) return 'WYGASŁO';
-  const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
-  return `${d}d ${h}h ${m}m ${s}s`;
-}
-setInterval(()=>document.querySelectorAll('.deadline-active').forEach(e=>{
-  const idx = Array.from(document.getElementById('questionsList').children).indexOf(e.closest('.card'));
-  if(idx>=0) e.textContent=countdown(new Date(questions[idx].deadline));
-}),1000);
-
-// ===== SAVE ANSWERS =====
-document.getElementById('saveBtn').onclick=async ()=>{
-  if(Object.keys(selections).length===0){ alert('Nie wybrano żadnej opcji!'); return; }
-  await fetch(BACKEND,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({action:'saveAnswers',user:{id:user.id,username:user.username,avatar:user.avatar},answers:selections})
-  });
-  alert('Typy zapisane ✅');
-  loadQuestions();
-}
-
-// ===== LOGOUT =====
-function logout(){ localStorage.removeItem('jasnowidz_user'); location.reload(); }
+function logout(){ localStorage.removeItem('typer_user'); location.reload(); }
 </script>
 </body>
 </html>
