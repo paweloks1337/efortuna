@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 body { background: linear-gradient(135deg,#1f1f1f 0%,#2b2b2b 100%); color:white; font-family:system-ui,sans-serif; }
-.card { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); border:1px solid rgba(239,68,68,0.3); }
+.card { background: rgba(31,41,55,0.95); backdrop-filter: blur(10px); border:1px solid rgba(239,68,68,0.3); }
 input, button { font-family: inherit; }
 </style>
 </head>
@@ -35,10 +35,9 @@ input, button { font-family: inherit; }
 </div>
 
 <script>
-const SHEET_API = 'https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl…/exec';
 let questions = [];
 
-// Pobierz listę pytań
 async function loadQuestions() {
   try {
     const res = await fetch(`${SHEET_API}?type=all`);
@@ -51,7 +50,6 @@ async function loadQuestions() {
   }
 }
 
-// Wyświetl pytania
 function renderQuestions() {
   const container = document.getElementById('questionsList');
   container.innerHTML = '';
@@ -71,7 +69,6 @@ function renderQuestions() {
   });
 }
 
-// Dodaj pytanie
 async function addQuestion(){
   const newQ = {
     match: document.getElementById('match').value,
@@ -103,10 +100,7 @@ async function addQuestion(){
     else{
       alert("Pytanie dodane!");
       loadQuestions();
-      // Czyść pola
-      document.getElementById('match').value='';
-      document.getElementById('question').value='';
-      ['optA','optB','optC','optD','points','deadline'].forEach(id=>document.getElementById(id).value='');
+      ['match','question','optA','optB','optC','optD','points','deadline'].forEach(id=>document.getElementById(id).value='');
     }
   } catch(e){
     console.error("Błąd fetch:", e);
@@ -114,7 +108,6 @@ async function addQuestion(){
   }
 }
 
-// Od razu załaduj pytania przy starcie
 loadQuestions();
 </script>
 </body>
