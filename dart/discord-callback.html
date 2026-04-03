@@ -1,25 +1,18 @@
 <!DOCTYPE html>
 <html>
 <body>
-
 <script>
-const hash = window.location.hash.substring(1);
-const params = new URLSearchParams(hash);
-const token = params.get("access_token");
-
+const hash=window.location.hash.substring(1);
+const params=new URLSearchParams(hash);
+const token=params.get("access_token");
 if(token){
-  fetch("https://discord.com/api/users/@me",{
-    headers:{Authorization:"Bearer "+token}
-  })
-  .then(r=>r.json())
-  .then(user=>{
-    localStorage.setItem("dc_user", JSON.stringify(user));
-    location.href="index.html";
-  });
-} else {
-  document.body.innerHTML="Błąd logowania.";
-}
+  fetch("https://discord.com/api/users/@me",{headers:{Authorization:"Bearer "+token}})
+    .then(r=>r.json())
+    .then(user=>{
+      localStorage.setItem("dc_user",JSON.stringify(user));
+      location.href="admin.html";
+    });
+}else{document.body.innerHTML="Błąd logowania Discord";}
 </script>
-
 </body>
 </html>
