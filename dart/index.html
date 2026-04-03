@@ -1,138 +1,117 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 Dart Typer</title>
-<style>
-body { margin:0; font-family:sans-serif; background:#0f0f0f; color:#fff; }
-header { background:#c40000; text-align:center; padding:12px; font-size:22px; }
-.container { max-width:600px; margin:0 auto; padding:12px; }
-.card { background:#1a1a1a; padding:12px; margin:12px 0; border-radius:10px; border-left:4px solid #c40000; }
-button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
-button.option { background:#333; color:#fff; margin:2px; }
-button.option.selected { background:#2196F3; color:#fff; }
-button.option.correct { background:#44ff44; color:#000; }
-button.option.wrong { background:#ff4444; color:#000; }
-input, select { width:100%; padding:8px; margin:4px 0; border-radius:6px; border:none; box-sizing:border-box; }
-#ranking { margin-top:20px; }
-.user-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #222; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Typer Dart Fantasy</title>
+  <style>
+    body {background:#0f0f0f;color:#ffd700;font-family:Arial,sans-serif;margin:0;padding:20px;}
+    button {background:#ffd700;color:#000;border:none;padding:12px 24px;margin:5px;cursor:pointer;border-radius:5px;font-weight:bold;}
+    button:hover {background:#ffed4a;}
+    .question {background:rgba(255,215,0,0.1);margin:20px 0;padding:20px;border:1px solid #ffd700;border-radius:10px;}
+    .deadline {color:#ff4444;font-weight:bold;}
+    .ranking {margin-top:40px;}
+    .rank-item {display:flex;justify-content:space-between;padding:10px;background:rgba(0,0,0,0.5);margin:5px 0;border-radius:5px;}
+    #login {text-align:center;padding:50px;}
+    #app {max-width:800px;margin:0 auto;}
+  </style>
 </head>
 <body>
-<header>🎯 Dart Typer</header>
-<div class="container" id="app">
-  <div id="status"></div>
-  <div id="questionsArea"></div>
-  <div id="ranking">
-    <h3>🏆 Ranking Globalny</h3>
-    <div id="rankingList">Ładowanie...</div>
+  <div id="login" style="display:none;">
+    <h1>🎯 Typer Dart Fantasy</h1>
+    <button onclick="loginDiscord()">🚀 Zaloguj Discord</button>
   </div>
-</div>
+  
+  <div id="app" style="display:none;">
+    <h1>🎯 Typer Dart <span id="username"></span></h1>
+    <div id="questions"></div>
+    <div id="ranking" class="ranking"></div>
+  </div>
 
-<script>
-const API = "https://script.google.com/macros/s/AKfycbwCZYbSsVUJFbnVVaDQiMOmwFvOSB8wyRIzRApCaJksgM_iOPgDRQ9owyq-P4icxjMXNA/exec";
-let user = JSON.parse(localStorage.getItem("dc_user")) || null;
-const app = document.getElementById('app');
-const status = document.getElementById('status');
+  <script>
+    const CLIENT_ID = '1483233223013302424';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzSZcvIbR3L76etNRasE13JV_hSD2eVPM_Fy4UaYtcU1TFel_IpTcc7ZtiE81B2WLfByw/exec';
+    let user = JSON.parse(localStorage.getItem('dc_user'));
 
-function showStatus(msg, error=false){
-  status.innerText = msg;
-  status.style.color = error ? "#ff4444" : "#44ff44";
-  setTimeout(()=>status.innerText='',5000);
-}
+    function loginDiscord() {
+      const REDIRECT = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
+      window.location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
+    }
 
-async function fetchData(){
-  try{
-    const res = await fetch(API);
-    const data = await res.json();
-    if(data.error) throw new Error(data.error);
-    return data;
-  }catch(err){
-    showStatus("Błąd ładowania: "+err.message,true);
-    return null;
-  }
-}
+    if (window.location.hash) {
+      // Callback obsługiwany w discord-callback.html
+      window.location.href = 'index.html';
+    }
 
-function renderQuestions(questions, answers){
-  const qArea = document.getElementById('questionsArea');
-  qArea.innerHTML = '';
-  const now = new Date();
-  questions.forEach(q=>{
-    const userAnswer = answers.find(a=>a.qid===q.id && a.userId===user.id);
-    const deadline = new Date(q.deadline);
-    const isLocked = now > deadline;
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML=`<b>${q.match}</b> | ${q.question}<br><small>${deadline.toLocaleString()}</small><div id="opts-${q.id}"></div>`;
-    qArea.appendChild(card);
-    const optsDiv = card.querySelector(`#opts-${q.id}`);
-    q.options.forEach(o=>{
-      const btn = document.createElement('button');
-      btn.innerText=o;
-      btn.className='option';
-      if(userAnswer && userAnswer.answer===o) btn.classList.add('selected');
-      if(isLocked){
-        btn.disabled=true;
-        if(q.correct){
-          if(o===q.correct) btn.classList.add('correct');
-          else if(userAnswer && userAnswer.answer===o && o!==q.correct) btn.classList.add('wrong');
-        }
+    async function loadApp() {
+      if (!user) return showLogin();
+      
+      document.getElementById('username').textContent = user.username;
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        
+        // Pytania
+        let qhtml = '';
+        data.questions.forEach(q => {
+          const now = Date.now();
+          const deadline = new Date(q.deadline).getTime();
+          const timeLeft = Math.max(0, Math.floor((deadline - now) / 1000));
+          
+          if (timeLeft > 0) {
+            const answered = data.answers.find(a => a.userId == user.id && a.qId == q.id);
+            qhtml += `
+              <div class="question">
+                <h3>${q.match}</h3>
+                <div class="deadline">⏱ ${Math.floor(timeLeft/3600)}h ${Math.floor((timeLeft%3600)/60)}m</div>
+                <p>${q.question}</p>
+                ${q.options.map((opt,i) => 
+                  `<button ${answered && answered.answer == i ? 'disabled style="background:#ccc"' : `onclick="saveAnswer(${q.id},${i})"}`}>${opt}</button>`
+                ).join('')}
+                ${answered ? `<div style="margin-top:10px;color:${answered.correct ? '#4f4' : '#f44'}">✓ Twój typ: ${q.options[answered.answer]} ${answered.correct ? '(+1pkt)' : '(0pkt)'}</div>` : ''}
+              </div>`;
+          }
+        });
+        document.getElementById('questions').innerHTML = qhtml || '<p>Brak aktywnych meczów.</p>';
+        
+        // Ranking TOP 10
+        data.users.sort((a,b) => b.points - a.points);
+        document.getElementById('ranking').innerHTML = `
+          <h2>🏆 Ranking (${data.users[0]?.points || 0} max pkt)</h2>
+          ${data.users.slice(0,10).map((u,i) => 
+            `<div class="rank-item">
+              <span>${i+1}. ${u.username}</span>
+              <span>${u.points} pkt (${u.played} typów)</span>
+            </div>`
+          ).join('')}`;
+          
+      } catch(err) {
+        console.error(err);
+        alert('Błąd ładowania: ' + err.message);
       }
-      btn.onclick=async()=>{ 
-        await submitAnswer(q.id,o);
-        renderQuestions(questions, [...answers.filter(a=>a.qid!==q.id), {userId:user.id,qid:q.id,answer:o}]);
-      };
-      optsDiv.appendChild(btn);
-    });
-  });
-}
-
-async function submitAnswer(qid, answer){
-  try{
-    await fetch(API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'answer',qid,userId:user.id,answer})
-    });
-  }catch(err){
-    showStatus("Błąd zapisu odpowiedzi",true);
-  }
-}
-
-function renderRanking(users, answers, questions){
-  const list = document.getElementById('rankingList');
-  const scoreMap={};
-  users.forEach(u=>{
-    let score=0;
-    answers.filter(a=>a.userId===u.id).forEach(a=>{
-      const q = questions.find(qq=>qq.id===a.qid);
-      if(q && q.correct===a.answer) score+=q.points;
-    });
-    scoreMap[u.username]=score;
-  });
-  const sorted = Object.entries(scoreMap).sort((a,b)=>b[1]-a[1]);
-  list.innerHTML=sorted.map(u=>`<div class="user-row"><span>${u[0]}</span><span>${u[1]} pkt</span></div>`).join('');
-}
-
-async function init(){
-  if(!user){
-    app.innerHTML='<div class="card"><button onclick="loginDiscord()" style="background:#5865f2;color:#fff;">🔐 Zaloguj Discord</button></div>';
-    return;
-  }
-  const data = await fetchData();
-  if(!data) return;
-  renderQuestions(data.questions,data.answers);
-  renderRanking(data.users,data.answers,data.questions);
-}
-
-function loginDiscord(){
-  const CLIENT_ID = "1483233223013302424";
-  const REDIRECT = encodeURIComponent(window.location.origin+"/discord-callback.html");
-  location.href=`https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
-}
-
-init();
-</script>
+    }
+    
+    async function saveAnswer(qId, answer) {
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'saveAnswer', userId: user.id, qId, answer})
+        });
+        loadApp();
+      } catch(err) {
+        alert('Błąd zapisu');
+      }
+    }
+    
+    function showLogin() {
+      document.getElementById('login').style.display = 'block';
+    }
+    
+    loadApp();
+  </script>
 </body>
 </html>
