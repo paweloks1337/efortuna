@@ -1,142 +1,199 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 Typer Dart</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body { background: linear-gradient(135deg,#1a051d 0%,#3c0d2d 100%); color:white; font-family:system-ui,sans-serif; }
-.card { background: rgba(50,0,30,0.85); backdrop-filter: blur(10px); border:1px solid rgba(239,68,68,0.3); }
-.correct { background: rgba(34,197,94,0.3); border-color: #10B981; }
-.wrong { background: rgba(239,68,68,0.3); border-color: #EF4444; }
-.pending { background: rgba(156,163,175,0.3); border-color: #9CA3AF; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Typer Dart</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #c40000;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .container {
+      padding: 12px;
+    }
+    .card {
+      background: #1a1a1a;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+    button {
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.02);
+    }
+    .btn-select { background: #333; color: white; }
+    .btn-save { background: #c40000; color: white; font-weight: bold; }
+    .correct { background: green !important; }
+    .wrong { background: red !important; }
+    .pending { background: gray !important; }
+    .timer { font-size: 14px; margin-top: 8px; opacity: 0.8; }
+    .login-btn {
+      background: #5865f2;
+      color: white;
+      padding: 12px;
+      font-size: 18px;
+      margin: 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    .rank {
+      background: #111;
+      padding: 10px;
+      margin: 12px;
+      border-radius: 10px;
+    }
+    .player {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .player img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body>
 
-<!-- LOGIN -->
-<div id="loginScreen" class="max-w-md mx-auto mt-16">
-  <div class="card p-8 rounded-2xl shadow-2xl text-center">
-    <h1 class="text-3xl font-bold mb-8">🎯 Typer Dart</h1>
-    <button id="discordLogin" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 text-black py-4 px-6 rounded-xl font-bold text-lg mb-4 shadow-lg">Zaloguj przez Discord</button>
-    <p id="status" class="text-gray-300 text-sm">Kliknij aby rozpocząć typowanie</p>
-  </div>
-</div>
+<header>🎯 TYPER DART</header>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden max-w-6xl mx-auto">
-  <div class="card p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center md:items-start">
-    <img id="avatar" class="w-24 h-24 rounded-full ring-4 ring-red-400">
-    <div class="flex-1 text-center md:text-left">
-      <h2 id="username" class="text-3xl font-bold mb-4"></h2>
-      <div class="flex flex-wrap gap-6 text-xl justify-center md:justify-start">
-        <div>Punkty: <span id="userPoints" class="font-black text-3xl text-red-400">0</span></div>
-        <div>Skuteczność: <span id="accuracy" class="font-black text-3xl text-red-400">0%</span></div>
-      </div>
-    </div>
-  </div>
+<div id="loginBox" class="container"></div>
 
-  <div id="questionsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"></div>
+<div id="questionsContainer" class="container"></div>
 
-  <div class="buttons-container flex justify-center gap-4">
-    <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white py-4 px-10 rounded-xl font-bold shadow-lg">Wyloguj</button>
-  </div>
-
-  <div class="card p-6 rounded-2xl mt-8">
-    <h2 class="text-2xl font-bold mb-4 text-center">🏆 Globalny Ranking</h2>
-    <div id="globalRanking" class="overflow-x-auto"></div>
-  </div>
+<div class="rank container">
+  <h3>🏆 Ranking</h3>
+  <div id="rankingList"></div>
 </div>
 
 <script>
-const CLIENT_ID='1483233223013302424';
-const SHEET_API='https://script.google.com/macros/s/AKfycbzMMcBHZaFYfslqMdBDW0u3T6uADWKDIJVrAvCfl9362ChLHhQ4pwqjRqW1G5vlU1JMBQ/exec';
-let user=null, questions=[], answers={};
+const API = "https://script.google.com/macros/s/AKfycbwLOFahdAvzVw7WDL1CSO8orf1euEABlLcpHSs-yRGQvbLeCPF7FwIXh8M1p4kN5U9F/exec";
 
-// LOGIN
-document.getElementById('discordLogin').onclick=e=>{
-  e.preventDefault();
-  const redirect_uri=encodeURIComponent(window.location.origin+'/dart/discord-callback.html');
-  const url=`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=token&scope=identify`;
-  window.location.href=url;
-};
+let user = JSON.parse(localStorage.getItem("dc_user")) || null;
+let selected = {};
 
-// LOAD SESSION
-document.addEventListener('DOMContentLoaded',async()=>{
-  const saved = localStorage.getItem('typer_user');
-  if(saved){ user=JSON.parse(saved); showDashboard(); loadQuestions(); loadRanking(); }
-});
-
-// SHOW DASHBOARD
-function showDashboard(){
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  document.getElementById('avatar').src=`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`;
-  document.getElementById('username').textContent=user.username;
+function showLogin() {
+  loginBox.innerHTML = `<button class="login-btn" onclick="loginDiscord()">Zaloguj przez Discord</button>`;
 }
 
-// LOGOUT
-function logout(){ localStorage.removeItem('typer_user'); location.reload(); }
-
-// LOAD QUESTIONS
-async function loadQuestions(){
-  try{
-    const res=await fetch(`${SHEET_API}?type=all`);
-    const data=await res.json();
-    questions=data.questions||[];
-    answers=data.answers||{};
-    renderQuestions();
-  }catch(e){ console.error(e);}
+function loginDiscord() {
+  const CLIENT_ID = "1483233223013302424";
+  const REDIRECT = encodeURIComponent("https://dcranking.pl/dart/discord-callback.html");
+  location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
 }
 
-// RENDER QUESTIONS
-function renderQuestions(){
-  const container=document.getElementById('questionsList');
-  container.innerHTML=questions.map(q=>{
-    const now=new Date(); const deadline=new Date(q.deadline);
-    const expired=now>deadline;
-    const userAnswer=(answers[user.id]||{})[q.id];
-    return `<div class="card p-4 rounded-xl">
-      <h3 class="font-bold mb-2">${q.match}<br>${q.question}</h3>
-      <div class="mb-2 text-sm">${formatTime(deadline)} | ${expired?'Zamknięte':'Otwarta'}</div>
-      <div class="flex flex-wrap gap-2">
-        ${q.options.map((opt,j)=>`
-          <button onclick="${expired||userAnswer!==undefined?'':'answerQuestion('+q.id+','+j+')'}"
-          class="px-3 py-1 rounded-xl ${userAnswer!==undefined?(userAnswer===q.correct?'correct':'wrong'):expired?'pending':''} border-2 border-gray-600 hover:border-red-400">${String.fromCharCode(65+j)}: ${opt}</button>`).join('')}
-      </div>
+function loadApp() {
+  loginBox.innerHTML = `<div>👤 ${user.username}</div>`;
+  fetch(API).then(r=>r.json()).then(data=>{
+    renderQuestions(data.questions);
+    renderRanking(data.users);
+  });
+}
+
+function renderQuestions(questions) {
+  let html = "";
+  questions.forEach(q => {
+    let now = Date.now();
+    let end = new Date(q.deadline).getTime();
+    let locked = now > end;
+    html += `<div class="card">
+      <div><b>${q.match}</b></div>
+      <div>${q.question}</div>
+      <div class="timer" id="timer${q.id}"></div>
+      ${q.options.map(o => `
+        <button class="btn-select ${q.correct ? (o === q.correct ? "correct":"wrong") : ""}" 
+          onclick="pick(${q.id}, '${o}')" ${locked ? 'disabled':''}>${o}</button>
+      `).join("")}
+      ${locked ? "" : `<button class="btn-save" onclick="saveAnswer(${q.id})">ZAPISZ</button>`}
     </div>`;
-  }).join('');
+  });
+  questionsContainer.innerHTML = html;
+  setInterval(()=>updateTimers(questions), 1000);
 }
 
-// FORMAT TIME
-function formatTime(date){
-  const diff=new Date(date)-new Date();
-  if(diff<0)return "WYGASŁE";
-  const d=Math.floor(diff/86400000);
-  const h=Math.floor(diff%86400000/3600000);
-  const m=Math.floor(diff%3600000/60000);
-  const s=Math.floor(diff%60000/1000);
-  return `${d}d ${h}h ${m}m ${s}s`;
+function pick(qid, val) {
+  selected[qid] = val;
 }
 
-// ANSWER QUESTION
-async function answerQuestion(qid,optid){
-  await fetch(SHEET_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'answer',userId:user.id,qid,answer:optid})});
-  loadQuestions(); loadRanking();
+function saveAnswer(qid) {
+  if(!selected[qid]) return alert("Wybierz opcję!");
+  fetch(API, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain"},
+    body:JSON.stringify({
+      action:"answer",
+      userId:user.id,
+      qid,
+      answer:selected[qid]
+    })
+  }).then(()=>alert("Zapisano!"));
 }
 
-// RANKING
-async function loadRanking(){
-  try{
-    const res=await fetch(`${SHEET_API}?type=all`);
-    const data=await res.json();
-    const users=data.users||[];
-    const table=`<table class="w-full text-left"><thead><tr class="border-b-2 border-red-400"><th>Nazwa</th><th>Punkty</th></tr></thead>
-      <tbody>${users.map(u=>`<tr class="border-b border-gray-600"><td>${u.Username}</td><td>${u.TotalPoints||0}</td></tr>`).join('')}</tbody></table>`;
-    document.getElementById('globalRanking').innerHTML=table;
-  }catch(e){ console.error(e);}
+function renderRanking(users) {
+  users.sort((a,b)=>b.points - a.points);
+  let html = "";
+  users.forEach(u => {
+    let avaUrl = u.avatar 
+      ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+      : "";
+    html += `<div class="player">
+      ${avaUrl ? `<img src="${avaUrl}">` : ""}
+      ${u.username} - ${u.points} pkt
+    </div>`;
+  });
+  rankingList.innerHTML = html;
 }
+
+function updateTimers(questions) {
+  questions.forEach(q => {
+    const el = document.getElementById("timer"+q.id);
+    if(!el) return;
+    let now = Date.now();
+    let end = new Date(q.deadline).getTime();
+    if(now >= end) {
+      el.textContent = "⛔ Zamknięte";
+    } else {
+      let diff = end - now;
+      let d = Math.floor(diff / 86400000);
+      let h = Math.floor((diff%86400000)/3600000);
+      let m = Math.floor((diff%3600000)/60000);
+      let s = Math.floor((diff%60000)/1000);
+      el.textContent = `⏱ ${d}d ${h}h ${m}m ${s}s`;
+    }
+  });
+}
+
+if(!user) showLogin();
+else loadApp();
 </script>
+
 </body>
 </html>
