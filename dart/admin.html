@@ -1,123 +1,146 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚙️ Admin Typer Dart</title>
-<style>
-body { margin:0; font-family:sans-serif; background:#0f0f0f; color:#fff; }
-header { background:#c40000; text-align:center; padding:12px; font-size:22px; }
-.container { max-width:600px; margin:0 auto; padding:12px; }
-input,button { width:100%; padding:10px; margin:6px 0; border:none; border-radius:8px; font-size:16px; box-sizing:border-box; }
-button { background:#c40000; color:#fff; font-weight:bold; cursor:pointer; }
-button:hover { background:#a00000; }
-button:disabled { background:#666; cursor:not-allowed; }
-.card { background:#1a1a1a; padding:15px; margin:12px 0; border-radius:10px; border-left:4px solid #c40000; }
-.user { padding:8px; background:#111; margin:6px 0; border-radius:6px; display:flex; justify-content:space-between; }
-.error { color:#ff4444; background:#331111; padding:10px; border-radius:6px; margin:10px 0; }
-.success { color:#44ff44; background:#113311; padding:10px; border-radius:6px; margin:10px 0; }
-#status { padding:10px; text-align:center; font-weight:bold; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚙️ Admin Typer Dart</title>
+  <style>
+    body {background:#0f0f0f;color:#ffd700;font-family:Arial,sans-serif;margin:0;padding:20px;}
+    button {background:#ffd700;color:#000;border:none;padding:12px 24px;margin:5px;cursor:pointer;border-radius:5px;font-weight:bold;}
+    button:hover {background:#ffed4a;}
+    form {background:rgba(255,215,0,0.1);padding:20px;border-radius:10px;margin:20px 0;max-width:500px;}
+    input,select {padding:10px;margin:5px 0;width:100%;background:#000;color:#ffd700;border:1px solid #ffd700;border-radius:5px;}
+    .match-item {background:rgba(255,215,0,0.1);padding:15px;margin:10px 0;border:1px solid #ffd700;border-radius:10px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+    .stats {font-size:0.9em;color:#aaa;}
+    #login {text-align:center;padding:50px;}
+    #adminPanel {max-width:1000px;margin:0 auto;}
+    #participants {margin-top:40px;}
+  </style>
 </head>
 <body>
-<header>⚙️ Admin Typer Dart</header>
-<div class="container" id="loginBox"></div>
-<div class="container" id="adminApp" style="display:none;"></div>
-<div id="status"></div>
-
-<script>
-const API = "https://script.google.com/macros/s/AKfycbwCZYbSsVUJFbnVVaDQiMOmwFvOSB8wyRIzRApCaJksgM_iOPgDRQ9owyq-P4icxjMXNA/exec";
-const ADMIN_ID = "1192231948173709453"; 
-let user = JSON.parse(localStorage.getItem("dc_user")) || null;
-const loginBox = document.getElementById('loginBox');
-const adminApp = document.getElementById('adminApp');
-const status = document.getElementById('status');
-
-function showStatus(msg,error=false){status.innerText=msg;status.style.color=error?"#ff4444":"#44ff44";setTimeout(()=>status.innerText='',5000);}
-function showLogin(){loginBox.innerHTML=`<div class="card"><button onclick="loginDiscord()" style="background:#5865f2;color:#fff;">🔐 Zaloguj Discord ADMIN</button></div>`;}
-
-async function loadAdmin(){
-  if(!user || user.id!==ADMIN_ID){showLogin();adminApp.style.display='none';return;}
-  adminApp.style.display='block';
-  loginBox.innerHTML=`<div class="success">✅ Zalogowany: ${user.username}</div>`;
-  adminApp.innerHTML=`
-  <div class="card">
-    <h3>➕ Dodaj mecz</h3>
-    <input id="match" placeholder="np. Littler vs Ratajski" required>
-    <input id="question" placeholder="Pytanie (opcjonalne)">
-    <input id="opt1" placeholder="Opcja 1 (np. 3-2)" required>
-    <input id="opt2" placeholder="Opcja 2">
-    <input id="opt3" placeholder="Opcja 3">
-    <input id="opt4" placeholder="Opcja 4">
-    <input id="deadline" type="datetime-local" required>
-    <input id="points" type="number" min="1" value="3" placeholder="Punkty">
-    <button onclick="addQ()">➕ DODAJ MECZ</button>
+  <div id="login" style="display:none;">
+    <h1>⚙️ Admin Typer Dart</h1>
+    <button onclick="loginDiscord()">🔐 Admin Login (Discord)</button>
   </div>
-  <div class="card" id="setCorrectArea"><h3>🎯 Ustaw wyniki</h3><div>Ładowanie...</div></div>
-  <div class="card"><h3>👥 Użytkownicy</h3><div id="usersArea">Ładowanie...</div></div>
-  `;
-  const res=await fetch(API);
-  const data=await res.json();
-  if(data.error){showStatus(data.error,true);return;}
-  renderSetCorrect(data.questions);
-  renderUsers(data.users||[],data.answers||[],data.questions||[]);
-}
+  
+  <div id="adminPanel" style="display:none;">
+    <h1>⚙️ Panel Admin</h1>
+    
+    <!-- DODAJ MECZ -->
+    <form id="addMatchForm">
+      <h3>➕ Nowy mecz</h3>
+      <input id="match" placeholder="Mecz: Littler vs van Gerwen" required>
+      <input id="question" placeholder="Pytanie: Kto wygra?" required>
+      <input id="options" placeholder='["Littler","Remis","van Gerwen"]' required>
+      <input id="deadline" type="datetime-local" required>
+      <button type="submit">🚀 DODAJ MECZ</button>
+    </form>
+    
+    <!-- LISTA MECZY -->
+    <div id="matches"><h2>📋 Mecze (Ustaw poprawną odpowiedź)</h2></div>
+    
+    <!-- UCZESTNICY -->
+    <div id="participants"><h2>👥 Uczestnicy (ile typów / punkty)</h2></div>
+  </div>
 
-async function addQ(){
-  const match=document.getElementById('match').value.trim();
-  const question=document.getElementById('question').value.trim();
-  const opt1=document.getElementById('opt1').value.trim();
-  const opt2=document.getElementById('opt2').value.trim();
-  const opt3=document.getElementById('opt3').value.trim();
-  const opt4=document.getElementById('opt4').value.trim();
-  const deadline=document.getElementById('deadline').value;
-  const points=parseInt(document.getElementById('points').value)||1;
-  if(!match||!opt1||!deadline){showStatus("Wypełnij: mecz, opcja 1, termin!",true);return;}
-  try{
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'addQuestion',match,question:question||"Przewidź wynik",options:[opt1,opt2,opt3,opt4].filter(o=>o),deadline,points})});
-    const result=await res.json();
-    if(result.success) showStatus("✅ Mecz dodany! "+match); else throw new Error(result.error||"Błąd serwera");
-    setTimeout(()=>loadAdmin(),1500);
-  }catch(err){showStatus("❌ "+err.message,true);}
-}
+  <script>
+    const CLIENT_ID = '1483233223013302424';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzfWxes2iE8DSICgtG4Ekme3YJvHQGkz2EXXbL87u4auz-zDkyMfAbTXS9DARixcejdNQ/exec';
+    const ADMIN_ID = '1483233223013302424';
+    let user = JSON.parse(localStorage.getItem('dc_user'));
 
-function renderSetCorrect(qs){
-  const area=document.getElementById('setCorrectArea');
-  let html='';
-  qs.forEach(q=>{
-    html+=`<div style="margin:10px 0;padding:10px;background:#111;border-radius:6px;">
-    <b>${q.match}</b> | ${q.deadline?new Date(q.deadline).toLocaleString('pl-PL'):'brak'}<br>
-    ${q.question}<br>
-    ${q.options.map((o,i)=>`<button onclick="setCorrect(${q.id},'${o.replace(/'/g,"\\'")}')" style="margin:2px;padding:6px;font-size:14px;background:#333;color:white;border:none;border-radius:4px;cursor:pointer;">${o}</button>`).join('')}
-    <div style="margin-top:8px;color:#ccc;font-size:14px;">Aktualnie: ${q.correct||"⏳ nie ustawiono"}</div>
-    </div>`;
-  });
-  area.innerHTML=html||'<div>Brak meczów</div>';
-}
+    function loginDiscord() {
+      const REDIRECT = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
+      window.location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
+    }
 
-async function setCorrect(qid,val){
-  try{
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'setCorrect',qid,correct:val})});
-    const result=await res.json();
-    if(result.success) showStatus("✅ Wynik ustawiony!"); else showStatus("Błąd: "+result.error,true);
-    setTimeout(()=>loadAdmin(),500);
-  }catch(err){showStatus("Błąd: "+err.message,true);}
-}
-
-function renderUsers(users,answers,qs){
-  const area=document.getElementById('usersArea');
-  let html='';
-  users.forEach(u=>{
-    const userAnswers=answers.filter(a=>a.userId==u.id);
-    const correctCount=userAnswers.filter(a=>qs.find(q=>q.id==a.qid && q.correct===a.answer)).length;
-    html+=`<div class="user">${u.username} <span>${correctCount}/${userAnswers.length} poprawnych</span></div>`;
-  });
-  area.innerHTML=html||"Brak użytkowników";
-}
-
-function loginDiscord(){const CLIENT_ID="1483233223013302424";const REDIRECT=encodeURIComponent(window.location.origin+"/discord-callback.html");location.href=`https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;}
-
-if(!user) showLogin(); else loadAdmin();
-</script>
+    async function loadAdmin() {
+      if (!user || user.id !== ADMIN_ID) {
+        alert('🚫 Brak dostępu do panelu admina!');
+        return showLogin();
+      }
+      
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        
+        // Mecze
+        let mhtml = '';
+        data.questions.forEach(q => {
+          mhtml += `
+            <div class="match-item">
+              <div>
+                <strong>${q.match}</strong><br>
+                <span class="stats">Deadline: ${q.deadline} | Typów: ${q.participants}/${data.users.length} | Aktywne: ${q.active ? '✅' : '⏸️'}</span>
+              </div>
+              <div>${q.question}</div>
+              <select onchange="setCorrect(${q.id},this.value)">
+                <option value="">Poprawna: ${q.correct !== '' ? q.options[q.correct] : 'USTAW'}</option>
+                ${q.options.map((opt,i) => `<option value="${i}">${opt}</option>`).join('')}
+              </select>
+            </div>`;
+        });
+        document.getElementById('matches').innerHTML = '<h2>📋 Mecze</h2>' + (mhtml || 'Brak meczów');
+        
+        // Uczestnicy z typami/punktami
+        let phtml = '';
+        data.users.forEach(u => {
+          const uAnswers = data.answers.filter(a => a.userId == u.id);
+          phtml += `<div class="rank-item">
+            ${u.username}: ${uAnswers.length} typów, ${u.points} pkt
+            ${uAnswers.map(a => `<small>Q${a.qId}:${a.correct?'✅':'❌'}</small>`).join(' ')}
+          </div>`;
+        });
+        document.getElementById('participants').innerHTML = '<h2>👥 Uczestnicy</h2>' + phtml;
+        
+      } catch(err) {
+        alert('Błąd: ' + err.message);
+      }
+    }
+    
+    async function setCorrect(qId, correct) {
+      if (!confirm('Ustawić poprawną odpowiedź? Ranking się zaktualizuje!')) return;
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'setCorrect', qId: parseInt(qId), correct: parseInt(correct)})
+      });
+      alert('✅ Poprawna odpowiedź ustawiona! Punkty zaktualizowane.');
+      loadAdmin();
+    }
+    
+    document.getElementById('addMatchForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        const options = JSON.parse(document.getElementById('options').value);
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            action: 'addMatch',
+            match: document.getElementById('match').value,
+            question: document.getElementById('question').value,
+            options,
+            deadline: document.getElementById('deadline').value
+          })
+        });
+        alert('✅ Mecz dodany!');
+        loadAdmin();
+        e.target.reset();
+      } catch(err) {
+        alert('Błąd JSON opcji: ' + err.message);
+      }
+    });
+    
+    function showLogin() {
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+    
+    loadAdmin();
+  </script>
 </body>
 </html>
