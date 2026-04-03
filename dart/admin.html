@@ -32,8 +32,11 @@
     const ADMIN_ID = '1192231948173709453';
     let user = JSON.parse(localStorage.getItem('dc_user') || 'null');
 
-    function login() {
-      const redirect = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
+    function loginDiscord() {
+  localStorage.setItem('login_from', 'admin.html'); // 👈 DODAJ TO
+  const REDIRECT = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
+  // reszta...
+}
       window.location = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${redirect}`;
     }
 
