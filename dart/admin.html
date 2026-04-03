@@ -27,14 +27,22 @@
     <h1>⚙️ Panel Admin</h1>
     
     <!-- DODAJ MECZ -->
-    <form id="addMatchForm">
-      <h3>➕ Nowy mecz</h3>
-      <input id="match" placeholder="Mecz: Littler vs van Gerwen" required>
-      <input id="question" placeholder="Pytanie: Kto wygra?" required>
-      <input id="options" placeholder='["Littler","Remis","van Gerwen"]' required>
-      <input id="deadline" type="datetime-local" required>
-      <button type="submit">🚀 DODAJ MECZ</button>
-    </form>
+    <!-- ➕ NOWY MECZ - POPRAWIONE POLE OPTIONS -->
+<form id="addMatchForm">
+  <h3>➕ Nowy mecz</h3>
+  <input id="match" placeholder="Mecz: Littler vs van Gerwen" required>
+  <input id="question" placeholder="Pytanie: Kto wygra?" required>
+  
+  <!-- 🎯 POPRAWIONE - 3 przyciski zamiast JSON -->
+  <div style="display:flex;gap:10px;">
+    <input id="opt1" placeholder="Opcja 1: Littler" required>
+    <input id="opt2" placeholder="Opcja 2: Remis">
+    <input id="opt3" placeholder="Opcja 3: van Gerwen">
+  </div>
+  
+  <input id="deadline" type="datetime-local" required>
+  <button type="submit">🚀 DODAJ MECZ</button>
+</form>
     
     <!-- LISTA MECZY -->
     <div id="matches"><h2>📋 Mecze (Ustaw poprawną odpowiedź)</h2></div>
