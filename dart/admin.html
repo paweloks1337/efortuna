@@ -1,116 +1,125 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏆 Typer Dart - Panel Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body { background: linear-gradient(135deg,#1f1f1f 0%,#2b2b2b 100%); color:white; font-family:system-ui,sans-serif; }
-.card { background: rgba(31,41,55,0.95); backdrop-filter: blur(10px); border:1px solid rgba(239,68,68,0.3); }
-input, button { font-family: inherit; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚙️ Admin Typer Dart</title>
+  <style>
+    body { background:#0f0f0f; color:#fff; font-family:sans-serif; margin:0; padding:0; }
+    header { background:#c40000; padding:12px; text-align:center; font-size:22px; }
+    .container { padding:12px; }
+    input,button { width:100%; padding:10px; margin:6px 0; border:none; border-radius:8px; font-size:16px; }
+    button { background:#c40000; color:#fff; font-weight:bold; cursor:pointer; }
+    .card { background:#1a1a1a; padding:10px; margin-top:12px; border-radius:10px; }
+    .user { padding:6px; background:#111; margin-top:6px; border-radius:6px; }
+  </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
-<div class="max-w-4xl mx-auto">
-  <h1 class="text-4xl font-bold mb-8 text-center text-red-500">🏆 Typer Dart - Panel Admin</h1>
+<body>
 
-  <!-- Dodawanie meczu -->
-  <div class="card p-6 rounded-2xl mb-12">
-    <h2 class="text-2xl font-bold mb-4 text-red-400">➕ Dodaj nowy mecz</h2>
-    <input id="match" placeholder="Np. Littler vs Ratajski" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
-    <input id="question" placeholder="Np. Kto wygra?" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <input id="optA" placeholder="Opcja 1" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
-      <input id="optB" placeholder="Opcja 2" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
-      <input id="optC" placeholder="Opcja 3 (opcjonalnie)" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
-      <input id="optD" placeholder="Opcja 4 (opcjonalnie)" class="p-3 rounded-xl border border-gray-600 bg-gray-900 text-white">
-    </div>
-    <input id="points" type="number" placeholder="Punkty za poprawną odpowiedź" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
-    <input id="deadline" type="datetime-local" class="w-full p-3 rounded-xl mb-4 border border-gray-600 bg-gray-900 text-white">
-    <button onclick="addQuestion()" class="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all">➕ Dodaj mecz</button>
-  </div>
+<header>⚙️ Admin Typer Dart</header>
 
-  <!-- Lista pytań -->
-  <div id="questionsList" class="space-y-4"></div>
-</div>
+<div id="loginBox" class="container"></div>
+
+<div id="adminApp" class="container"></div>
 
 <script>
-const SHEET_API = "TU_WKLEJ_URL_Z_APPS_SCRIPT";
-let questions = [];
+const API = "https://script.google.com/macros/s/AKfycbwLOFahdAvzVw7WDL1CSO8orf1euEABlLcpHSs-yRGQvbLeCPF7FwIXh8M1p4kN5U9F/exec";
+const ADMIN_ID = "1483233223013302424"; // wpisz swoje
 
-async function loadQuestions() {
-  try {
-    const res = await fetch(`${SHEET_API}?type=all`);
-    const data = await res.json();
-    questions = data.questions || [];
-    renderQuestions();
-  } catch(e){
-    console.error("Błąd ładowania pytań:", e);
-    alert("Nie udało się pobrać pytań!");
-  }
+let user = JSON.parse(localStorage.getItem("dc_user")) || null;
+
+function showLogin() {
+  loginBox.innerHTML = `<button onclick="loginDiscord()" style="background:#5865f2;color:#fff;padding:10px;width:100%;border-radius:8px;font-size:16px;">Zaloguj Discord ADMIN</button>`;
 }
 
-function renderQuestions() {
-  const container = document.getElementById('questionsList');
-  container.innerHTML = '';
-  questions.forEach((q,i) => {
-    const now = new Date();
-    const deadline = new Date(q.deadline);
-    const expired = now > deadline;
-    const card = document.createElement('div');
-    card.className = 'card p-4 rounded-2xl';
-    card.innerHTML = `
-      <h3 class="text-xl font-bold mb-2">${q.match}</h3>
-      <p class="mb-2">${q.question}</p>
-      <div class="flex flex-wrap gap-2 mb-2">${q.options.map((o,j)=>`<span class="px-2 py-1 border rounded-xl ${expired ? 'bg-gray-700 text-gray-300' : 'bg-gray-900 text-white'}">[${j+1}] ${o}</span>`).join('')}</div>
-      <div class="text-sm text-gray-300">Deadline: ${deadline.toLocaleString()} | Punkty: ${q.points}</div>
-    `;
-    container.appendChild(card);
-  });
+function loginDiscord(){
+  const CLIENT_ID = "1483233223013302424";
+  const REDIRECT = encodeURIComponent("https://dcranking.pl/dart/discord-callback.html");
+  location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
 }
 
-async function addQuestion(){
-  const newQ = {
-    action: "addQuestion",
-    match: document.getElementById('match').value,
-    question: document.getElementById('question').value,
-    options: [
-      document.getElementById('optA').value,
-      document.getElementById('optB').value,
-      document.getElementById('optC').value,
-      document.getElementById('optD').value
-    ].filter(o => o),
-    deadline: document.getElementById('deadline').value,
-    points: parseInt(document.getElementById('points').value)
-  };
-
-  if(!newQ.match || !newQ.question || newQ.options.length < 2 || !newQ.deadline || !newQ.points){
-    alert("Wypełnij wszystkie pola!");
+function loadAdmin(){
+  if(!user || user.id !== ADMIN_ID){
+    adminApp.innerHTML = "<h3>Brak dostępu</h3>";
     return;
   }
 
-  try {
-    const res = await fetch(SHEET_API, {
-      method:'POST',
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(newQ)
-    });
-    const data = await res.json();
-    if(data.success){
-      alert("Pytanie dodane!");
-      loadQuestions();
-      ['match','question','optA','optB','optC','optD','points','deadline'].forEach(id=>document.getElementById(id).value='');
-    } else {
-      alert("Błąd: " + (data.error || "Nieznany"));
-    }
-  } catch(e){
-    console.error(e);
-    alert("Nie udało się dodać pytania!");
-  }
+  adminApp.innerHTML = `
+    <h3>Dodaj mecz</h3>
+    <input id="match" placeholder="np. Littler vs Ratajski">
+    <input id="question" placeholder="Pytanie">
+    <input id="opt1" placeholder="Opcja 1">
+    <input id="opt2" placeholder="Opcja 2">
+    <input id="opt3" placeholder="Opcja 3">
+    <input id="opt4" placeholder="Opcja 4">
+    <input id="deadline" type="datetime-local">
+    <input id="points" type="number" placeholder="Punkty">
+    <button onclick="addQ()">Dodaj mecz</button>
+
+    <div class="card" id="setCorrectArea"></div>
+
+    <h3>Użytkownicy</h3><div id="usersArea"></div>
+  `;
+
+  fetch(API).then(r=>r.json()).then(data=>{
+    renderSetCorrect(data.questions);
+    renderUsers(data.users, data.answers, data.questions);
+  });
 }
 
-loadQuestions();
+function addQ(){
+  fetch(API,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain"},
+    body:JSON.stringify({
+      action:"addQuestion",
+      match:match.value,
+      question:question.value,
+      options:[opt1.value,opt2.value,opt3.value,opt4.value],
+      deadline:new Date(deadline.value).toISOString(),
+      points:points.value
+    })
+  }).then(()=>location.reload());
+}
+
+function renderSetCorrect(qs){
+  let html="";
+  qs.forEach(q=>{
+    html += `
+      <div class="card">
+        <b>${q.match}</b><br>${q.question}
+        ${q.options.map(o=>`<button onclick="setCorrect(${q.id},'${o}')">${o}</button>`).join("")}
+        <div>Aktualna: ${q.correct || "brak"}</div>
+      </div>
+    `;
+  });
+  setCorrectArea.innerHTML = html;
+}
+
+function setCorrect(qid,val){
+  fetch(API,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain"},
+    body:JSON.stringify({
+      action:"setCorrect",
+      qid,
+      correct:val
+    })
+  }).then(()=>alert("Ustawiono!"));
+}
+
+function renderUsers(users, answers, qs){
+  let html="";
+  users.forEach(u=>{
+    const userAnswers = answers.filter(a=>a.userId == u.id);
+    html += `<div class="user">${u.username} - typów: ${userAnswers.length}/${qs.length}</div>`;
+  });
+  usersArea.innerHTML = html;
+}
+
+if(!user) showLogin();
+else loadAdmin();
 </script>
+
 </body>
 </html>
