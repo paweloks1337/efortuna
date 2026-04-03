@@ -3,21 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <title>Discord Login Callback</title>
+<style>body{background:#36393f;color:#fff;font-family:Arial;text-align:center;padding:50px;font-size:18px;}</style>
 </head>
 <body>
+  <div>🔄 Logowanie Discord... <span id="status">⏳</span></div>
+  
 <script>
 const hash = window.location.hash.substring(1);
 const params = new URLSearchParams(hash);
 const token = params.get("access_token");
+
 if(token){
-  fetch("https://discord.com/api/users/@me",{headers:{Authorization:"Bearer "+token}})
+  document.getElementById('status').textContent = '✅';
+  
+  fetch("https://discord.com/api/users/@me",{
+    headers:{Authorization:"Bearer "+token}
+  })
   .then(r=>r.json())
   .then(user=>{
     localStorage.setItem("dc_user",JSON.stringify(user));
-    location.href="index.html";
+    
+    // 👇 INTELIGENTNE PRZENOSZENIE!
+    const from = localStorage.getItem('login_from') || 'index.html';
+    localStorage.removeItem('login_from');
+    
+    if(from === 'admin.html' && user.id === '1483233223013302424'){
+      location.href = "admin.html";
+    } else {
+      location.href = "index.html";
+    }
+  })
+  .catch(err=>{
+    document.getElementById('status').textContent = '❌ Błąd!';
+    document.body.innerHTML += '<br>Błąd: ' + err;
   });
-}else{
-  document.body.innerHTML="Błąd logowania Discord.";
+} else {
+  document.body.innerHTML = "❌ Błąd logowania Discord - brak tokenu";
 }
 </script>
 </body>
