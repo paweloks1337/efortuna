@@ -7,119 +7,199 @@
   <style>
     body { background:#0f0f0f; color:#fff; font-family:sans-serif; margin:0; padding:0; }
     header { background:#c40000; padding:12px; text-align:center; font-size:22px; }
-    .container { padding:12px; }
-    input,button { width:100%; padding:10px; margin:6px 0; border:none; border-radius:8px; font-size:16px; }
+    .container { max-width:600px; margin:0 auto; padding:12px; }
+    input,button { width:100%; padding:10px; margin:6px 0; border:none; border-radius:8px; font-size:16px; box-sizing:border-box; }
     button { background:#c40000; color:#fff; font-weight:bold; cursor:pointer; }
-    .card { background:#1a1a1a; padding:10px; margin-top:12px; border-radius:10px; }
-    .user { padding:6px; background:#111; margin-top:6px; border-radius:6px; }
+    button:hover { background:#a00000; }
+    button:disabled { background:#666; cursor:not-allowed; }
+    .card { background:#1a1a1a; padding:15px; margin:12px 0; border-radius:10px; border-left:4px solid #c40000; }
+    .user { padding:8px; background:#111; margin:6px 0; border-radius:6px; display:flex; justify-content:space-between; }
+    .error { color:#ff4444; background:#331111; padding:10px; border-radius:6px; margin:10px 0; }
+    .success { color:#44ff44; background:#113311; padding:10px; border-radius:6px; margin:10px 0; }
+    #status { padding:10px; text-align:center; font-weight:bold; }
   </style>
 </head>
 <body>
-
 <header>⚙️ Admin Typer Dart</header>
-
 <div id="loginBox" class="container"></div>
-
-<div id="adminApp" class="container"></div>
+<div id="adminApp" class="container" style="display:none;"></div>
+<div id="status"></div>
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbwLOFahdAvzVw7WDL1CSO8orf1euEABlLcpHSs-yRGQvbLeCPF7FwIXh8M1p4kN5U9F/exec";
-const ADMIN_ID = "1192231948173709453"; // wpisz swoje
-
+const ADMIN_ID = "1483233223013302424"; 
 let user = JSON.parse(localStorage.getItem("dc_user")) || null;
+const loginBox = document.getElementById('loginBox');
+const adminApp = document.getElementById('adminApp');
+const status = document.getElementById('status');
+
+function showStatus(msg, isError=false) {
+  status.innerHTML = msg;
+  status.className = isError ? 'error' : 'success';
+  setTimeout(()=>status.innerHTML='', 5000);
+}
 
 function showLogin() {
-  loginBox.innerHTML = `<button onclick="loginDiscord()" style="background:#5865f2;color:#fff;padding:10px;width:100%;border-radius:8px;font-size:16px;">Zaloguj Discord ADMIN</button>`;
+  loginBox.innerHTML = `<div class="card">
+    <button onclick="loginDiscord()" style="background:#5865f2;color:#fff;">🔐 Zaloguj Discord ADMIN</button>
+    <div style="font-size:14px;margin-top:10px;">${user ? 'Nie jesteś adminem' : 'Wymagane logowanie'}</div>
+  </div>`;
+}
+
+async function loadAdmin(){
+  if(!user || user.id !== ADMIN_ID){
+    showLogin();
+    adminApp.style.display = 'none';
+    return;
+  }
+  adminApp.style.display = 'block';
+  loginBox.innerHTML = `<div class="success">✅ Zalogowany: ${user.username}</div>`;
+
+  adminApp.innerHTML = `
+    <div class="card">
+      <h3>➕ Dodaj mecz</h3>
+      <input id="match" placeholder="np. Littler vs Ratajski" required>
+      <input id="question" placeholder="Pytanie (opcjonalne)">
+      <input id="opt1" placeholder="Opcja 1 (np. 3-2)" required>
+      <input id="opt2" placeholder="Opcja 2">
+      <input id="opt3" placeholder="Opcja 3">
+      <input id="opt4" placeholder="Opcja 4">
+      <input id="deadline" type="datetime-local" required>
+      <input id="points" type="number" min="1" value="3" placeholder="Punkty">
+      <button id="addBtn" onclick="addQ()">➕ DODAJ MECZ</button>
+    </div>
+    <div class="card" id="setCorrectArea"><h3>🎯 Ustaw wyniki</h3><div>Ładowanie...</div></div>
+    <div class="card"><h3>👥 Użytkownicy</h3><div id="usersArea">Ładowanie...</div></div>
+  `;
+
+  try {
+    const res = await fetch(API);
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    renderSetCorrect(data.questions);
+    renderUsers(data.users || [], data.answers || [], data.questions || []);
+  } catch(err) {
+    showStatus("Błąd ładowania: " + err.message, true);
+  }
+}
+
+async function addQ(){
+  const addBtn = document.getElementById('addBtn');
+  const matchEl = document.getElementById('match');
+  const questionEl = document.getElementById('question');
+  const opt1El = document.getElementById('opt1');
+  const opt2El = document.getElementById('opt2');
+  const opt3El = document.getElementById('opt3');
+  const opt4El = document.getElementById('opt4');
+  const deadlineEl = document.getElementById('deadline');
+  const pointsEl = document.getElementById('points');
+
+  const match = matchEl.value.trim();
+  const question = questionEl.value.trim();
+  const opt1 = opt1El.value.trim();
+  const opt2 = opt2El.value.trim();
+  const opt3 = opt3El.value.trim();
+  const opt4 = opt4El.value.trim();
+  const deadline = deadlineEl.value;
+  const points = parseInt(pointsEl.value) || 1;
+
+  if(!match || !opt1 || !deadline) {
+    showStatus("Wypełnij: mecz, opcja 1, termin!", true);
+    return;
+  }
+
+  addBtn.disabled = true;
+  addBtn.textContent = "Dodawanie...";
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "addQuestion",
+        match,
+        question: question || "Przewidź wynik",
+        options: [opt1, opt2, opt3, opt4].filter(o=>o),
+        deadline,
+        points
+      })
+    });
+    
+    const result = await res.json();
+    if(result.success) {
+      showStatus("✅ Mecz dodany! " + match);
+      matchEl.value = questionEl.value = opt1El.value = opt2El.value = opt3El.value = opt4El.value = deadlineEl.value = '';
+      setTimeout(()=>location.reload(), 1500);
+    } else {
+      throw new Error(result.error || "Błąd serwera");
+    }
+  } catch(err) {
+    showStatus("❌ " + err.message, true);
+    console.error("addQ error:", err);
+  } finally {
+    addBtn.disabled = false;
+    addBtn.textContent = "➕ DODAJ MECZ";
+  }
+}
+
+function renderSetCorrect(qs) {
+  let html = "";
+  qs.forEach(q => {
+    html += `
+      <div style="margin:10px 0;padding:10px;background:#111;border-radius:6px;">
+        <b>${q.match}</b> | ${q.deadline ? new Date(q.deadline).toLocaleString('pl-PL') : 'brak'}<br>
+        ${q.question}<br>
+        ${q.options.map((o, i) => 
+          `<button onclick="setCorrect(${q.id},'${o.replace(/'/g,"\\'")}')" 
+                  style="margin:2px;padding:6px;font-size:14px;background:#333;color:white;border:none;border-radius:4px;cursor:pointer;">${o}</button>`
+        ).join("")}
+        <div style="margin-top:8px;color:#ccc;font-size:14px;">Aktualnie: ${q.correct || "⏳ nie ustawiono"}</div>
+      </div>
+    `;
+  });
+  document.getElementById('setCorrectArea').innerHTML = html || '<div>Brak meczów</div>';
+}
+
+async function setCorrect(qid, val) {
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "setCorrect", qid, correct: val })
+    });
+    const result = await res.json();
+    if(result.success) showStatus("✅ Wynik ustawiony!");
+    else showStatus("Błąd: " + result.error, true);
+    location.reload();
+  } catch(err) {
+    showStatus("Błąd: " + err.message, true);
+  }
+}
+
+function renderUsers(users, answers, qs) {
+  let html = "";
+  users.forEach(u => {
+    const userAnswers = answers.filter(a => a.userId == u.id);
+    const correctCount = userAnswers.filter(a => {
+      const q = qs.find(qq => qq.id == a.qid);
+      return q && q.correct === a.answer;
+    }).length;
+    html += `<div class="user">
+      ${u.username} 
+      <span>${correctCount}/${userAnswers.length} poprawnych (${Math.round(correctCount/userAnswers.length*100)||0}%)</span>
+    </div>`;
+  });
+  document.getElementById('usersArea').innerHTML = html || "Brak użytkowników";
 }
 
 function loginDiscord(){
   const CLIENT_ID = "1483233223013302424";
-  const REDIRECT = encodeURIComponent("https://dcranking.pl/dart/discord-callback.html");
+  const REDIRECT = encodeURIComponent(window.location.origin + window.location.pathname + "#");
   location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
-}
-
-function loadAdmin(){
-  if(!user || user.id !== ADMIN_ID){
-    adminApp.innerHTML = "<h3>Brak dostępu</h3>";
-    return;
-  }
-
-  adminApp.innerHTML = `
-    <h3>Dodaj mecz</h3>
-    <input id="match" placeholder="np. Littler vs Ratajski">
-    <input id="question" placeholder="Pytanie">
-    <input id="opt1" placeholder="Opcja 1">
-    <input id="opt2" placeholder="Opcja 2">
-    <input id="opt3" placeholder="Opcja 3">
-    <input id="opt4" placeholder="Opcja 4">
-    <input id="deadline" type="datetime-local">
-    <input id="points" type="number" placeholder="Punkty">
-    <button onclick="addQ()">Dodaj mecz</button>
-
-    <div class="card" id="setCorrectArea"></div>
-
-    <h3>Użytkownicy</h3><div id="usersArea"></div>
-  `;
-
-  fetch(API).then(r=>r.json()).then(data=>{
-    renderSetCorrect(data.questions);
-    renderUsers(data.users, data.answers, data.questions);
-  });
-}
-
-function addQ(){
-  fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"text/plain"},
-    body:JSON.stringify({
-      action:"addQuestion",
-      match:match.value,
-      question:question.value,
-      options:[opt1.value,opt2.value,opt3.value,opt4.value],
-      deadline:new Date(deadline.value).toISOString(),
-      points:points.value
-    })
-  }).then(()=>location.reload());
-}
-
-function renderSetCorrect(qs){
-  let html="";
-  qs.forEach(q=>{
-    html += `
-      <div class="card">
-        <b>${q.match}</b><br>${q.question}
-        ${q.options.map(o=>`<button onclick="setCorrect(${q.id},'${o}')">${o}</button>`).join("")}
-        <div>Aktualna: ${q.correct || "brak"}</div>
-      </div>
-    `;
-  });
-  setCorrectArea.innerHTML = html;
-}
-
-function setCorrect(qid,val){
-  fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"text/plain"},
-    body:JSON.stringify({
-      action:"setCorrect",
-      qid,
-      correct:val
-    })
-  }).then(()=>alert("Ustawiono!"));
-}
-
-function renderUsers(users, answers, qs){
-  let html="";
-  users.forEach(u=>{
-    const userAnswers = answers.filter(a=>a.userId == u.id);
-    html += `<div class="user">${u.username} - typów: ${userAnswers.length}/${qs.length}</div>`;
-  });
-  usersArea.innerHTML = html;
 }
 
 if(!user) showLogin();
 else loadAdmin();
 </script>
-
 </body>
 </html>
