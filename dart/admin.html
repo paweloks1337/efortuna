@@ -3,196 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚙️ Admin Typer Dart</title>
-  <style>
-    body {background:#0f0f0f;color:#ffd700;font-family:Arial,sans-serif;margin:0;padding:20px;}
-    button {background:#ffd700;color:#000;border:none;padding:12px 24px;margin:5px;cursor:pointer;border-radius:5px;font-weight:bold;}
-    button:hover {background:#ffed4a;}
-    button:disabled {background:#666;}
-    form {background:rgba(255,215,0,0.1);padding:20px;border-radius:10px;margin:20px 0;max-width:500px;}
-    input,select {padding:10px;margin:5px 0;width:100%;background:#000;color:#ffd700;border:1px solid #ffd700;border-radius:5px;box-sizing:border-box;}
-    .match-item {background:rgba(255,215,0,0.1);padding:15px;margin:10px 0;border:1px solid #ffd700;border-radius:10px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
-    .stats {font-size:0.9em;color:#aaa;}
-    #login {text-align:center;padding:50px;}
-    #adminPanel {max-width:1000px;margin:0 auto;}
-    #participants .rank-item {justify-content:flex-start;}
-    .success {color:#4f4 !important;}
-    .error {color:#f44 !important;}
-  </style>
+  <title>⚙️ Admin Dart</title>
+  <style>body{background:#000;color:#ffd700;font:16px Arial;padding:20px;margin:0;}button{background:#ffd700;color:#000;border:0;padding:15px;margin:10px 0;border-radius:8px;font-size:16px;cursor:pointer;width:100%;}form input{padding:12px;margin:5px 0;width:100%;background:#111;color:#ffd700;border:1px solid #ffd700;border-radius:5px;font-size:16px;}#status{padding:20px;text-align:center;font-size:18px;}</style>
 </head>
 <body>
-  <div id="login" style="display:none;">
-    <h1>⚙️ Admin Typer Dart</h1>
-    <button onclick="loginDiscord()">🔐 Admin Login (Discord)</button>
+  <div id="login">
+    <h1>⚙️ Admin Dart</h1>
+    <button onclick="login()">Zaloguj Discord</button>
   </div>
-  
-  <div id="adminPanel" style="display:none;">
-    <h1>⚙️ Panel Admin</h1>
-    
-    <!-- ➕ NOWY MECZ - POPRAWIONE 3 POLA -->
-    <form id="addMatchForm">
-      <h3>➕ Nowy mecz</h3>
-      <input id="match" placeholder="Mecz: Littler vs Humphries" required>
-      <input id="question" placeholder="Pytanie: Kto wygra?" required>
-      
-      <div style="display:flex;gap:10px;">
-        <input id="opt1" placeholder="Opcja 1: Littler" required>
-        <input id="opt2" placeholder="Opcja 2: Remis">
-        <input id="opt3" placeholder="Opcja 3: Humphries">
-      </div>
-      
-      <input id="deadline" type="datetime-local" required>
-      <button type="submit">🚀 DODAJ MECZ</button>
+  <div id="panel" style="display:none;">
+    <h1>Admin Panel</h1>
+    <form id="form">
+      <input id="match" placeholder="Mecz (Littler vs Humphries)">
+      <input id="question" placeholder="Pytanie (Kto wygra?)">
+      <input id="opt1" placeholder="Opcja 1: Littler">
+      <input id="opt2" placeholder="Opcja 2: Remis">
+      <input id="opt3" placeholder="Opcja 3: Humphries">
+      <input id="deadline" type="datetime-local">
+      <button type="submit">➕ DODAJ MECZ</button>
     </form>
-    
-    <!-- 📋 LISTA MECZY -->
-    <div id="matches"><h2>📋 Mecze (Ustaw poprawną odpowiedź)</h2><div>Ładowanie...</div></div>
-    
-    <!-- 👥 UCZESTNICY -->
-    <div id="participants"><h2>👥 Uczestnicy (typy / punkty)</h2><div>Ładowanie...</div></div>
+    <div id="status">Ładowanie meczów...</div>
+    <div id="matches"></div>
   </div>
 
   <script>
     const CLIENT_ID = '1483233223013302424';
     const API_URL = 'https://script.google.com/macros/s/AKfycbwm0HXWnKISrf86bHacY6NmoHtUPIoJROzgpoxbUhKZZYAAAFdAoIowz5dQh3Hbu3WKWQ/exec';
-    const ADMIN_ID = '1192231948173709453';
-    let user = JSON.parse(localStorage.getItem('dc_user'));
+    const ADMIN_ID = '1483233223013302424';
+    let user = JSON.parse(localStorage.getItem('dc_user') || 'null');
 
-    function loginDiscord() {
-      const REDIRECT = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
-      window.location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
+    function login() {
+      const redirect = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
+      window.location = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${redirect}`;
     }
 
-    async function loadAdmin() {
-      if (!user || user.id !== ADMIN_ID) {
-        alert('🚫 Brak dostępu do panelu admina!');
-        return showLogin();
-      }
-      
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-      
+    async function loadData() {
       try {
-        console.log('🔄 Ładowanie danych...');
+        document.getElementById('status').innerHTML = '🔄 Ładowanie...';
         const res = await fetch(API_URL);
         const data = await res.json();
-        console.log('✅ Dane:', data);
-        
-        // Mecze
-        let mhtml = '';
-        data.questions.forEach(q => {
-          const correctText = q.correct !== '' ? q.options[q.correct] : 'USTAW';
-          mhtml += `
-            <div class="match-item">
-              <div>
-                <strong>${q.match}</strong><br>
-                <span class="stats">Deadline: ${new Date(q.deadline).toLocaleString('pl-PL')} | Typów: ${q.participants}/${data.users.length}</span>
-              </div>
-              <div style="flex:1">${q.question}</div>
-              <select onchange="setCorrect(${q.id},this.value)" style="min-width:200px">
-                <option value="">👑 Poprawna: ${correctText}</option>
-                ${q.options.map((opt,i) => `<option value="${i}">${opt}</option>`).join('')}
-              </select>
-            </div>`;
-        });
-        document.getElementById('matches').innerHTML = '<h2>📋 Mecze</h2>' + (mhtml || '<p>Brak meczów. Dodaj pierwszy! 🎯</p>');
-        
-        // Uczestnicy
-        let phtml = '';
-        data.users.forEach(u => {
-          const uAnswers = data.answers.filter(a => a.userId == u.id);
-          const correctAnswers = uAnswers.filter(a => a.correct).length;
-          phtml += `<div class="rank-item">
-            <strong>${u.username}</strong>: ${u.points} pkt (${correctAnswers}/${uAnswers.length} poprawnych)
-            <span class="stats">${uAnswers.map(a => `<small>Q${a.qId}:${a.correct ? '✅' : '❌'}</small>`).join(' ')}</span>
-          </div>`;
-        });
-        document.getElementById('participants').innerHTML = '<h2>👥 Uczestnicy (' + data.users.length + ')</h2>' + (phtml || '<p>Brak graczy.</p>');
-        
-      } catch(err) {
-        console.error('BŁĄD:', err);
-        document.getElementById('matches').innerHTML = '<p class="error">Błąd API: ' + err.message + '</p>';
+        showMatches(data.questions);
+        document.getElementById('status').innerHTML = `✅ ${data.questions.length} meczów`;
+      } catch(e) {
+        document.getElementById('status').innerHTML = '❌ Błąd: ' + e.message;
       }
     }
-    
-    async function setCorrect(qId, correct) {
-      if (correct === '') return;
-      if (!confirm(`Ustawić "${q.options[correct]}" jako poprawną?
-Ranking i punkty się zaktualizują!`)) return;
-      
+
+    function showMatches(questions) {
+      let html = '';
+      questions.forEach(q => {
+        html += `<div style="background:#111;padding:15px;margin:15px 0;border-radius:8px;">
+          <strong>${q.match}</strong> | Typów: ${q.participants}<br>
+          ${q.question}<br>
+          <select onchange="setCorrect(${q.id},this.value)" style="width:100%;padding:10px;">
+            <option>${q.correct ? q.options[q.correct] : 'USTAW POPRAWNĄ'}</option>
+            ${q.options.map((o,i)=>`<option value="${i}">${o}</option>`).join('')}
+          </select>
+        </div>`;
+      });
+      document.getElementById('matches').innerHTML = html || 'Brak meczów';
+    }
+
+    async function setCorrect(id, correct) {
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({action: 'setCorrect', qId: parseInt(qId), correct: parseInt(correct)})
+          body: `{"action":"setCorrect","qId":${id},"correct":${correct}}`
         });
-        const result = await res.json();
-        if (result.success) {
-          alert('✅ Poprawna odpowiedź ustawiona! Punkty zaktualizowane.');
-          loadAdmin();
-        } else {
-          alert('❌ Błąd: ' + result.error);
-        }
-      } catch(err) {
-        alert('❌ Błąd sieci: ' + err.message);
+        const r = await res.text();
+        alert('✅ Ustawiono!');
+        loadData();
+      } catch(e) {
+        alert('❌ ' + e.message);
       }
     }
-    
-    // ➕ DODAJ MECZ - POPRAWIONE
-    document.getElementById('addMatchForm').addEventListener('submit', async e => {
+
+    document.getElementById('form').onsubmit = async e => {
       e.preventDefault();
       try {
-        const opt1 = document.getElementById('opt1').value.trim();
-        const opt2 = document.getElementById('opt2').value.trim();
-        const opt3 = document.getElementById('opt3').value.trim();
-        
-        if (!opt1) throw new Error('Wpisz Opcję 1!');
-        
-        const options = [opt1];
-        if (opt2) options.push(opt2);
-        if (opt3) options.push(opt3);
-        
-        const formData = {
-          action: 'addMatch',
-          match: document.getElementById('match').value.trim(),
-          question: document.getElementById('question').value.trim(),
-          options: options,
-          deadline: document.getElementById('deadline').value
-        };
-        
-        console.log('📤 Wysyłam:', formData);
+        const options = [document.getElementById('opt1').value];
+        if(document.getElementById('opt2').value) options.push(document.getElementById('opt2').value);
+        if(document.getElementById('opt3').value) options.push(document.getElementById('opt3').value);
         
         const res = await fetch(API_URL, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(formData)
+          body: `{"action":"addMatch","match":"${document.getElementById('match').value}","question":"${document.getElementById('question').value}","options":${JSON.stringify(options)},"deadline":"${document.getElementById('deadline').value}"}`
         });
         
-        const result = await res.json();
-        console.log('📥 Odpowiedź:', result);
-        
-        if (result.success) {
-          alert(`✅ Mecz "${formData.match}" dodany!
-${options.length} opcji: ${options.join(', ')}`);
-          e.target.reset();
-          loadAdmin();
-        } else {
-          throw new Error(result.error || 'Nieznany błąd');
-        }
-      } catch(err) {
-        console.error('BŁĄD:', err);
-        alert('❌ BŁĄD: ' + err.message);
+        const r = await res.text();
+        alert('✅ Mecz dodany!');
+        document.getElementById('form').reset();
+        loadData();
+      } catch(e) {
+        alert('❌ ' + e.message);
       }
-    });
-    
-    function showLogin() {
-      document.getElementById('login').style.display = 'block';
-      document.getElementById('adminPanel').style.display = 'none';
-    }
-    
+    };
+
     // START
-    if (window.location.hash) window.location.href = 'admin.html';
-    loadAdmin();
+    if (!user || user.id != ADMIN_ID) {
+      document.getElementById('login').style.display = 'block';
+    } else {
+      document.getElementById('panel').style.display = 'block';
+      loadData();
+    }
   </script>
 </body>
 </html>
