@@ -9,7 +9,7 @@
 <body>
   <div id="login">
     <h1>⚙️ Admin Dart</h1>
-    <button onclick="login()">Zaloguj Discord</button>
+    <button onclick="loginDiscord()">Zaloguj Discord</button>
   </div>
   <div id="panel" style="display:none;">
     <h1>Admin Panel</h1>
@@ -22,7 +22,7 @@
       <input id="deadline" type="datetime-local">
       <button type="submit">➕ DODAJ MECZ</button>
     </form>
-    <div id="status">Ładowanie meczów...</div>
+    <div id="status">Kliknij login</div>
     <div id="matches"></div>
   </div>
 
@@ -32,12 +32,11 @@
     const ADMIN_ID = '1192231948173709453';
     let user = JSON.parse(localStorage.getItem('dc_user') || 'null');
 
+    // ✅ POPRAWNA FUNKCJA LOGIN
     function loginDiscord() {
-  localStorage.setItem('login_from', 'admin.html'); // 👈 DODAJ TO
-  const REDIRECT = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
-  // reszta...
-}
-      window.location = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${redirect}`;
+      localStorage.setItem('login_from', 'admin.html');
+      const REDIRECT = encodeURIComponent('https://dcranking.pl/dart/discord-callback.html');
+      window.location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
     }
 
     async function loadData() {
@@ -58,56 +57,78 @@
         html += `<div style="background:#111;padding:15px;margin:15px 0;border-radius:8px;">
           <strong>${q.match}</strong> | Typów: ${q.participants}<br>
           ${q.question}<br>
-          <select onchange="setCorrect(${q.id},this.value)" style="width:100%;padding:10px;">
-            <option>${q.correct ? q.options[q.correct] : 'USTAW POPRAWNĄ'}</option>
+          <select onchange="setCorrect(${q.id},this.value)" style="width:100%;padding:10px;margin-top:10px;">
+            <option>${q.correct !== '' ? q.options[q.correct] : 'USTAW POPRAWNĄ'}</option>
             ${q.options.map((o,i)=>`<option value="${i}">${o}</option>`).join('')}
           </select>
         </div>`;
       });
-      document.getElementById('matches').innerHTML = html || 'Brak meczów';
+      document.getElementById('matches').innerHTML = html || 'Brak meczów - dodaj pierwszy!';
     }
 
     async function setCorrect(id, correct) {
+      if(correct === '') return;
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
-          body: `{"action":"setCorrect","qId":${id},"correct":${correct}}`
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'setCorrect', qId: parseInt(id), correct: parseInt(correct)})
         });
-        const r = await res.text();
-        alert('✅ Ustawiono!');
-        loadData();
+        const r = await res.json();
+        if(r.success) {
+          alert('✅ Poprawna ustawiona!');
+          loadData();
+        }
       } catch(e) {
-        alert('❌ ' + e.message);
+        alert('❌ Błąd: ' + e.message);
       }
     }
 
     document.getElementById('form').onsubmit = async e => {
       e.preventDefault();
       try {
-        const options = [document.getElementById('opt1').value];
-        if(document.getElementById('opt2').value) options.push(document.getElementById('opt2').value);
-        if(document.getElementById('opt3').value) options.push(document.getElementById('opt3').value);
+        const options = [];
+        const opt1 = document.getElementById('opt1').value.trim();
+        const opt2 = document.getElementById('opt2').value.trim();
+        const opt3 = document.getElementById('opt3').value.trim();
+        
+        if(opt1) options.push(opt1);
+        if(opt2) options.push(opt2);
+        if(opt3) options.push(opt3);
         
         const res = await fetch(API_URL, {
           method: 'POST',
-          body: `{"action":"addMatch","match":"${document.getElementById('match').value}","question":"${document.getElementById('question').value}","options":${JSON.stringify(options)},"deadline":"${document.getElementById('deadline').value}"}`
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            action: 'addMatch',
+            match: document.getElementById('match').value.trim(),
+            question: document.getElementById('question').value.trim(),
+            options: options,
+            deadline: document.getElementById('deadline').value
+          })
         });
         
-        const r = await res.text();
-        alert('✅ Mecz dodany!');
-        document.getElementById('form').reset();
-        loadData();
+        const r = await res.json();
+        if(r.success) {
+          alert('✅ Mecz dodany!');
+          document.getElementById('form').reset();
+          loadData();
+        }
       } catch(e) {
-        alert('❌ ' + e.message);
+        alert('❌ Błąd: ' + e.message);
       }
     };
 
     // START
-    if (!user || user.id != ADMIN_ID) {
-      document.getElementById('login').style.display = 'block';
-    } else {
+    if(window.location.hash.includes('access_token') && !user) {
+      // Callback processing już w callback.html
+      setTimeout(() => location.reload(), 1000);
+    } else if(user && user.id === ADMIN_ID) {
+      document.getElementById('login').style.display = 'none';
       document.getElementById('panel').style.display = 'block';
       loadData();
+    } else {
+      document.getElementById('login').style.display = 'block';
     }
   </script>
 </body>
