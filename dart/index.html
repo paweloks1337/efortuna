@@ -3,123 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 Typer Dart</title>
+<title>🎯 Dart Typer</title>
 <style>
 body { margin:0; font-family:sans-serif; background:#0f0f0f; color:#fff; }
-header { background:#c40000; padding:12px; text-align:center; font-size:22px; }
+header { background:#c40000; text-align:center; padding:12px; font-size:22px; }
 .container { max-width:600px; margin:0 auto; padding:12px; }
 .card { background:#1a1a1a; padding:12px; margin:12px 0; border-radius:10px; border-left:4px solid #c40000; }
-button { padding:8px 12px; margin:2px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
-button.selected { background:#1e90ff; color:#fff; }
-button.correct { background:#44ff44; color:#000; }
-button.wrong { background:#ff4444; color:#000; }
-button.pending { background:#888; color:#000; cursor:not-allowed; }
-#ranking .user { display:flex; justify-content:space-between; padding:6px; background:#111; border-radius:6px; margin:4px 0; }
-#countdown { text-align:center; font-weight:bold; margin-bottom:12px; font-size:18px; }
+button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+button.option { background:#333; color:#fff; margin:2px; }
+button.option.selected { background:#2196F3; color:#fff; }
+button.option.correct { background:#44ff44; color:#000; }
+button.option.wrong { background:#ff4444; color:#000; }
+input, select { width:100%; padding:8px; margin:4px 0; border-radius:6px; border:none; box-sizing:border-box; }
+#ranking { margin-top:20px; }
+.user-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #222; }
 </style>
 </head>
 <body>
-<header>🎯 Typer Dart</header>
-<div class="container" id="typerApp">
-  <div id="countdown"></div>
+<header>🎯 Dart Typer</header>
+<div class="container" id="app">
+  <div id="status"></div>
   <div id="questionsArea"></div>
-  <h3>🏆 Ranking Globalny</h3>
-  <div id="ranking"></div>
+  <div id="ranking">
+    <h3>🏆 Ranking Globalny</h3>
+    <div id="rankingList">Ładowanie...</div>
+  </div>
 </div>
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbwCZYbSsVUJFbnVVaDQiMOmwFvOSB8wyRIzRApCaJksgM_iOPgDRQ9owyq-P4icxjMXNA/exec";
-let data, user;
+let user = JSON.parse(localStorage.getItem("dc_user")) || null;
+const app = document.getElementById('app');
+const status = document.getElementById('status');
 
-function renderQuestions() {
-  const qArea = document.getElementById("questionsArea");
-  qArea.innerHTML = "";
-  data.questions.forEach(q => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<b>${q.match}</b><br>${q.question}<br>`;
-    
-    const now = new Date();
+function showStatus(msg, error=false){
+  status.innerText = msg;
+  status.style.color = error ? "#ff4444" : "#44ff44";
+  setTimeout(()=>status.innerText='',5000);
+}
+
+async function fetchData(){
+  try{
+    const res = await fetch(API);
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    return data;
+  }catch(err){
+    showStatus("Błąd ładowania: "+err.message,true);
+    return null;
+  }
+}
+
+function renderQuestions(questions, answers){
+  const qArea = document.getElementById('questionsArea');
+  qArea.innerHTML = '';
+  const now = new Date();
+  questions.forEach(q=>{
+    const userAnswer = answers.find(a=>a.qid===q.id && a.userId===user.id);
     const deadline = new Date(q.deadline);
-    const disabled = now>deadline;
-    
-    q.options.forEach(o => {
-      const btn = document.createElement("button");
-      btn.textContent = o;
-      btn.disabled = disabled;
-      btn.className = "pending";
-      const userAnswer = data.answers.find(a=>a.userId==user.id && a.qid==q.id);
-      if(userAnswer && userAnswer.answer==o) btn.className = disabled ? (q.correct==o ? 'correct':'wrong') : 'selected';
-      btn.onclick = ()=>submitAnswer(q.id, o, btn, card, disabled);
-      card.appendChild(btn);
-    });
+    const isLocked = now > deadline;
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML=`<b>${q.match}</b> | ${q.question}<br><small>${deadline.toLocaleString()}</small><div id="opts-${q.id}"></div>`;
     qArea.appendChild(card);
+    const optsDiv = card.querySelector(`#opts-${q.id}`);
+    q.options.forEach(o=>{
+      const btn = document.createElement('button');
+      btn.innerText=o;
+      btn.className='option';
+      if(userAnswer && userAnswer.answer===o) btn.classList.add('selected');
+      if(isLocked){
+        btn.disabled=true;
+        if(q.correct){
+          if(o===q.correct) btn.classList.add('correct');
+          else if(userAnswer && userAnswer.answer===o && o!==q.correct) btn.classList.add('wrong');
+        }
+      }
+      btn.onclick=async()=>{ 
+        await submitAnswer(q.id,o);
+        renderQuestions(questions, [...answers.filter(a=>a.qid!==q.id), {userId:user.id,qid:q.id,answer:o}]);
+      };
+      optsDiv.appendChild(btn);
+    });
   });
 }
 
-async function submitAnswer(qid, answer, btn, card, disabled){
-  if(disabled) return;
-  const buttons = card.querySelectorAll("button");
-  buttons.forEach(b=>b.classList.remove("selected"));
-  btn.classList.add("selected");
-  try {
-    await fetch(API, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({action:"answer", userId:user.id, qid, answer})
+async function submitAnswer(qid, answer){
+  try{
+    await fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'answer',qid,userId:user.id,answer})
     });
-    const ansIndex = data.answers.findIndex(a=>a.userId==user.id && a.qid==qid);
-    if(ansIndex>-1) data.answers[ansIndex].answer=answer;
-    else data.answers.push({userId:user.id,qid,answer});
-    renderRanking();
-  } catch(err) { console.error(err); }
+  }catch(err){
+    showStatus("Błąd zapisu odpowiedzi",true);
+  }
 }
 
-function renderRanking(){
-  const rankDiv = document.getElementById("ranking");
-  const scores = data.users.map(u=>{
-    const userAnswers = data.answers.filter(a=>a.userId==u.id);
-    const correctCount = userAnswers.filter(a=>{
-      const q = data.questions.find(qq=>qq.id==a.qid);
-      return q && q.correct==a.answer;
-    }).length;
-    return {username:u.username, points:u.points + correctCount, avatar:u.avatar, correct:correctCount, total:userAnswers.length};
-  }).sort((a,b)=>b.points-a.points);
-  
-  rankDiv.innerHTML = scores.map(s=>
-    `<div class="user"><span>${s.username}</span><span>${s.correct}/${s.total} (${s.points}pkt)</span></div>`
-  ).join("");
+function renderRanking(users, answers, questions){
+  const list = document.getElementById('rankingList');
+  const scoreMap={};
+  users.forEach(u=>{
+    let score=0;
+    answers.filter(a=>a.userId===u.id).forEach(a=>{
+      const q = questions.find(qq=>qq.id===a.qid);
+      if(q && q.correct===a.answer) score+=q.points;
+    });
+    scoreMap[u.username]=score;
+  });
+  const sorted = Object.entries(scoreMap).sort((a,b)=>b[1]-a[1]);
+  list.innerHTML=sorted.map(u=>`<div class="user-row"><span>${u[0]}</span><span>${u[1]} pkt</span></div>`).join('');
 }
 
-async function loadData(){
-  user = JSON.parse(localStorage.getItem("dc_user"));
+async function init(){
   if(!user){
-    const nick = prompt("Podaj swój nick do Typera");
-    user={id:Date.now(),username:nick,avatar:"",points:0};
-    await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"addUser",...user})});
-    localStorage.setItem("dc_user",JSON.stringify(user));
+    app.innerHTML='<div class="card"><button onclick="loginDiscord()" style="background:#5865f2;color:#fff;">🔐 Zaloguj Discord</button></div>';
+    return;
   }
-  const res = await fetch(API);
-  data = await res.json();
-  renderQuestions();
-  renderRanking();
-  setupCountdown();
+  const data = await fetchData();
+  if(!data) return;
+  renderQuestions(data.questions,data.answers);
+  renderRanking(data.users,data.answers,data.questions);
 }
 
-function setupCountdown(){
-  const countdown = document.getElementById("countdown");
-  function update(){
-    const upcoming = data.questions.filter(q=>!q.correct).map(q=>new Date(q.deadline)).sort((a,b)=>a-b)[0];
-    if(!upcoming){ countdown.textContent="Brak aktywnych pytań"; return; }
-    const diff = new Date(upcoming)-new Date();
-    if(diff<=0){ countdown.textContent="⏳ Czekamy na wyniki"; return; }
-    const d=Math.floor(diff/1000/60/60/24), h=Math.floor(diff/1000/60/60)%24, m=Math.floor(diff/1000/60)%60, s=Math.floor(diff/1000)%60;
-    countdown.textContent=`Kolejny mecz za: ${d}d ${h}h ${m}m ${s}s`;
-  }
-  update(); setInterval(update,1000);
+function loginDiscord(){
+  const CLIENT_ID = "1483233223013302424";
+  const REDIRECT = encodeURIComponent(window.location.origin+"/discord-callback.html");
+  location.href=`https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
 }
 
-loadData();
+init();
 </script>
 </body>
 </html>
