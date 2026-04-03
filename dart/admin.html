@@ -8,13 +8,16 @@
     body {background:#0f0f0f;color:#ffd700;font-family:Arial,sans-serif;margin:0;padding:20px;}
     button {background:#ffd700;color:#000;border:none;padding:12px 24px;margin:5px;cursor:pointer;border-radius:5px;font-weight:bold;}
     button:hover {background:#ffed4a;}
+    button:disabled {background:#666;}
     form {background:rgba(255,215,0,0.1);padding:20px;border-radius:10px;margin:20px 0;max-width:500px;}
-    input,select {padding:10px;margin:5px 0;width:100%;background:#000;color:#ffd700;border:1px solid #ffd700;border-radius:5px;}
+    input,select {padding:10px;margin:5px 0;width:100%;background:#000;color:#ffd700;border:1px solid #ffd700;border-radius:5px;box-sizing:border-box;}
     .match-item {background:rgba(255,215,0,0.1);padding:15px;margin:10px 0;border:1px solid #ffd700;border-radius:10px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
     .stats {font-size:0.9em;color:#aaa;}
     #login {text-align:center;padding:50px;}
     #adminPanel {max-width:1000px;margin:0 auto;}
-    #participants {margin-top:40px;}
+    #participants .rank-item {justify-content:flex-start;}
+    .success {color:#4f4 !important;}
+    .error {color:#f44 !important;}
   </style>
 </head>
 <body>
@@ -26,34 +29,32 @@
   <div id="adminPanel" style="display:none;">
     <h1>⚙️ Panel Admin</h1>
     
-    <!-- DODAJ MECZ -->
-    <!-- ➕ NOWY MECZ - POPRAWIONE POLE OPTIONS -->
-<form id="addMatchForm">
-  <h3>➕ Nowy mecz</h3>
-  <input id="match" placeholder="Mecz: Littler vs van Gerwen" required>
-  <input id="question" placeholder="Pytanie: Kto wygra?" required>
-  
-  <!-- 🎯 POPRAWIONE - 3 przyciski zamiast JSON -->
-  <div style="display:flex;gap:10px;">
-    <input id="opt1" placeholder="Opcja 1: Littler" required>
-    <input id="opt2" placeholder="Opcja 2: Remis">
-    <input id="opt3" placeholder="Opcja 3: van Gerwen">
-  </div>
-  
-  <input id="deadline" type="datetime-local" required>
-  <button type="submit">🚀 DODAJ MECZ</button>
-</form>
+    <!-- ➕ NOWY MECZ - POPRAWIONE 3 POLA -->
+    <form id="addMatchForm">
+      <h3>➕ Nowy mecz</h3>
+      <input id="match" placeholder="Mecz: Littler vs Humphries" required>
+      <input id="question" placeholder="Pytanie: Kto wygra?" required>
+      
+      <div style="display:flex;gap:10px;">
+        <input id="opt1" placeholder="Opcja 1: Littler" required>
+        <input id="opt2" placeholder="Opcja 2: Remis">
+        <input id="opt3" placeholder="Opcja 3: Humphries">
+      </div>
+      
+      <input id="deadline" type="datetime-local" required>
+      <button type="submit">🚀 DODAJ MECZ</button>
+    </form>
     
-    <!-- LISTA MECZY -->
-    <div id="matches"><h2>📋 Mecze (Ustaw poprawną odpowiedź)</h2></div>
+    <!-- 📋 LISTA MECZY -->
+    <div id="matches"><h2>📋 Mecze (Ustaw poprawną odpowiedź)</h2><div>Ładowanie...</div></div>
     
-    <!-- UCZESTNICY -->
-    <div id="participants"><h2>👥 Uczestnicy (ile typów / punkty)</h2></div>
+    <!-- 👥 UCZESTNICY -->
+    <div id="participants"><h2>👥 Uczestnicy (typy / punkty)</h2><div>Ładowanie...</div></div>
   </div>
 
   <script>
     const CLIENT_ID = '1483233223013302424';
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzfWxes2iE8DSICgtG4Ekme3YJvHQGkz2EXXbL87u4auz-zDkyMfAbTXS9DARixcejdNQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzSZcvIbR3L76etNRasE13JV_hSD2eVPM_Fy4UaYtcU1TFel_IpTcc7ZtiE81B2WLfByw/exec';
     const ADMIN_ID = '1192231948173709453';
     let user = JSON.parse(localStorage.getItem('dc_user'));
 
@@ -72,74 +73,115 @@
       document.getElementById('adminPanel').style.display = 'block';
       
       try {
+        console.log('🔄 Ładowanie danych...');
         const res = await fetch(API_URL);
         const data = await res.json();
+        console.log('✅ Dane:', data);
         
         // Mecze
         let mhtml = '';
         data.questions.forEach(q => {
+          const correctText = q.correct !== '' ? q.options[q.correct] : 'USTAW';
           mhtml += `
             <div class="match-item">
               <div>
                 <strong>${q.match}</strong><br>
-                <span class="stats">Deadline: ${q.deadline} | Typów: ${q.participants}/${data.users.length} | Aktywne: ${q.active ? '✅' : '⏸️'}</span>
+                <span class="stats">Deadline: ${new Date(q.deadline).toLocaleString('pl-PL')} | Typów: ${q.participants}/${data.users.length}</span>
               </div>
-              <div>${q.question}</div>
-              <select onchange="setCorrect(${q.id},this.value)">
-                <option value="">Poprawna: ${q.correct !== '' ? q.options[q.correct] : 'USTAW'}</option>
+              <div style="flex:1">${q.question}</div>
+              <select onchange="setCorrect(${q.id},this.value)" style="min-width:200px">
+                <option value="">👑 Poprawna: ${correctText}</option>
                 ${q.options.map((opt,i) => `<option value="${i}">${opt}</option>`).join('')}
               </select>
             </div>`;
         });
-        document.getElementById('matches').innerHTML = '<h2>📋 Mecze</h2>' + (mhtml || 'Brak meczów');
+        document.getElementById('matches').innerHTML = '<h2>📋 Mecze</h2>' + (mhtml || '<p>Brak meczów. Dodaj pierwszy! 🎯</p>');
         
-        // Uczestnicy z typami/punktami
+        // Uczestnicy
         let phtml = '';
         data.users.forEach(u => {
           const uAnswers = data.answers.filter(a => a.userId == u.id);
+          const correctAnswers = uAnswers.filter(a => a.correct).length;
           phtml += `<div class="rank-item">
-            ${u.username}: ${uAnswers.length} typów, ${u.points} pkt
-            ${uAnswers.map(a => `<small>Q${a.qId}:${a.correct?'✅':'❌'}</small>`).join(' ')}
+            <strong>${u.username}</strong>: ${u.points} pkt (${correctAnswers}/${uAnswers.length} poprawnych)
+            <span class="stats">${uAnswers.map(a => `<small>Q${a.qId}:${a.correct ? '✅' : '❌'}</small>`).join(' ')}</span>
           </div>`;
         });
-        document.getElementById('participants').innerHTML = '<h2>👥 Uczestnicy</h2>' + phtml;
+        document.getElementById('participants').innerHTML = '<h2>👥 Uczestnicy (' + data.users.length + ')</h2>' + (phtml || '<p>Brak graczy.</p>');
         
       } catch(err) {
-        alert('Błąd: ' + err.message);
+        console.error('BŁĄD:', err);
+        document.getElementById('matches').innerHTML = '<p class="error">Błąd API: ' + err.message + '</p>';
       }
     }
     
     async function setCorrect(qId, correct) {
-      if (!confirm('Ustawić poprawną odpowiedź? Ranking się zaktualizuje!')) return;
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'setCorrect', qId: parseInt(qId), correct: parseInt(correct)})
-      });
-      alert('✅ Poprawna odpowiedź ustawiona! Punkty zaktualizowane.');
-      loadAdmin();
+      if (correct === '') return;
+      if (!confirm(`Ustawić "${q.options[correct]}" jako poprawną?
+Ranking i punkty się zaktualizują!`)) return;
+      
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'setCorrect', qId: parseInt(qId), correct: parseInt(correct)})
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert('✅ Poprawna odpowiedź ustawiona! Punkty zaktualizowane.');
+          loadAdmin();
+        } else {
+          alert('❌ Błąd: ' + result.error);
+        }
+      } catch(err) {
+        alert('❌ Błąd sieci: ' + err.message);
+      }
     }
     
+    // ➕ DODAJ MECZ - POPRAWIONE
     document.getElementById('addMatchForm').addEventListener('submit', async e => {
       e.preventDefault();
       try {
-        const options = JSON.parse(document.getElementById('options').value);
-        await fetch(API_URL, {
+        const opt1 = document.getElementById('opt1').value.trim();
+        const opt2 = document.getElementById('opt2').value.trim();
+        const opt3 = document.getElementById('opt3').value.trim();
+        
+        if (!opt1) throw new Error('Wpisz Opcję 1!');
+        
+        const options = [opt1];
+        if (opt2) options.push(opt2);
+        if (opt3) options.push(opt3);
+        
+        const formData = {
+          action: 'addMatch',
+          match: document.getElementById('match').value.trim(),
+          question: document.getElementById('question').value.trim(),
+          options: options,
+          deadline: document.getElementById('deadline').value
+        };
+        
+        console.log('📤 Wysyłam:', formData);
+        
+        const res = await fetch(API_URL, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            action: 'addMatch',
-            match: document.getElementById('match').value,
-            question: document.getElementById('question').value,
-            options,
-            deadline: document.getElementById('deadline').value
-          })
+          body: JSON.stringify(formData)
         });
-        alert('✅ Mecz dodany!');
-        loadAdmin();
-        e.target.reset();
+        
+        const result = await res.json();
+        console.log('📥 Odpowiedź:', result);
+        
+        if (result.success) {
+          alert(`✅ Mecz "${formData.match}" dodany!
+${options.length} opcji: ${options.join(', ')}`);
+          e.target.reset();
+          loadAdmin();
+        } else {
+          throw new Error(result.error || 'Nieznany błąd');
+        }
       } catch(err) {
-        alert('Błąd JSON opcji: ' + err.message);
+        console.error('BŁĄD:', err);
+        alert('❌ BŁĄD: ' + err.message);
       }
     });
     
@@ -148,6 +190,8 @@
       document.getElementById('adminPanel').style.display = 'none';
     }
     
+    // START
+    if (window.location.hash) window.location.href = 'admin.html';
     loadAdmin();
   </script>
 </body>
