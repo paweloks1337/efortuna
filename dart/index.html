@@ -1,199 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎯 Typer Dart</title>
-  <style>
-    body {
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #c40000;
-      padding: 15px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .container {
-      padding: 12px;
-    }
-    .card {
-      background: #1a1a1a;
-      margin-bottom: 15px;
-      padding: 15px;
-      border-radius: 10px;
-      animation: fadeIn 0.3s ease;
-    }
-    button {
-      width: 100%;
-      margin-top: 8px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    button:hover {
-      transform: scale(1.02);
-    }
-    .btn-select { background: #333; color: white; }
-    .btn-save { background: #c40000; color: white; font-weight: bold; }
-    .correct { background: green !important; }
-    .wrong { background: red !important; }
-    .pending { background: gray !important; }
-    .timer { font-size: 14px; margin-top: 8px; opacity: 0.8; }
-    .login-btn {
-      background: #5865f2;
-      color: white;
-      padding: 12px;
-      font-size: 18px;
-      margin: 20px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-    }
-    .rank {
-      background: #111;
-      padding: 10px;
-      margin: 12px;
-      border-radius: 10px;
-    }
-    .player {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .player img {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Typer Dart</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#0f0f0f; color:#fff; }
+header { background:#c40000; padding:12px; text-align:center; font-size:22px; }
+.container { max-width:600px; margin:0 auto; padding:12px; }
+.card { background:#1a1a1a; padding:12px; margin:12px 0; border-radius:10px; border-left:4px solid #c40000; }
+button { padding:8px 12px; margin:2px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+button.selected { background:#1e90ff; color:#fff; }
+button.correct { background:#44ff44; color:#000; }
+button.wrong { background:#ff4444; color:#000; }
+button.pending { background:#888; color:#000; cursor:not-allowed; }
+#ranking .user { display:flex; justify-content:space-between; padding:6px; background:#111; border-radius:6px; margin:4px 0; }
+#countdown { text-align:center; font-weight:bold; margin-bottom:12px; font-size:18px; }
+</style>
 </head>
 <body>
-
-<header>🎯 TYPER DART</header>
-
-<div id="loginBox" class="container"></div>
-
-<div id="questionsContainer" class="container"></div>
-
-<div class="rank container">
-  <h3>🏆 Ranking</h3>
-  <div id="rankingList"></div>
+<header>🎯 Typer Dart</header>
+<div class="container" id="typerApp">
+  <div id="countdown"></div>
+  <div id="questionsArea"></div>
+  <h3>🏆 Ranking Globalny</h3>
+  <div id="ranking"></div>
 </div>
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbwLOFahdAvzVw7WDL1CSO8orf1euEABlLcpHSs-yRGQvbLeCPF7FwIXh8M1p4kN5U9F/exec";
+let data, user;
 
-let user = JSON.parse(localStorage.getItem("dc_user")) || null;
-let selected = {};
-
-function showLogin() {
-  loginBox.innerHTML = `<button class="login-btn" onclick="loginDiscord()">Zaloguj przez Discord</button>`;
-}
-
-function loginDiscord() {
-  const CLIENT_ID = "1483233223013302424";
-  const REDIRECT = encodeURIComponent("https://dcranking.pl/dart/discord-callback.html");
-  location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&scope=identify&redirect_uri=${REDIRECT}`;
-}
-
-function loadApp() {
-  loginBox.innerHTML = `<div>👤 ${user.username}</div>`;
-  fetch(API).then(r=>r.json()).then(data=>{
-    renderQuestions(data.questions);
-    renderRanking(data.users);
+function renderQuestions() {
+  const qArea = document.getElementById("questionsArea");
+  qArea.innerHTML = "";
+  data.questions.forEach(q => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<b>${q.match}</b><br>${q.question}<br>`;
+    
+    const now = new Date();
+    const deadline = new Date(q.deadline);
+    const disabled = now>deadline;
+    
+    q.options.forEach(o => {
+      const btn = document.createElement("button");
+      btn.textContent = o;
+      btn.disabled = disabled;
+      btn.className = "pending";
+      const userAnswer = data.answers.find(a=>a.userId==user.id && a.qid==q.id);
+      if(userAnswer && userAnswer.answer==o) btn.className = disabled ? (q.correct==o ? 'correct':'wrong') : 'selected';
+      btn.onclick = ()=>submitAnswer(q.id, o, btn, card, disabled);
+      card.appendChild(btn);
+    });
+    qArea.appendChild(card);
   });
 }
 
-function renderQuestions(questions) {
-  let html = "";
-  questions.forEach(q => {
-    let now = Date.now();
-    let end = new Date(q.deadline).getTime();
-    let locked = now > end;
-    html += `<div class="card">
-      <div><b>${q.match}</b></div>
-      <div>${q.question}</div>
-      <div class="timer" id="timer${q.id}"></div>
-      ${q.options.map(o => `
-        <button class="btn-select ${q.correct ? (o === q.correct ? "correct":"wrong") : ""}" 
-          onclick="pick(${q.id}, '${o}')" ${locked ? 'disabled':''}>${o}</button>
-      `).join("")}
-      ${locked ? "" : `<button class="btn-save" onclick="saveAnswer(${q.id})">ZAPISZ</button>`}
-    </div>`;
-  });
-  questionsContainer.innerHTML = html;
-  setInterval(()=>updateTimers(questions), 1000);
+async function submitAnswer(qid, answer, btn, card, disabled){
+  if(disabled) return;
+  const buttons = card.querySelectorAll("button");
+  buttons.forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected");
+  try {
+    await fetch(API, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({action:"answer", userId:user.id, qid, answer})
+    });
+    const ansIndex = data.answers.findIndex(a=>a.userId==user.id && a.qid==qid);
+    if(ansIndex>-1) data.answers[ansIndex].answer=answer;
+    else data.answers.push({userId:user.id,qid,answer});
+    renderRanking();
+  } catch(err) { console.error(err); }
 }
 
-function pick(qid, val) {
-  selected[qid] = val;
+function renderRanking(){
+  const rankDiv = document.getElementById("ranking");
+  const scores = data.users.map(u=>{
+    const userAnswers = data.answers.filter(a=>a.userId==u.id);
+    const correctCount = userAnswers.filter(a=>{
+      const q = data.questions.find(qq=>qq.id==a.qid);
+      return q && q.correct==a.answer;
+    }).length;
+    return {username:u.username, points:u.points + correctCount, avatar:u.avatar, correct:correctCount, total:userAnswers.length};
+  }).sort((a,b)=>b.points-a.points);
+  
+  rankDiv.innerHTML = scores.map(s=>
+    `<div class="user"><span>${s.username}</span><span>${s.correct}/${s.total} (${s.points}pkt)</span></div>`
+  ).join("");
 }
 
-function saveAnswer(qid) {
-  if(!selected[qid]) return alert("Wybierz opcję!");
-  fetch(API, {
-    method:"POST",
-    headers:{"Content-Type":"text/plain"},
-    body:JSON.stringify({
-      action:"answer",
-      userId:user.id,
-      qid,
-      answer:selected[qid]
-    })
-  }).then(()=>alert("Zapisano!"));
+async function loadData(){
+  user = JSON.parse(localStorage.getItem("dc_user"));
+  if(!user){
+    const nick = prompt("Podaj swój nick do Typera");
+    user={id:Date.now(),username:nick,avatar:"",points:0};
+    await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"addUser",...user})});
+    localStorage.setItem("dc_user",JSON.stringify(user));
+  }
+  const res = await fetch(API);
+  data = await res.json();
+  renderQuestions();
+  renderRanking();
+  setupCountdown();
 }
 
-function renderRanking(users) {
-  users.sort((a,b)=>b.points - a.points);
-  let html = "";
-  users.forEach(u => {
-    let avaUrl = u.avatar 
-      ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
-      : "";
-    html += `<div class="player">
-      ${avaUrl ? `<img src="${avaUrl}">` : ""}
-      ${u.username} - ${u.points} pkt
-    </div>`;
-  });
-  rankingList.innerHTML = html;
+function setupCountdown(){
+  const countdown = document.getElementById("countdown");
+  function update(){
+    const upcoming = data.questions.filter(q=>!q.correct).map(q=>new Date(q.deadline)).sort((a,b)=>a-b)[0];
+    if(!upcoming){ countdown.textContent="Brak aktywnych pytań"; return; }
+    const diff = new Date(upcoming)-new Date();
+    if(diff<=0){ countdown.textContent="⏳ Czekamy na wyniki"; return; }
+    const d=Math.floor(diff/1000/60/60/24), h=Math.floor(diff/1000/60/60)%24, m=Math.floor(diff/1000/60)%60, s=Math.floor(diff/1000)%60;
+    countdown.textContent=`Kolejny mecz za: ${d}d ${h}h ${m}m ${s}s`;
+  }
+  update(); setInterval(update,1000);
 }
 
-function updateTimers(questions) {
-  questions.forEach(q => {
-    const el = document.getElementById("timer"+q.id);
-    if(!el) return;
-    let now = Date.now();
-    let end = new Date(q.deadline).getTime();
-    if(now >= end) {
-      el.textContent = "⛔ Zamknięte";
-    } else {
-      let diff = end - now;
-      let d = Math.floor(diff / 86400000);
-      let h = Math.floor((diff%86400000)/3600000);
-      let m = Math.floor((diff%3600000)/60000);
-      let s = Math.floor((diff%60000)/1000);
-      el.textContent = `⏱ ${d}d ${h}h ${m}m ${s}s`;
-    }
-  });
-}
-
-if(!user) showLogin();
-else loadApp();
+loadData();
 </script>
-
 </body>
 </html>
