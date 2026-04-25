@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-cs-bg text-cs-text font-body antialiased;
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(249, 115, 22, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0d1521;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e2d40;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #f97316;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-cs-accent hover:bg-orange-500 text-white font-semibold px-5 py-2.5 rounded-lg 
+           transition-all duration-200 shadow-glow-orange hover:shadow-lg
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply bg-cs-border hover:bg-slate-700 text-cs-text font-semibold px-5 py-2.5 rounded-lg 
+           transition-all duration-200 border border-cs-border hover:border-slate-600
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply text-cs-muted hover:text-cs-text px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-cs-card border border-cs-border rounded-xl p-5 animate-fade-in;
+  }
+
+  .card-hover {
+    @apply card hover:border-cs-accent/40 transition-all duration-300 hover:shadow-glow-orange cursor-pointer;
+  }
+
+  .input {
+    @apply bg-cs-surface border border-cs-border rounded-lg px-4 py-2.5 text-cs-text 
+           placeholder-cs-muted w-full focus:outline-none focus:border-cs-accent 
+           focus:ring-1 focus:ring-cs-accent/30 transition-all duration-200 font-body;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  .badge-upcoming {
+    @apply badge bg-cs-accent2/10 text-cs-accent2 border border-cs-accent2/20;
+  }
+
+  .badge-live {
+    @apply badge bg-cs-red/10 text-cs-red border border-cs-red/20;
+  }
+
+  .badge-finished {
+    @apply badge bg-cs-muted/10 text-cs-muted border border-cs-muted/20;
+  }
+
+  .section-title {
+    @apply font-display text-3xl text-cs-text tracking-widest uppercase;
+  }
+
+  .glow-text-orange {
+    text-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+  }
+
+  .glow-text-cyan {
+    text-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+  }
+}
