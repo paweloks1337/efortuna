@@ -45,7 +45,8 @@ td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius
 <div class="sort-box">
   <label>📅 Wybierz miesiąc:</label>
   <select id="month-select">
-    <option value="kwiecien" selected>Kwiecień</option>
+    <option value="maj" selected>Maj</option>
+    <option value="kwiecien">Kwiecień</option>
     <option value="marzec">Marzec</option>
     <option value="luty">Luty</option>
     <option value="styczen">Styczeń</option>
@@ -57,6 +58,7 @@ td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius
 
 <script>
 const CSV_URLS = {
+  maj: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg5KetOj1gI-RwW7c8jForGl7QHTA2EFBjar_7usr594aCldQIiNqzglkItznWYJBBX8lISZ_RK4yL/pub?output=csv",
   kwiecien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSH66B29eSQCx3n4azrAONb4DnOv80o0OLpyb3u2d8oRKATfJp6kOe7ONb3n0MEwjLoQobdaEQKbuQ5/pub?output=csv",
  marzec: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsopL8OBdIkFkCdGLo-_n8YewObXzEvVHQ9K0PXy3ANcxxJ2B6krxvxPPpHex66ut4Ut8hvARMzmh1/pub?output=csv",
   luty: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQodqUqlWT0Ddd8ch_t3Jm7NzRmkrp_qyoP3KTz5gMw3exgx41WL7zcVrDvtQop7niDpeuyM57vaO9n/pub?output=csv",
