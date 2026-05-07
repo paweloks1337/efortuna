@@ -57,85 +57,188 @@ td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius
 <div id="coupons-container"></div>
 
 <script>
+<script>
 const CSV_URLS = {
   maj: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg5KetOj1gI-RwW7c8jForGl7QHTA2EFBjar_7usr594aCldQIiNqzglkItznWYJBBX8lISZ_RK4yL/pub?output=csv",
   kwiecien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSH66B29eSQCx3n4azrAONb4DnOv80o0OLpyb3u2d8oRKATfJp6kOe7ONb3n0MEwjLoQobdaEQKbuQ5/pub?output=csv",
- marzec: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsopL8OBdIkFkCdGLo-_n8YewObXzEvVHQ9K0PXy3ANcxxJ2B6krxvxPPpHex66ut4Ut8hvARMzmh1/pub?output=csv",
+  marzec: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsopL8OBdIkFkCdGLo-_n8YewObXzEvVHQ9K0PXy3ANcxxJ2B6krxvxPPpHex66ut4Ut8hvARMzmh1/pub?output=csv",
   luty: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQodqUqlWT0Ddd8ch_t3Jm7NzRmkrp_qyoP3KTz5gMw3exgx41WL7zcVrDvtQop7niDpeuyM57vaO9n/pub?output=csv",
   styczen: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
-function parseCSV(t){
-  return t.trim().split(/\r?\n/).map(r =>
-    r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
-  );
+function parseCSV(text){
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+
+  for(const line of lines){
+    if(!line.trim()) continue;
+
+    const result = [];
+    let current = "";
+    let inside = false;
+
+    for(let i=0;i<line.length;i++){
+      const char = line[i];
+
+      if(char === '"'){
+        inside = !inside;
+      }
+      else if(char === "," && !inside){
+        result.push(current);
+        current = "";
+      }
+      else{
+        current += char;
+      }
+    }
+
+    result.push(current);
+
+    rows.push(
+      result.map(x => x.replace(/^"|"$/g,"").trim())
+    );
+  }
+
+  return rows;
 }
 
 async function loadCoupons(month){
+
+  const url = CSV_URLS[month];
+  if(!url) return;
+
   document.getElementById("loader").classList.remove("hidden");
-  const res = await fetch(CSV_URLS[month]);
-  const txt = await res.text();
-  const rows = parseCSV(txt);
-  const head = rows[0].map(h=>h.toLowerCase());
 
-  const iNick=head.findIndex(h=>h.includes("nick"));
-  const iPts=head.findIndex(h=>h.includes("punk"));
-  const iDate=head.findIndex(h=>h.includes("data"));
-  const iLink=head.findIndex(h=>h.includes("link"));
+  try{
 
-  const byDate = {};
+    const res = await fetch(url);
 
-  rows.slice(1).forEach(r=>{
-    const date=(r[iDate]||"—").trim();
-    if(!byDate[date]) byDate[date]=[];
-    byDate[date].push({
-      nick:(r[iNick]||"").trim(),
-      points:parseFloat((r[iPts]||0).replace(",","."))||0,
-      link:(r[iLink]||"#").trim()
-    });
-  });
+    if(!res.ok){
+      throw new Error("Błąd fetch");
+    }
 
-  const dates = Object.keys(byDate).sort((a,b)=>{
-    const [da,ma,ya]=a.split(".");
-    const [db,mb,yb]=b.split(".");
-    return new Date(`${yb}-${mb}-${db}`) - new Date(`${ya}-${ma}-${da}`);
-  });
+    const txt = await res.text();
 
-  const container=document.getElementById("coupons-container");
-  container.innerHTML="";
+    if(txt.startsWith("<")){
+      throw new Error("To nie CSV");
+    }
 
-  dates.forEach(d=>{
-    const box=document.createElement("div");
-    box.className="container";
-    box.innerHTML=`
-      <h2>📅 ${d}</h2>
-      <table>
-        <thead><tr><th>Nick</th><th>Punkty</th><th>Kupon</th></tr></thead>
-        <tbody></tbody>
-      </table>`;
-    const tbody=box.querySelector("tbody");
+    const rows = parseCSV(txt);
 
-    byDate[d].forEach(c=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td class="nick">${c.nick}</td>
-        <td class="points">${c.points.toFixed(0)}</td>
-        <td class="link"><button onclick="window.open('${c.link}','_blank')">Otwórz</button></td>`;
-      tbody.appendChild(tr);
+    const head = rows[0].map(h => h.toLowerCase());
+
+    const iNick = head.findIndex(h => h.includes("nick"));
+    const iPts  = head.findIndex(h => h.includes("punk"));
+    const iDate = head.findIndex(h => h.includes("data"));
+    const iLink = head.findIndex(h => h.includes("link"));
+
+    if(iNick===-1 || iPts===-1 || iDate===-1 || iLink===-1){
+      console.log(head);
+      throw new Error("Brak wymaganych kolumn");
+    }
+
+    const byDate = {};
+
+    rows.slice(1).forEach(r => {
+
+      const date = (r[iDate] || "—").trim();
+
+      if(!byDate[date]){
+        byDate[date] = [];
+      }
+
+      byDate[date].push({
+        nick: (r[iNick] || "").trim(),
+        points: parseFloat((r[iPts] || "0").replace(",", ".")) || 0,
+        link: (r[iLink] || "#").trim()
+      });
+
     });
 
-    container.appendChild(box);
-  });
+    const dates = Object.keys(byDate).sort((a,b)=>{
+
+      const [da,ma,ya] = a.split(".");
+      const [db,mb,yb] = b.split(".");
+
+      return new Date(`${yb}-${mb}-${db}`) - new Date(`${ya}-${ma}-${da}`);
+    });
+
+    const container = document.getElementById("coupons-container");
+
+    container.innerHTML = "";
+
+    dates.forEach(d => {
+
+      const box = document.createElement("div");
+
+      box.className = "container";
+
+      box.innerHTML = `
+        <h2>📅 ${d}</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nick</th>
+              <th>Punkty</th>
+              <th>Kupon</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      `;
+
+      const tbody = box.querySelector("tbody");
+
+      byDate[d].forEach(c => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td class="nick">${c.nick}</td>
+          <td class="points">${c.points.toFixed(0)}</td>
+          <td class="link">
+            <button onclick="window.open('${c.link}','_blank')">
+              Otwórz
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+
+      });
+
+      container.appendChild(box);
+
+    });
+
+  }
+  catch(err){
+
+    console.error(err);
+
+    document.getElementById("coupons-container").innerHTML = `
+      <div class="container">
+        ❌ Błąd ładowania danych
+      </div>
+    `;
+  }
 
   document.getElementById("loader").classList.add("hidden");
 }
 
-document.getElementById("month-select").addEventListener("change", e=>{
-  loadCoupons(e.target.value);
-});
+window.addEventListener("load", () => {
 
-window.addEventListener("load", ()=>loadCoupons("kwiecien"));
+  const select = document.getElementById("month-select");
+
+  loadCoupons(select.value);
+
+  select.addEventListener("change", e => {
+    loadCoupons(e.target.value);
+  });
+
+});
 </script>
 </body>
 </html>
