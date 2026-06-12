@@ -759,8 +759,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
     <tbody id="ranking-body"></tbody>
   </table>
 </div>
-
-<!-- Popup -->
 <div id="popup" class="popup-overlay" onclick="handleOverlayClick(event)">
   <div class="popup-sheet">
     <div class="popup-handle"></div>
@@ -848,4 +846,223 @@ async function loadRankingForMonth(month) {
     if (rows.length < 2) throw new Error('Brak danych w arkuszu');
 
     const head = rows[0].map(x => x.toLowerCase());
-    const ni = head.findIndex(h => h.includes('nick
+    const ni = head.findIndex(h => h.includes('nick'));
+    const pi = head.findIndex(h => h.includes('punk'));
+    const li = head.findIndex(h => h.includes('link'));
+    const di = head.findIndex(h => h.includes('data'));
+
+    if (ni === -1) throw new Error('Nie znaleziono kolumny "nick" w arkuszu');
+
+    const data = {};
+    rows.slice(1).forEach(r => {
+      const nick = (r[ni] || '').trim();
+      if (!nick) return;
+      const pts  = pi !== -1 ? (parseFloat((r[pi] || '0').replace(',', '.')) || 0) : 0;
+      const link = li !== -1 ? (r[li] || '').trim() : '';
+      const date = di !== -1 ? (r[di] || '').trim() : '';
+
+      if (!data[nick]) data[nick] = { punkty: 0, kupony: 0, links: [] };
+      data[nick].punkty += pts;
+      data[nick].kupony++;
+      data[nick].links.push({ url: link, points: pts, date });
+    });
+
+    playersData = data;
+    list = Object.entries(data).map(([nick, v]) => ({ nick, ...v }));
+    list.sort((a, b) => b.punkty - a.punkty);
+
+    renderTable(list);
+
+    const sum = list.reduce((a, b) => a + b.punkty, 0);
+    document.getElementById('count').textContent = list.length;
+    document.getElementById('sum').textContent = Math.round(sum).toLocaleString('pl');
+    document.getElementById('avg').textContent = list.length ? (sum / list.length).toFixed(1) : '0';
+
+  } catch (err) {
+    console.error('Błąd ładowania rankingu:', err);
+    document.getElementById('ranking-body').innerHTML = `
+      <tr><td colspan="4">
+        <div class="error-state">
+          <div class="error-icon">⚠️</div>
+          <p>Nie udało się załadować danych.<br><small style="opacity:0.6">${err.message}</small></p>
+          <button class="retry-btn" onclick="loadRankingForMonth('${month}')">Spróbuj ponownie</button>
+        </div>
+      </td></tr>`;
+    document.getElementById('count').textContent = '—';
+    document.getElementById('sum').textContent = '—';
+    document.getElementById('avg').textContent = '—';
+  } finally {
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('table-wrap').classList.add('show');
+  }
+}
+
+/* ── RENDER TABLE ── */
+function renderTable(data) {
+  const tbody = document.getElementById('ranking-body');
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="4">
+        <div class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <p>Brak wyników dla podanej frazy</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map((p, i) => {
+    const rank = list.indexOf(p) + 1; // prawdziwa pozycja w rankingu
+    const rankClass = rank <= 3 ? `rank-${rank}` : '';
+    const initials = p.nick.substring(0, 2).toUpperCase();
+    const badge = rank <= 3
+      ? `<span class="rank-badge">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span>`
+      : `<span class="rank-badge" style="color:var(--muted);font-size:0.8rem">${rank}</span>`;
+
+    return `
+      <tr class="${rankClass}">
+        <td class="rank">${badge}</td>
+        <td class="nick" onclick="openPopup('${escapeHtml(p.nick)}')">
+          <span class="nick-inner">
+            <span class="nick-avatar">${initials}</span>
+            ${escapeHtml(p.nick)}
+          </span>
+        </td>
+        <td class="coupons">
+          <span class="coupon-chip">🧾 ${p.kupony}</span>
+        </td>
+        <td class="points">${p.punkty.toFixed(2)} pkt</td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── SEARCH ── */
+document.getElementById('search').addEventListener('input', function () {
+  const q = this.value.toLowerCase().trim();
+  if (!q) {
+    renderTable(list);
+    return;
+  }
+  const filtered = list.filter(p => p.nick.toLowerCase().includes(q));
+  renderTable(filtered);
+});
+
+/* ── MONTH SELECT ── */
+document.getElementById('month-select').addEventListener('change', function () {
+  document.getElementById('search').value = '';
+  loadRankingForMonth(this.value);
+});
+
+/* ── POPUP ── */
+function openPopup(nick) {
+  currentPopupNick = nick;
+  const player = playersData[nick];
+  if (!player) return;
+
+  document.getElementById('popup-nick').textContent = nick;
+  document.getElementById('popup-total').textContent = player.punkty.toFixed(2) + ' pkt';
+
+  renderPopupLinks(player.links, currentSortType);
+
+  document.getElementById('popup').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderPopupLinks(links, sortType) {
+  const container = document.getElementById('popup-links');
+
+  const sorted = [...links].sort((a, b) => {
+    if (sortType === 'points') return b.points - a.points;
+    // sort by date — try to parse, fallback to string compare
+    const da = parseDate(a.date);
+    const db = parseDate(b.date);
+    return db - da;
+  });
+
+  const maxPts = Math.max(...links.map(l => l.points));
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0">Brak kuponów</p>';
+    return;
+  }
+
+  container.innerHTML = sorted.map((l, i) => {
+    const isBest = l.points === maxPts && maxPts > 0;
+    const delay = i * 40;
+    const hasLink = l.url && l.url.startsWith('http');
+    return `
+      <div class="coupon-item${isBest ? ' is-best' : ''}" style="animation-delay:${delay}ms">
+        <div class="coupon-left">
+          <div class="coupon-date">${l.date || 'Brak daty'}</div>
+          <div class="coupon-pts">${l.points.toFixed(2)} pkt</div>
+        </div>
+        ${isBest ? '<span class="best-label">⭐ Najlepszy</span>' : ''}
+        ${hasLink ? `<button class="coupon-open" onclick="openLink('${escapeJs(l.url)}')">Otwórz</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function parseDate(str) {
+  if (!str) return new Date(0);
+  // Try DD.MM.YYYY or YYYY-MM-DD
+  const dotMatch = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (dotMatch) return new Date(`${dotMatch[3]}-${dotMatch[2].padStart(2,'0')}-${dotMatch[1].padStart(2,'0')}`);
+  const d = new Date(str);
+  return isNaN(d) ? new Date(0) : d;
+}
+
+function setSortType(type, btn) {
+  currentSortType = type;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (currentPopupNick && playersData[currentPopupNick]) {
+    renderPopupLinks(playersData[currentPopupNick].links, type);
+  }
+}
+
+function closePopup() {
+  document.getElementById('popup').classList.remove('active');
+  document.body.style.overflow = '';
+  currentPopupNick = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('popup')) closePopup();
+}
+
+// Close popup on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePopup();
+});
+
+/* ── OPEN LINK ── */
+function openLink(url) {
+  window.open(url, '_blank', 'noopener,noreferrer');
+  showToast('Otwieranie kuponu…');
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ── HELPERS ── */
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function escapeJs(str) {
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+/* ── INIT ── */
+loadRankingForMonth('maj');
+</script>
+</body>
+  </html>
