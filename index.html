@@ -1,195 +1,808 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-8HRSFSGF0F"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'G-8HRSFSGF0F');
-</script><!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8HRSFSGF0F"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
   gtag('config', 'G-8HRSFSGF0F');
 </script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>🏆 Mistrzostwa Typerów Discord</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88;--red:#FF4444}
-body{margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center;overflow-x:hidden}
-nav{background:linear-gradient(90deg,#000,#222);padding:14px 0;box-shadow:0 2px 10px rgba(255,215,0,0.18)}
-nav a{color:var(--gold);text-decoration:none;margin:0 18px;font-weight:600;transition:0.25s}
-nav a:hover{color:#fff;text-shadow:0 0 8px var(--gold)}
-h1{margin:18px 0;text-shadow:0 0 12px var(--gold)}
-#loader{position:fixed;left:50%;top:48%;width:76px;height:76px;border-radius:50%;border:8px solid rgba(255,215,0,0.18);border-top:8px solid var(--gold);transform:translate(-50%,-50%);animation:spin 1s linear infinite;z-index:9999}
-@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
-#loader.hidden{display:none}
-.container{width:90%;max-width:860px;margin:36px auto;background:#1a1a1a;padding:18px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
-.container.show{opacity:1;transform:translateY(0)}
-.sort-box{text-align:center;margin:10px auto;}
-.sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:600}
-table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:left}
-th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
-td.nick{color:#fff;font-weight:600;cursor:pointer}
-td.points{color:var(--green);font-weight:700;text-align:right}
-td.coupons{color:#ccc;text-align:center}
-.stats{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;color:#ccc}
-.stat-box{display:inline-block;margin:6px 18px}
-.toast{position:fixed;top:18px;right:18px;background:rgba(0,0,0,0.85);color:var(--gold);padding:12px 18px;border-radius:10px;box-shadow:0 0 12px var(--gold);opacity:0;transform:translateY(-10px);transition:all .4s;z-index:10001}
-.toast.show{opacity:1;transform:translateY(0)}
-#search{width:80%;max-width:340px;padding:10px;border-radius:8px;border:2px solid var(--gold);background:#000;color:var(--gold);margin:8px auto;display:block}
-#search:focus{outline:none;box-shadow:0 0 12px rgba(255,215,0,0.12)}
-.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:99999;visibility:hidden;opacity:0;transition:.3s}
-.popup.active{visibility:visible;opacity:1}
-.popup-content{background:#1a1a1a;border:2px solid var(--gold);border-radius:12px;padding:20px;max-width:450px;width:90%;color:#fff;text-align:left;box-shadow:0 0 20px rgba(255,215,0,0.3);animation:fadeIn .4s ease}
-.popup-content h2{color:var(--gold);margin-bottom:10px;text-align:center}
-.popup-content .sort-box{text-align:center;margin-bottom:10px}
-.popup-content select{background:#111;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 10px;font-weight:600}
-.popup-content .coupon{display:flex;align-items:center;justify-content:space-between;background:#111;padding:8px 12px;border-radius:8px;margin:6px 0;opacity:0;transform:translateY(10px);animation:slideUp .4s ease forwards;}
-.popup-content .coupon-date{color:var(--gold);font-size:.85rem}
-.popup-content .coupon-points{color:var(--green);font-weight:700}
-.popup-content .coupon.best .coupon-points{color:var(--red);animation: pulse 1s infinite alternate;}
-@keyframes pulse{from{text-shadow:0 0 6px var(--red)}to{text-shadow:0 0 18px var(--red)}}
-.popup-content button.open-btn{background:var(--gold);border:none;padding:6px 10px;border-radius:6px;color:#000;font-weight:600;cursor:pointer;transition:.2s}
-.popup-content button.open-btn:hover{box-shadow:0 0 10px var(--gold)}
-.popup-total{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);text-align:center;color:var(--gold);font-weight:600}
-.close-btn{display:block;margin:12px auto 0;padding:8px 18px;background:var(--gold);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer}
-@keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-@keyframes slideUp{to{transform:translateY(0);opacity:1}}
-/* --- Ogólne style tabeli --- */
-table {
+/* ── TOKENS ── */
+:root {
+  --bg:        #0A0A0F;
+  --surface:   #13131D;
+  --surface2:  #1C1C2E;
+  --border:    rgba(255,214,10,0.12);
+  --gold:      #FFD60A;
+  --gold-dim:  rgba(255,214,10,0.15);
+  --gold-glow: rgba(255,214,10,0.35);
+  --green:     #00E676;
+  --green-dim: rgba(0,230,118,0.12);
+  --text:      #E8E8F0;
+  --muted:     #6B6B80;
+  --radius:    12px;
+  --radius-lg: 20px;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ATMOSPHERE ── */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse at center, rgba(255,214,10,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 16px;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+nav a:hover {
+  color: var(--gold);
+  background: var(--gold-dim);
+}
+nav a.active {
+  color: var(--gold);
+  background: var(--gold-dim);
+}
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 40px 20px 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-dim);
+  border: 1px solid var(--border);
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.hero-eyebrow .dot {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.hero h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.hero h1 span {
+  color: var(--gold);
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  max-width: 860px;
+  margin: 0 auto 24px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.search-wrap {
+  flex: 1;
+  min-width: 180px;
+  position: relative;
+}
+
+.search-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+#search {
   width: 100%;
-  border-collapse: separate;  /* Oddzielne wiersze, dla przejrzystości */
-  border-spacing: 0 6px;      /* Odstęp między wierszami */
+  padding: 10px 12px 10px 38px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-th, td {
-  padding: 12px 18px;          /* Większe odstępy dla czytelności */
+#search::placeholder { color: var(--muted); }
+#search:focus {
+  border-color: rgba(255,214,10,0.5);
+  box-shadow: 0 0 0 3px rgba(255,214,10,0.08);
+}
+
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap svg {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 10px 34px 10px 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+select:focus { border-color: rgba(255,214,10,0.5); }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 860px;
+  margin: 0 auto 20px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.stat-pill strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── TABLE CONTAINER ── */
+.table-wrap {
+  max-width: 860px;
+  margin: 0 auto 60px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.table-wrap.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── TABLE ── */
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ranking-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.ranking-table th {
+  padding: 10px 16px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
   text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Minimalne szerokości kolumn, aby punkty i kupony się nie ściskały */
-td.nick { min-width: 130px; color: #fff; font-weight: 600; cursor: pointer; }
-td.coupons { min-width: 60px; text-align: center; color: #ccc; }
-td.points { min-width: 80px; text-align: right; color: var(--green); font-weight: 700; }
+.ranking-table th:nth-child(3) { text-align: center; }
+.ranking-table th:nth-child(4) { text-align: right; }
 
-/* Lekko zaokrąglone wiersze dla estetyki */
-tr { border-radius: 8px; overflow: hidden; display: table-row; }
+/* ── ROWS ── */
+.ranking-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+  cursor: default;
+}
 
-/* --- Styl mobilny --- */
-@media (max-width: 600px) {
-  .container {
-    overflow-x: auto;           /* Scroll poziomy na małych ekranach */
-    padding: 0 8px;
+.ranking-table tbody tr:hover {
+  background: var(--surface2);
+}
+
+.ranking-table td {
+  padding: 13px 16px;
+  font-size: 0.93rem;
+  vertical-align: middle;
+}
+
+/* Rank cell */
+.ranking-table td.rank {
+  width: 48px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.rank-1 .rank-badge {
+  background: linear-gradient(135deg, #FFD60A, #FF9A00);
+  color: #000;
+  box-shadow: 0 0 14px rgba(255,214,10,0.5);
+}
+
+.rank-2 .rank-badge {
+  background: linear-gradient(135deg, #C0C0C0, #888);
+  color: #000;
+  box-shadow: 0 0 10px rgba(192,192,192,0.3);
+}
+
+.rank-3 .rank-badge {
+  background: linear-gradient(135deg, #CD7F32, #8B4513);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(205,127,50,0.3);
+}
+
+/* Top 3 row highlight */
+.rank-1, .rank-2, .rank-3 {
+  background: rgba(255,214,10,0.025);
+}
+
+/* Nick cell */
+.ranking-table td.nick {
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nick-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.15s;
+}
+
+.nick-inner:hover { color: var(--gold); }
+
+.nick-avatar {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.rank-1 .nick-avatar { border-color: rgba(255,214,10,0.4); color: var(--gold); background: rgba(255,214,10,0.1); }
+.rank-2 .nick-avatar { border-color: rgba(192,192,192,0.4); color: #C0C0C0; background: rgba(192,192,192,0.1); }
+.rank-3 .nick-avatar { border-color: rgba(205,127,50,0.4); color: #CD7F32; background: rgba(205,127,50,0.1); }
+
+/* Coupons cell */
+.ranking-table td.coupons {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.coupon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Points cell */
+.ranking-table td.points {
+  text-align: right;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+.rank-1 td.points { color: var(--gold); }
+
+/* ── LOADER ── */
+#loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  z-index: 9999;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#loader.hidden { display: none; }
+
+.loader-ring {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--surface2);
+  border-top-color: var(--gold);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ── POPUP ── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 99999;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+
+@media (min-width: 600px) {
+  .popup-overlay {
+    align-items: center;
   }
-
-
-  
-  table { width: auto; min-width: 100%; }
-
-  th, td { padding: 10px 14px; font-size: 0.95rem; }
-
-  td.nick, td.points, td.coupons { white-space: nowrap; } /* Nie łamiemy liczb ani nicków */
-}
-}
-  .info-box{
-  max-width:860px;
-  margin:10px auto 14px;
-  padding:10px 14px;
-  background:linear-gradient(90deg,#111,#1a1a1a);
-  border:1px solid rgba(255,215,0,0.35);
-  border-radius:12px;
-  box-shadow:0 0 14px rgba(255,215,0,0.12);
-  color:#fff;
-  font-size:.95rem;
-  text-align:left;
 }
 
-
-
-@keyframes pulseDot{
-  0%{box-shadow:0 0 4px rgba(255,59,59,.4)}
-  50%{box-shadow:0 0 8px rgba(255,59,59,.7)}
-  100%{box-shadow:0 0 4px rgba(255,59,59,.4)}
+.popup-overlay.active {
+  visibility: visible;
+  opacity: 1;
 }
 
-/* x2 na zielono */
-.info-box span{
-  color:#00FF88;
-  font-weight:700;
+.popup-sheet {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 28px 20px 32px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
 
-/* MOBILE */
-@media(max-width:600px){
-  .info-box{
-    font-size:.9rem;
-    padding:8px 10px;
+@media (min-width: 600px) {
+  .popup-sheet {
+    border-radius: var(--radius-lg);
+    transform: scale(0.96);
+    max-height: 80vh;
   }
 }
-  </style>
+
+.popup-overlay.active .popup-sheet {
+  transform: translateY(0) scale(1);
+}
+
+/* drag handle */
+.popup-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 999px;
+  margin: 0 auto 20px;
+}
+
+@media (min-width: 600px) {
+  .popup-handle { display: none; }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.popup-nick {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.popup-close {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.popup-close:hover { color: #fff; background: #2A2A3E; }
+
+.popup-sort {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.sort-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sort-btn.active {
+  background: var(--gold-dim);
+  border-color: rgba(255,214,10,0.4);
+  color: var(--gold);
+}
+
+/* coupon items */
+.coupon-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: slideUp 0.3s ease forwards;
+  gap: 10px;
+}
+
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.coupon-item.is-best {
+  border-color: rgba(255,214,10,0.35);
+  background: rgba(255,214,10,0.06);
+}
+
+.coupon-item.is-best .coupon-pts {
+  color: var(--gold);
+}
+
+.coupon-left { flex: 1; min-width: 0; }
+
+.coupon-date {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.coupon-pts {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.best-label {
+  font-size: 0.68rem;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(255,214,10,0.3);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.coupon-open {
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: var(--gold);
+  border: none;
+  color: #000;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.coupon-open:hover { opacity: 0.85; transform: scale(0.97); }
+
+.popup-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-total-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.popup-total-pts {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  z-index: 99998;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.empty-state svg {
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+/* ── MOBILE OVERFLOW FIX ── */
+@media (max-width: 500px) {
+  .ranking-table td, .ranking-table th { padding: 11px 10px; }
+  .ranking-table th:first-child { padding-left: 12px; }
+  .ranking-table td.rank { width: 40px; }
+  .nick-avatar { display: none; }
+}
+</style>
 </head>
 <body>
-<div id="loader"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-label">Ładowanie rankingu…</div>
+</div>
+
+<!-- Nav -->
 <nav>
-  <a href="index.html">🏆 Ranking</a>
+  <a href="index.html" class="active">🏆 Ranking</a>
   <a href="kalkulator.html">📊 Kalkulator</a>
-  <a href="kupony.html">🧾 Lista Kuponów</a>
+  <a href="kupony.html">🧾 Kupony</a>
   <a href="zasady.html">📖 Zasady</a>
 </nav>
-<h1> 🏆 Mistrzostwa Typerów Discord</h1>
-  <div class="info-box">
-  <span class="info-dot"></span>
-  
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Discord Community
+  </div>
+  <h1>Mistrzostwa<br><span>Typerów</span></h1>
 </div>
-<input id="search" placeholder="🔍 Szukaj nicku..." />
-<div class="sort-box">
-  <label>📅 Wybierz miesiąc:</label>
-  <select id="month-select">
-    <option value="maj" selected>Maj</option>
-    <option value="kwiecien">Kwiecień</option>
-    <option value="marzec">Marzec</option>
-    <option value="luty">Luty</option>
-    <option value="styczen">Styczeń</option>
-    <option value="grudzien">Grudzień</option>
-  </select>
-</div>
-<div class="container" id="ranking-container" style="display:none;">
-  <table id="ranking">
-    <thead><tr><th>Miejsce</th><th>Nick</th><th style="text-align:center;">Kupony</th><th style="text-align:right;">Punkty</th></tr></thead>
-    <tbody></tbody>
-  </table>
-  <div class="stats">
-    <div class="stat-box">👥 Typerzy: <b id="count">0</b></div>
-    <div class="stat-box">💰 Suma punktów: <b id="sum">0</b></div>
-    <div class="stat-box">📊 Średnia: <b id="avg">0</b></div>
+
+<!-- Controls -->
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="search" placeholder="Szukaj gracza…" autocomplete="off" />
+  </div>
+  <div class="select-wrap">
+    <select id="month-select">
+      <option value="maj">Maj</option>
+      <option value="kwiecien">Kwiecień</option>
+      <option value="marzec">Marzec</option>
+      <option value="luty">Luty</option>
+      <option value="styczen">Styczeń</option>
+      <option value="grudzien">Grudzień</option>
+    </select>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
   </div>
 </div>
 
-<div id="popup" class="popup">
-  <div class="popup-content">
-    <h2 id="popup-nick"></h2>
-    <div class="sort-box">
-      <label>Sortuj według: </label>
-      <select id="sort-select">
-        <option value="date">📅 Daty</option>
-        <option value="points">🏆 Punktów</option>
-      </select>
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat-pill">👥 Typerzy <strong id="count">—</strong></div>
+  <div class="stat-pill">💰 Suma <strong id="sum">—</strong> pkt</div>
+  <div class="stat-pill">📊 Średnia <strong id="avg">—</strong> pkt</div>
+</div>
+
+<!-- Table -->
+<div class="table-wrap" id="table-wrap">
+  <table class="ranking-table" id="ranking">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Gracz</th>
+        <th style="text-align:center">Kupony</th>
+        <th style="text-align:right">Punkty</th>
+      </tr>
+    </thead>
+    <tbody id="ranking-body"></tbody>
+  </table>
+</div>
+
+<!-- Popup -->
+<div id="popup" class="popup-overlay">
+  <div class="popup-sheet">
+    <div class="popup-handle"></div>
+    <div class="popup-header">
+      <div class="popup-nick" id="popup-nick"></div>
+      <button class="popup-close" onclick="closePopup()" aria-label="Zamknij">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="popup-sort">
+      <button class="sort-btn active" data-sort="date" onclick="setSortType('date', this)">📅 Data</button>
+      <button class="sort-btn" data-sort="points" onclick="setSortType('points', this)">🏆 Punkty</button>
     </div>
     <div id="popup-links"></div>
-    <div id="popup-total" class="popup-total"></div>
-    <button class="close-btn" onclick="closePopup()">Zamknij</button>
+    <div class="popup-footer">
+      <div>
+        <div class="popup-total-label">Łącznie</div>
+        <div class="popup-total-pts" id="popup-total"></div>
+      </div>
+    </div>
   </div>
 </div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -202,114 +815,52 @@ const CSV_URLS = {
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
-let playersData={}, list=[];
+let playersData = {}, list = [], currentPopupNick = '', currentSortType = 'date';
 
-function parseCSV(t){
-  return t.trim().split(/\r?\n/).map(l => l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x => x.replace(/^"|"$/g,'')));
+function parseCSV(t) {
+  return t.trim().split(/\r?\n/).map(l =>
+    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x => x.replace(/^"|"$/g, ''))
+  );
 }
 
-async function loadRankingForMonth(month){
-  const CSV_URL = CSV_URLS[month];
-  if(!CSV_URL) return;
+async function loadRankingForMonth(month) {
+  const url = CSV_URLS[month];
+  if (!url) return;
+  document.getElementById('loader').classList.remove('hidden');
+  document.getElementById('table-wrap').classList.remove('show');
+  document.getElementById('ranking-body').innerHTML = '';
 
-  document.getElementById("loader").classList.remove("hidden");
-  document.getElementById("ranking-container").style.display = "none";
-
-  const res = await fetch(CSV_URL);
+  const res = await fetch(url);
   const txt = await res.text();
   const rows = parseCSV(txt);
   const head = rows[0].map(x => x.toLowerCase());
-  const n = head.findIndex(h => h.includes("nick")),
-        p = head.findIndex(h => h.includes("punk")),
-        l = head.findIndex(h => h.includes("link")),
-        d = head.findIndex(h => h.includes("data"));
+  const ni = head.findIndex(h => h.includes('nick'));
+  const pi = head.findIndex(h => h.includes('punk'));
+  const li = head.findIndex(h => h.includes('link'));
+  const di = head.findIndex(h => h.includes('data'));
 
   const data = {};
   rows.slice(1).forEach(r => {
-    const nick = (r[n]||"").trim();
-    const pts = parseFloat((r[p]||"0").replace(",", "."))||0;
-    const link = (r[l]||"").trim();
-    const date = (r[d]||"").trim();
-    if(!nick) return;
-    if(!data[nick]) data[nick] = {punkty:0, kupony:0, links:[]};
+    const nick = (r[ni] || '').trim();
+    const pts = parseFloat((r[pi] || '0').replace(',', '.')) || 0;
+    const link = (r[li] || '').trim();
+    const date = (r[di] || '').trim();
+    if (!nick) return;
+    if (!data[nick]) data[nick] = { punkty: 0, kupony: 0, links: [] };
     data[nick].punkty += pts;
     data[nick].kupony++;
-    if(link) data[nick].links.push({url: link, points: pts, date: date});
+    if (link) data[nick].links.push({ url: link, points: pts, date });
   });
 
   playersData = data;
-  list = Object.entries(data).map(([nick,v]) => ({nick, ...v}));
+  list = Object.entries(data).map(([nick, v]) => ({ nick, ...v }));
+  list.sort((a, b) => b.punkty - a.punkty);
 
-  renderTable("points");
-  document.getElementById("count").textContent = list.length;
-  const sum = list.reduce((a,b) => a + b.punkty,0);
-  document.getElementById("sum").textContent = sum.toFixed(0);
-  document.getElementById("avg").textContent = (sum/list.length).toFixed(1);
+  renderTable();
 
-  document.getElementById("ranking-container").style.display = "block";
-  setTimeout(()=>document.querySelector(".container").classList.add("show"),60);
-  document.getElementById("loader").classList.add("hidden");
-}
+  const sum = list.reduce((a, b) => a + b.punkty, 0);
+  document.getElementById('count').textContent = list.length;
+  document.getElementById('sum').textContent = Math.round(sum).toLocaleString('pl');
+  document.getElementById('avg').textContent = list.length ? (sum / list.length).toFixed(1) : '0';
 
-function renderTable(sortBy){
-  const tb = document.querySelector("#ranking tbody"); tb.innerHTML = "";
-  const sorted = [...list];
-  sorted.sort((a,b) => sortBy==="coupons" ? b.kupony-a.kupony : b.punkty-a.punkty);
-  sorted.forEach((p,i)=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${i+1}</td><td class="nick">${p.nick}</td><td class="coupons">${p.kupony}</td><td class="points">${Math.round(p.punkty)}</td>`;
-    tr.querySelector(".nick").addEventListener("click",()=>openPopup(p.nick));
-    tb.appendChild(tr);
-  });
-}
-
-function renderLinks(nick,sortType){
-  const p = playersData[nick]; if(!p) return;
-  let sorted = [...p.links];
-  if(sortType==="points") sorted.sort((a,b)=>b.points-a.points);
-  else sorted.sort((a,b)=>(new Date(b.date)-new Date(a.date))||b.points-a.points);
-  const maxPts = Math.max(...sorted.map(l=>l.points));
-  const div = document.getElementById("popup-links");
-  div.innerHTML = sorted.length
-    ? sorted.map((l,i)=>`
-      <div class="coupon ${l.points===maxPts?'best':''}" style="animation-delay:${i*0.08}s">
-        <div>
-          <div class="coupon-date">📅 ${l.date||"—"}</div>
-          <div class="coupon-points">🏆 ${l.points.toFixed(0)} pkt</div>
-        </div>
-        <button class="open-btn" onclick="window.open('${l.url}','_blank')">Otwórz</button>
-      </div>`).join("")
-    : "<p>Brak kuponów.</p>";
-}
-
-function openPopup(nick){
-  const popup = document.getElementById("popup");
-  document.getElementById("popup-nick").textContent = nick;
-  const sel = document.getElementById("sort-select");
-  renderLinks(nick,sel.value);
-  sel.onchange = ()=>renderLinks(nick,sel.value);
-  document.getElementById("popup-total").textContent = `Łącznie: ${playersData[nick].punkty.toFixed(0)} pkt`;
-  popup.classList.add("active");
-}
-
-function closePopup(){document.getElementById("popup").classList.remove("active");}
-
-document.getElementById("search").addEventListener("input", e=>{
-  const q = e.target.value.toLowerCase();
-  document.querySelectorAll("#ranking tbody tr").forEach(tr=>{
-    const nick = tr.querySelector(".nick")?.textContent.toLowerCase()||"";
-    tr.style.display = nick.includes(q) ? "" : "none";
-  });
-});
-
-window.addEventListener("load", ()=>{
-  const monthSelect = document.getElementById("month-select");
-  loadRankingForMonth(monthSelect.value);
-
-  monthSelect.addEventListener("change", ()=>{
-    loadRankingForMonth(monthSelect.value);
-  });
-});
-</script>
-</body>
-</html>
+  document.getElementById('loader').classList
