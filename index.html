@@ -31,7 +31,6 @@
   --radius-lg: 20px;
 }
 
-/* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -42,7 +41,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── BACKGROUND ATMOSPHERE ── */
 body::before {
   content: '';
   position: fixed;
@@ -79,14 +77,8 @@ nav a {
   transition: color 0.2s, background 0.2s;
   white-space: nowrap;
 }
-nav a:hover {
-  color: var(--gold);
-  background: var(--gold-dim);
-}
-nav a.active {
-  color: var(--gold);
-  background: var(--gold-dim);
-}
+nav a:hover { color: var(--gold); background: var(--gold-dim); }
+nav a.active { color: var(--gold); background: var(--gold-dim); }
 
 /* ── HERO ── */
 .hero {
@@ -133,9 +125,7 @@ nav a.active {
   color: #fff;
 }
 
-.hero h1 span {
-  color: var(--gold);
-}
+.hero h1 span { color: var(--gold); }
 
 /* ── CONTROLS ── */
 .controls {
@@ -184,9 +174,7 @@ nav a.active {
   box-shadow: 0 0 0 3px rgba(255,214,10,0.08);
 }
 
-.select-wrap {
-  position: relative;
-}
+.select-wrap { position: relative; }
 
 .select-wrap svg {
   position: absolute;
@@ -240,10 +228,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   color: var(--muted);
 }
 
-.stat-pill strong {
-  color: var(--text);
-  font-weight: 600;
-}
+.stat-pill strong { color: var(--text); font-weight: 600; }
 
 /* ── TABLE CONTAINER ── */
 .table-wrap {
@@ -257,10 +242,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   transition: opacity 0.5s, transform 0.5s;
 }
 
-.table-wrap.show {
-  opacity: 1;
-  transform: translateY(0);
-}
+.table-wrap.show { opacity: 1; transform: translateY(0); }
 
 /* ── TABLE ── */
 .ranking-table {
@@ -268,9 +250,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   border-collapse: collapse;
 }
 
-.ranking-table thead tr {
-  border-bottom: 1px solid var(--border);
-}
+.ranking-table thead tr { border-bottom: 1px solid var(--border); }
 
 .ranking-table th {
   padding: 10px 16px;
@@ -292,9 +272,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   cursor: default;
 }
 
-.ranking-table tbody tr:hover {
-  background: var(--surface2);
-}
+.ranking-table tbody tr:hover { background: var(--surface2); }
 
 .ranking-table td {
   padding: 13px 16px;
@@ -302,7 +280,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   vertical-align: middle;
 }
 
-/* Rank cell */
 .ranking-table td.rank {
   width: 48px;
   font-family: 'Rajdhani', sans-serif;
@@ -340,12 +317,8 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   box-shadow: 0 0 10px rgba(205,127,50,0.3);
 }
 
-/* Top 3 row highlight */
-.rank-1, .rank-2, .rank-3 {
-  background: rgba(255,214,10,0.025);
-}
+.rank-1, .rank-2, .rank-3 { background: rgba(255,214,10,0.025); }
 
-/* Nick cell */
 .ranking-table td.nick {
   font-weight: 600;
   color: #fff;
@@ -381,7 +354,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 .rank-2 .nick-avatar { border-color: rgba(192,192,192,0.4); color: #C0C0C0; background: rgba(192,192,192,0.1); }
 .rank-3 .nick-avatar { border-color: rgba(205,127,50,0.4); color: #CD7F32; background: rgba(205,127,50,0.1); }
 
-/* Coupons cell */
 .ranking-table td.coupons {
   text-align: center;
   color: var(--muted);
@@ -401,7 +373,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   font-weight: 500;
 }
 
-/* Points cell */
 .ranking-table td.points {
   text-align: right;
   font-family: 'Rajdhani', sans-serif;
@@ -461,15 +432,10 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 }
 
 @media (min-width: 600px) {
-  .popup-overlay {
-    align-items: center;
-  }
+  .popup-overlay { align-items: center; }
 }
 
-.popup-overlay.active {
-  visibility: visible;
-  opacity: 1;
-}
+.popup-overlay.active { visibility: visible; opacity: 1; }
 
 .popup-sheet {
   background: var(--surface);
@@ -492,11 +458,8 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   }
 }
 
-.popup-overlay.active .popup-sheet {
-  transform: translateY(0) scale(1);
-}
+.popup-overlay.active .popup-sheet { transform: translateY(0) scale(1); }
 
-/* drag handle */
 .popup-handle {
   width: 36px; height: 4px;
   background: var(--border);
@@ -504,9 +467,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   margin: 0 auto 20px;
 }
 
-@media (min-width: 600px) {
-  .popup-handle { display: none; }
-}
+@media (min-width: 600px) { .popup-handle { display: none; } }
 
 .popup-header {
   display: flex;
@@ -565,7 +526,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   color: var(--gold);
 }
 
-/* coupon items */
 .coupon-item {
   display: flex;
   align-items: center;
@@ -581,18 +541,14 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   gap: 10px;
 }
 
-@keyframes slideUp {
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
 .coupon-item.is-best {
   border-color: rgba(255,214,10,0.35);
   background: rgba(255,214,10,0.06);
 }
 
-.coupon-item.is-best .coupon-pts {
-  color: var(--gold);
-}
+.coupon-item.is-best .coupon-pts { color: var(--gold); }
 
 .coupon-left { flex: 1; min-width: 0; }
 
@@ -681,10 +637,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   white-space: nowrap;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── EMPTY STATE ── */
 .empty-state {
@@ -693,12 +646,42 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   color: var(--muted);
 }
 
-.empty-state svg {
-  margin-bottom: 12px;
-  opacity: 0.4;
+.empty-state svg { margin-bottom: 12px; opacity: 0.4; }
+
+/* ── ERROR STATE ── */
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
 }
 
-/* ── MOBILE OVERFLOW FIX ── */
+.error-state .error-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.error-state p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.error-state .retry-btn {
+  margin-top: 16px;
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  background: var(--gold-dim);
+  border: 1px solid rgba(255,214,10,0.3);
+  color: var(--gold);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.error-state .retry-btn:hover { background: rgba(255,214,10,0.25); }
+
+/* ── MOBILE ── */
 @media (max-width: 500px) {
   .ranking-table td, .ranking-table th { padding: 11px 10px; }
   .ranking-table th:first-child { padding-left: 12px; }
@@ -778,7 +761,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 </div>
 
 <!-- Popup -->
-<div id="popup" class="popup-overlay">
+<div id="popup" class="popup-overlay" onclick="handleOverlayClick(event)">
   <div class="popup-sheet">
     <div class="popup-handle"></div>
     <div class="popup-header">
@@ -807,60 +790,62 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 
 <script>
 const CSV_URLS = {
-  maj: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg5KetOj1gI-RwW7c8jForGl7QHTA2EFBjar_7usr594aCldQIiNqzglkItznWYJBBX8lISZ_RK4yL/pub?output=csv",
+  maj:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg5KetOj1gI-RwW7c8jForGl7QHTA2EFBjar_7usr594aCldQIiNqzglkItznWYJBBX8lISZ_RK4yL/pub?output=csv",
   kwiecien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSH66B29eSQCx3n4azrAONb4DnOv80o0OLpyb3u2d8oRKATfJp6kOe7ONb3n0MEwjLoQobdaEQKbuQ5/pub?output=csv",
-  marzec: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsopL8OBdIkFkCdGLo-_n8YewObXzEvVHQ9K0PXy3ANcxxJ2B6krxvxPPpHex66ut4Ut8hvARMzmh1/pub?output=csv",
-  luty: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQodqUqlWT0Ddd8ch_t3Jm7NzRmkrp_qyoP3KTz5gMw3exgx41WL7zcVrDvtQop7niDpeuyM57vaO9n/pub?output=csv",
-  styczen: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
+  marzec:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsopL8OBdIkFkCdGLo-_n8YewObXzEvVHQ9K0PXy3ANcxxJ2B6krxvxPPpHex66ut4Ut8hvARMzmh1/pub?output=csv",
+  luty:     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQodqUqlWT0Ddd8ch_t3Jm7NzRmkrp_qyoP3KTz5gMw3exgx41WL7zcVrDvtQop7niDpeuyM57vaO9n/pub?output=csv",
+  styczen:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
-let playersData = {}, list = [], currentPopupNick = '', currentSortType = 'date';
+let playersData = {};
+let list = [];
+let currentPopupNick = '';
+let currentSortType = 'date';
+let currentMonth = 'maj';
 
-function parseCSV(t) {
-  return t.trim().split(/\r?\n/).map(l =>
-    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x => x.replace(/^"|"$/g, ''))
-  );
+/* ── CSV PARSER ── */
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  return lines.map(line => {
+    const cols = [];
+    let inQuotes = false;
+    let current = '';
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes) {
+        cols.push(current.trim());
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    cols.push(current.trim());
+    return cols;
+  });
 }
 
+/* ── LOAD DATA ── */
 async function loadRankingForMonth(month) {
   const url = CSV_URLS[month];
   if (!url) return;
+
+  currentMonth = month;
   document.getElementById('loader').classList.remove('hidden');
   document.getElementById('table-wrap').classList.remove('show');
   document.getElementById('ranking-body').innerHTML = '';
 
-  const res = await fetch(url);
-  const txt = await res.text();
-  const rows = parseCSV(txt);
-  const head = rows[0].map(x => x.toLowerCase());
-  const ni = head.findIndex(h => h.includes('nick'));
-  const pi = head.findIndex(h => h.includes('punk'));
-  const li = head.findIndex(h => h.includes('link'));
-  const di = head.findIndex(h => h.includes('data'));
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-  const data = {};
-  rows.slice(1).forEach(r => {
-    const nick = (r[ni] || '').trim();
-    const pts = parseFloat((r[pi] || '0').replace(',', '.')) || 0;
-    const link = (r[li] || '').trim();
-    const date = (r[di] || '').trim();
-    if (!nick) return;
-    if (!data[nick]) data[nick] = { punkty: 0, kupony: 0, links: [] };
-    data[nick].punkty += pts;
-    data[nick].kupony++;
-    if (link) data[nick].links.push({ url: link, points: pts, date });
-  });
+    const txt = await res.text();
+    if (!txt || txt.trim().length === 0) throw new Error('Pusta odpowiedź z arkusza');
 
-  playersData = data;
-  list = Object.entries(data).map(([nick, v]) => ({ nick, ...v }));
-  list.sort((a, b) => b.punkty - a.punkty);
+    const rows = parseCSV(txt);
+    if (rows.length < 2) throw new Error('Brak danych w arkuszu');
 
-  renderTable();
-
-  const sum = list.reduce((a, b) => a + b.punkty, 0);
-  document.getElementById('count').textContent = list.length;
-  document.getElementById('sum').textContent = Math.round(sum).toLocaleString('pl');
-  document.getElementById('avg').textContent = list.length ? (sum / list.length).toFixed(1) : '0';
-
-  document.getElementById('loader').classList
+    const head = rows[0].map(x => x.toLowerCase());
+    const ni = head.findIndex(h => h.includes('nick
