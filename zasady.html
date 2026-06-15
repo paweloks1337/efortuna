@@ -1,199 +1,405 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>📖 Zasady - Mistrzostwa Discorda</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8HRSFSGF0F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-8HRSFSGF0F');
+</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>📖 Zasady – Mistrzostwa Typerów</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-body {
-  margin:0;
-  padding:0;
-  font-family:'Poppins',sans-serif;
-  background: linear-gradient(180deg,#000,#111);
-  color:#FFD700;
-  line-height:1.6;
-  text-align:center;
+:root {
+  --bg:        #0A0A0F;
+  --surface:   #13131D;
+  --surface2:  #1C1C2E;
+  --border:    rgba(255,214,10,0.12);
+  --gold:      #FFD60A;
+  --gold-dim:  rgba(255,214,10,0.15);
+  --green:     #00E676;
+  --red:       #FF4D4D;
+  --text:      #E8E8F0;
+  --muted:     #6B6B80;
+  --radius:    12px;
+  --radius-lg: 20px;
 }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse at center, rgba(255,214,10,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
 nav {
-  background: linear-gradient(90deg,#000,#222);
-  padding:14px 0;
-  box-shadow:0 2px 10px rgba(255,215,0,0.18);
-  margin-bottom:24px;
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: center; gap: 4px;
+  padding: 10px 16px;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
 }
 nav a {
-  color:#FFD700;
-  text-decoration:none;
-  margin:0 18px;
-  font-weight:600;
-  transition:0.25s;
+  color: var(--muted); text-decoration: none;
+  font-size: 0.82rem; font-weight: 600;
+  padding: 7px 14px; border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
 }
-nav a:hover { color:#fff; text-shadow:0 0 8px #FFD700; }
+nav a:hover { color: var(--gold); background: var(--gold-dim); }
+nav a.active { color: var(--gold); background: var(--gold-dim); }
 
-.container {
-  width:90%;
-  max-width:860px;
-  margin:0 auto 36px auto;
-  background:#1a1a1a;
-  padding:24px;
-  border-radius:14px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.6);
-  text-align:left;
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 40px 20px 28px;
+  position: relative; z-index: 1;
 }
-
-h1 {
-  text-align:center;
-  color:#FFD700;
-  font-size:1.8rem;
-  margin-bottom:18px;
-  text-shadow:0 0 12px #FFD700;
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold); background: var(--gold-dim);
+  border: 1px solid var(--border);
+  padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
 }
-
-h2 {
-  color:#FFD700;
-  font-size:1.4rem;
-  margin:18px 0 12px 0;
-  text-shadow:0 0 10px #FFD700;
+.hero-eyebrow .dot {
+  width: 6px; height: 6px;
+  background: var(--gold); border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
 }
-
-p {
-  color:#fff;
-  margin:6px 0;
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 700; letter-spacing: 0.02em; line-height: 1.1; color: #fff;
 }
+.hero h1 span { color: var(--gold); }
 
-ul {
-  margin:8px 0 18px 18px;
-  padding:0;
-  color:#fff;
-}
-
-ul li {
-  margin:6px 0;
+/* LAYOUT */
+.page {
+  max-width: 780px;
+  margin: 0 auto 60px;
+  padding: 0 16px;
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 16px;
 }
 
-a {
-  color:#00FF88;
-  text-decoration:none;
-  font-weight:600;
+/* SECTION CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
 }
 
-a:hover {
-  text-decoration:underline;
+.card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.15rem; font-weight: 700;
+  color: var(--gold);
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
-.highlight {
-  color:#FF4444;
-  font-weight:700;
+.card p {
+  color: var(--text);
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+}
+.card p:last-child { margin-bottom: 0; }
+
+/* PRIZE POOL BANNER */
+.prize-banner {
+  background: linear-gradient(135deg, rgba(255,214,10,0.1), rgba(255,214,10,0.04));
+  border: 1px solid rgba(255,214,10,0.3);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  text-align: center;
+}
+.prize-banner .edition {
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.prize-banner .total {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  font-weight: 700; color: var(--gold); line-height: 1;
+}
+.prize-banner .total-sub {
+  font-size: 0.85rem; color: var(--muted); margin-top: 6px;
 }
 
-.reward {
-  color:#00FF88;
-  font-weight:700;
+/* MULTIPLIER TABLE */
+.mult-grid {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mult-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 0.88rem;
+}
+.mult-row .tag {
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px;
+  flex-shrink: 0;
+}
+.tag-solo { background: rgba(255,214,10,0.15); color: var(--gold); border: 1px solid rgba(255,214,10,0.3); }
+.tag-ako  { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }
+.mult-row .range { color: var(--muted); flex: 1; }
+.mult-row .mult-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--green);
+  margin-left: auto;
 }
 
-.note {
-  font-style:italic;
-  color:#ccc;
-  margin-top:12px;
+/* PRIZE LIST */
+.prize-list {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.prize-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+}
+.prize-item.top1 { border-color: rgba(255,214,10,0.4); background: rgba(255,214,10,0.06); }
+.prize-item.top2 { border-color: rgba(192,192,192,0.3); }
+.prize-item.top3 { border-color: rgba(205,127,50,0.3); }
+
+.prize-icon { font-size: 1.3rem; flex-shrink: 0; width: 28px; text-align: center; }
+.prize-info { flex: 1; min-width: 0; }
+.prize-place { font-weight: 600; color: var(--text); font-size: 0.9rem; }
+.prize-place small { color: var(--muted); font-weight: 400; font-size: 0.8rem; margin-left: 4px; }
+.prize-amount {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--green);
+  white-space: nowrap; flex-shrink: 0;
+}
+.prize-item.top1 .prize-amount { color: var(--gold); }
+
+/* RULES LIST */
+.rules-list {
+  display: flex; flex-direction: column; gap: 8px;
+  list-style: none;
+}
+.rules-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 0.9rem; color: var(--text);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 14px;
+}
+.rules-list li.warn {
+  border-color: rgba(255,77,77,0.3);
+  background: rgba(255,77,77,0.06);
+}
+.rules-list li .ico { flex-shrink: 0; }
+.rules-list li .warn-text { color: var(--red); font-weight: 600; }
+
+/* EXAMPLE BOX */
+.example-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  color: var(--green);
+  word-break: break-all;
+  margin-top: 12px;
+}
+.example-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
 }
 
+@media (max-width: 500px) {
+  .card { padding: 18px 16px; }
+  .prize-banner { padding: 20px 16px; }
+  .mult-row .tag { display: none; }
+}
 </style>
 </head>
 <body>
+
 <nav>
   <a href="index.html">🏆 Ranking</a>
   <a href="kalkulator.html">📊 Kalkulator</a>
-  <a href="kupony.html">🧾 Lista Kuponów</a>
-  <a href="zasady.html">📖 Zasady</a>
+  <a href="kupony.html">🧾 Kupony</a>
+  <a href="zasady.html" class="active">📖 Zasady</a>
 </nav>
 
-<div class="container">
-  <h1>🌎 MISTRZOSTWA TYPERÓW DISCORDA</h1>
-
-  <p><strong>Edycja: Mistrzostwa Świata 2026</strong> 🌎</p>
-
-  <p>
-    W tej edycji łączna pula nagród to
-    <span class="reward">15 000 zł we freebetach</span>.
-  </p>
-
-  <p>Typujemy wyłącznie zakłady związane z Mistrzostwami Świata.</p>
-
-  <h2>⚠️ Uwaga!</h2>
-
-  <p>
-    Mecze rozgrywane wieczorem i w nocy traktujemy jako jeden dzień meczowy.
-  </p>
-
-  <p>
-    Jeśli mecze zaczynają się 11 czerwca o 18:00 i kończą nad ranem
-    12 czerwca, kupon publikujesz 12 czerwca.
-  </p>
-
-  <h2>🧮 Jak liczymy punkty?</h2>
-
-  <p>
-    Punkty obliczamy na podstawie wygranej × mnożnik według poniższego wzoru:
-  </p>
-
-  <ul>
-    <li>✅ Kupon z kursem poniżej 1.50 — <strong>x1</strong> za każdą wygraną złotówkę</li>
-    <li>✅ Kupon SOLO z kursem 1.50–4.99 — <strong>x3</strong> za każdą wygraną złotówkę</li>
-    <li>✅ Kupon SOLO z kursem powyżej 5.00 — <strong>x7,5</strong> za każdą wygraną złotówkę</li>
-    <li>✅ Kupon AKO z kursem 1.50–4.99 — <strong>x2,5</strong> za każdą wygraną złotówkę</li>
-    <li>✅ Kupon AKO z kursem 5.00–10.00 — <strong>x5</strong> za każdą wygraną złotówkę</li>
-    <li>✅ Kupon AKO z kursem powyżej 10.00 — <strong>x8</strong> za każdą wygraną złotówkę</li>
-  </ul>
-
-  <h2>💰 Nagrody</h2>
-
-  <p><strong>SPECJALNA EDYCJA MUNDIALOWA</strong></p>
-
-  <p class="reward">ŁĄCZNIE 15 000 ZŁ WE FREEBETACH!</p>
-
-  <ul>
-    <li>🥇 <strong>1. miejsce – TYPER MŚ 2026</strong><br>Freebety o wartości 2 500 zł + ranga „#1 Typer MŚ2026” na Discordzie</li>
-
-    <li>🥈 <strong>2. miejsce</strong><br>Freebety o wartości 1 500 zł</li>
-
-    <li>🥉 <strong>3. miejsce</strong><br>Freebety o wartości 1 000 zł</li>
-
-    <li><strong>4–5. miejsce</strong><br>Freebety o wartości 500 zł</li>
-
-    <li><strong>6–10. miejsce</strong><br>Freebety o wartości 300 zł</li>
-
-    <li><strong>11–20. miejsce</strong><br>Freebety o wartości 150 zł</li>
-
-    <li><strong>21–50. miejsce</strong><br>Freebety o wartości 100 zł</li>
-
-    <li><strong>51–100. miejsce</strong><br>Freebety o wartości 60 zł</li>
-  </ul>
-
-  <h2>📝 Jak opublikować wygrany kupon?</h2>
-
-  <p>
-    Kupony publikujemy na kanale <strong>#Kupony</strong> w formacie:
-  </p>
-
-  <p class="reward">
-    Liczba punktów(spacja)Link do kuponu
-  </p>
-
-  <p>Przykład:</p>
-
-  <p style="word-break: break-all;">
-    532,75 https://www.efortuna.pl/ticketdetail?id=...
-  </p>
-
-  <h2>📌 Ważne zasady</h2>
-
-  <ul>
-    <li>Pamiętajcie, że możecie opublikować tylko jeden kupon dziennie.</li>
-    <li>Jeżeli danego dnia traficie lepszy kupon, usuńcie poprzedni i wrzućcie nowy.</li>
-    <li>
-      <span class="highlight">⚠️ Wrzucamy wyłącznie kupony, które zostały rozliczone tego samego dnia.</span>
-    </li>
-  </ul>
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Edycja MŚ 2026
+  </div>
+  <h1>Zasady<br><span>Mistrzostw</span></h1>
 </div>
+
+<div class="page">
+
+  <!-- PULA NAGRÓD -->
+  <div class="prize-banner">
+    <div class="edition">Mistrzostwa Świata 2026 🌎</div>
+    <div class="total">15 000 zł</div>
+    <div class="total-sub">łączna pula nagród we freebetach</div>
+  </div>
+
+  <!-- O CO CHODZI -->
+  <div class="card">
+    <div class="card-title">🎯 Ogólne zasady</div>
+    <p>Typujemy wyłącznie zakłady związane z Mistrzostwami Świata 2026.</p>
+    <p>Mecze rozgrywane wieczorem i w nocy traktujemy jako jeden dzień meczowy. Jeśli mecze zaczynają się 11 czerwca o 18:00 i kończą nad ranem 12 czerwca — kupon publikujesz <strong>12 czerwca</strong>.</p>
+  </div>
+
+  <!-- PUNKTACJA -->
+  <div class="card">
+    <div class="card-title">🧮 Jak liczymy punkty?</div>
+    <p style="margin-bottom:14px">Punkty = wygrana netto (po 12% podatku) × mnożnik zależny od kursu i typu kuponu.</p>
+    <div class="mult-grid">
+      <div class="mult-row">
+        <span class="tag tag-solo">SOLO</span><span class="tag tag-ako">AKO</span>
+        <span class="range">Kurs poniżej 1.50</span>
+        <span class="mult-val" style="color:var(--muted)">×0</span>
+      </div>
+      <div class="mult-row">
+        <span class="tag tag-solo">SOLO</span>
+        <span class="range">Kurs 1.50 – 4.99</span>
+        <span class="mult-val">×3</span>
+      </div>
+      <div class="mult-row">
+        <span class="tag tag-solo">SOLO</span>
+        <span class="range">Kurs 5.00+</span>
+        <span class="mult-val">×7.5</span>
+      </div>
+      <div class="mult-row">
+        <span class="tag tag-ako">AKO</span>
+        <span class="range">Kurs 1.50 – 4.99</span>
+        <span class="mult-val">×2.5</span>
+      </div>
+      <div class="mult-row">
+        <span class="tag tag-ako">AKO</span>
+        <span class="range">Kurs 5.00 – 10.00</span>
+        <span class="mult-val">×5</span>
+      </div>
+      <div class="mult-row">
+        <span class="tag tag-ako">AKO</span>
+        <span class="range">Kurs powyżej 10.00</span>
+        <span class="mult-val">×8</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAGRODY -->
+  <div class="card">
+    <div class="card-title">💰 Nagrody</div>
+    <div class="prize-list">
+      <div class="prize-item top1">
+        <div class="prize-icon">🥇</div>
+        <div class="prize-info">
+          <div class="prize-place">1. miejsce <small>— Typer MŚ 2026 + ranga na Discordzie</small></div>
+        </div>
+        <div class="prize-amount">2 500 zł</div>
+      </div>
+      <div class="prize-item top2">
+        <div class="prize-icon">🥈</div>
+        <div class="prize-info"><div class="prize-place">2. miejsce</div></div>
+        <div class="prize-amount">1 500 zł</div>
+      </div>
+      <div class="prize-item top3">
+        <div class="prize-icon">🥉</div>
+        <div class="prize-info"><div class="prize-place">3. miejsce</div></div>
+        <div class="prize-amount">1 000 zł</div>
+      </div>
+      <div class="prize-item">
+        <div class="prize-icon">4️⃣</div>
+        <div class="prize-info"><div class="prize-place">4–5. miejsce</div></div>
+        <div class="prize-amount">500 zł</div>
+      </div>
+      <div class="prize-item">
+        <div class="prize-icon">🏅</div>
+        <div class="prize-info"><div class="prize-place">6–10. miejsce</div></div>
+        <div class="prize-amount">300 zł</div>
+      </div>
+      <div class="prize-item">
+        <div class="prize-icon">🎖️</div>
+        <div class="prize-info"><div class="prize-place">11–20. miejsce</div></div>
+        <div class="prize-amount">150 zł</div>
+      </div>
+      <div class="prize-item">
+        <div class="prize-icon">🎗️</div>
+        <div class="prize-info"><div class="prize-place">21–50. miejsce</div></div>
+        <div class="prize-amount">100 zł</div>
+      </div>
+      <div class="prize-item">
+        <div class="prize-icon">⭐</div>
+        <div class="prize-info"><div class="prize-place">51–100. miejsce</div></div>
+        <div class="prize-amount">60 zł</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAK PUBLIKOWAĆ -->
+  <div class="card">
+    <div class="card-title">📝 Jak opublikować kupon?</div>
+    <p>Kupony wrzucamy na kanał <strong>#Kupony</strong> w formacie:</p>
+    <div class="example-box">
+      <div class="example-label">Format</div>
+      Liczba punktów&nbsp;&nbsp;Link do kuponu
+    </div>
+    <div class="example-box" style="margin-top:8px">
+      <div class="example-label">Przykład</div>
+      532,75 https://www.efortuna.pl/ticketdetail?id=...
+    </div>
+  </div>
+
+  <!-- WAŻNE ZASADY -->
+  <div class="card">
+    <div class="card-title">📌 Ważne zasady</div>
+    <ul class="rules-list">
+      <li><span class="ico">📅</span><span>Możesz opublikować tylko <strong>jeden kupon dziennie</strong>.</span></li>
+      <li><span class="ico">🔄</span><span>Jeżeli danego dnia trafisz lepszy kupon — usuń poprzedni i wrzuć nowy.</span></li>
+      <li class="warn"><span class="ico">⚠️</span><span class="warn-text">Wrzucamy wyłącznie kupony rozliczone tego samego dnia.</span></li>
+    </ul>
+  </div>
+
+</div>
+
 </body>
 </html>
