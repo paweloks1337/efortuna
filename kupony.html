@@ -1,61 +1,282 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🧾 Lista Kuponów - Mistrzostwa Discorda</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8HRSFSGF0F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-8HRSFSGF0F');
+</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🧾 Lista Kuponów</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#FFD700;--dark:#111;--green:#00FF88}
-body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#000,#111);color:var(--gold);text-align:center}
-nav{background:#111;padding:14px 0}
-nav a{color:var(--gold);text-decoration:none;margin:0 16px;font-weight:600}
-h1{margin:18px 0}
+:root {
+  --bg:        #0A0A0F;
+  --surface:   #13131D;
+  --surface2:  #1C1C2E;
+  --border:    rgba(255,214,10,0.12);
+  --gold:      #FFD60A;
+  --gold-dim:  rgba(255,214,10,0.15);
+  --green:     #00E676;
+  --text:      #E8E8F0;
+  --muted:     #6B6B80;
+  --radius:    12px;
+  --radius-lg: 20px;
+}
 
-.container{width:90%;max-width:860px;margin:24px auto;background:#1a1a1a;padding:16px;border-radius:14px;text-align:left}
-table{width:100%;border-collapse:separate;border-spacing:0 6px}
-th,td{padding:10px 14px}
-th{color:var(--gold);text-transform:uppercase;font-size:.9rem}
-td.nick{color:#fff;font-weight:600}
-td.points{color:var(--green);text-align:center;font-weight:700}
-td.link button{background:var(--gold);border:none;padding:6px 10px;border-radius:6px;font-weight:600;cursor:pointer}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.sort-box{margin:12px auto}
-.sort-box select{background:#111;border:1px solid var(--gold);color:var(--gold);padding:6px 10px;border-radius:8px}
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-#loader{position:fixed;left:50%;top:50%;width:70px;height:70px;border-radius:50%;border:8px solid rgba(255,215,0,.2);border-top:8px solid var(--gold);transform:translate(-50%,-50%);animation:spin 1s linear infinite}
-#loader.hidden{display:none}
-@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse at center, rgba(255,214,10,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: center; gap: 4px;
+  padding: 10px 16px;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+nav a {
+  color: var(--muted); text-decoration: none;
+  font-size: 0.82rem; font-weight: 600;
+  padding: 7px 14px; border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+nav a:hover { color: var(--gold); background: var(--gold-dim); }
+nav a.active { color: var(--gold); background: var(--gold-dim); }
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 40px 20px 28px;
+  position: relative; z-index: 1;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold); background: var(--gold-dim);
+  border: 1px solid var(--border);
+  padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
+}
+.hero-eyebrow .dot {
+  width: 6px; height: 6px;
+  background: var(--gold); border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 700; letter-spacing: 0.02em; line-height: 1.1; color: #fff;
+}
+.hero h1 span { color: var(--gold); }
+
+/* CONTROLS */
+.controls {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 10px; max-width: 860px;
+  margin: 0 auto 28px; padding: 0 16px;
+  position: relative; z-index: 1;
+}
+.select-wrap { position: relative; }
+.select-wrap svg {
+  position: absolute; right: 10px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; color: var(--muted);
+}
+select {
+  appearance: none; -webkit-appearance: none;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 500;
+  padding: 10px 34px 10px 14px; cursor: pointer; outline: none;
+  transition: border-color 0.2s;
+}
+select:focus { border-color: rgba(255,214,10,0.5); }
+
+/* LOADER */
+#loader {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  background: var(--bg); z-index: 9999;
+}
+#loader.hidden { display: none !important; }
+.loader-ring {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 3px solid var(--surface2);
+  border-top-color: var(--gold);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; }
+
+/* DATE GROUPS */
+.content {
+  max-width: 860px; margin: 0 auto 60px;
+  padding: 0 16px;
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.date-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  opacity: 0; transform: translateY(12px);
+  animation: fadeUp 0.4s ease forwards;
+}
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+.date-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.date-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem; font-weight: 700; color: var(--gold);
+}
+.date-count {
+  margin-left: auto;
+  font-size: 0.75rem; color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px; padding: 2px 10px;
+}
+
+/* TABLE inside group */
+.coupon-table {
+  width: 100%; border-collapse: collapse;
+}
+.coupon-table th {
+  padding: 10px 20px;
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.coupon-table th:nth-child(2) { text-align: center; }
+.coupon-table th:nth-child(3) { text-align: right; }
+
+.coupon-table td {
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+}
+.coupon-table tr:last-child td { border-bottom: none; }
+.coupon-table tbody tr { transition: background 0.15s; }
+.coupon-table tbody tr:hover { background: var(--surface2); }
+
+.td-nick {
+  font-weight: 600; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.nick-avatar {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+  font-weight: 700; color: var(--muted); flex-shrink: 0;
+}
+.td-points {
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.05rem; font-weight: 700; color: var(--green);
+}
+.td-link { text-align: right; }
+.open-btn {
+  padding: 6px 14px;
+  background: var(--gold); border: none;
+  border-radius: 8px; color: #000;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+.open-btn:hover { opacity: 0.85; transform: scale(0.97); }
+
+/* EMPTY / ERROR */
+.state-box {
+  text-align: center; padding: 60px 20px;
+  color: var(--muted); position: relative; z-index: 1;
+}
+.state-box .icon { font-size: 2rem; margin-bottom: 10px; }
+
+@media (max-width: 500px) {
+  .coupon-table th, .coupon-table td { padding: 10px 12px; }
+  .nick-avatar { display: none; }
+  .td-nick { font-size: 0.85rem; }
+}
 </style>
 </head>
-
 <body>
-<div id="loader"></div>
 
-<nav>
-  <a href="/">🏆 Ranking</a>
-  <a href="/kalkulator">📊 Kalkulator</a>
-  <a href="/kupony">🧾 Lista Kuponów</a>
-  <a href="/zasady">📖 Zasady</a>
-</nav>
-
-<h1>🧾 Lista Kuponów</h1>
-
-<div class="sort-box">
-  <label>📅 Wybierz miesiąc:</label>
-  <select id="month-select">
-    <option value="maj" selected>Maj</option>
-    <option value="kwiecien">Kwiecień</option>
-    <option value="marzec">Marzec</option>
-    <option value="luty">Luty</option>
-    <option value="styczen">Styczeń</option>
-    <option value="grudzien">Grudzień</option>
-  </select>
+<div id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-label">Ładowanie kuponów…</div>
 </div>
 
-<div id="coupons-container"></div>
+<nav>
+  <a href="index.html">🏆 Ranking</a>
+  <a href="kalkulator.html">📊 Kalkulator</a>
+  <a href="kupony.html" class="active">🧾 Kupony</a>
+  <a href="zasady.html">📖 Zasady</a>
+</nav>
 
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Historia
+  </div>
+  <h1>Lista<br><span>Kuponów</span></h1>
+</div>
+
+<div class="controls">
+  <div class="select-wrap">
+    <select id="month-select">
+      <option value="maj">Maj</option>
+      <option value="kwiecien">Kwiecień</option>
+      <option value="marzec">Marzec</option>
+      <option value="luty">Luty</option>
+      <option value="styczen">Styczeń</option>
+      <option value="grudzien">Grudzień</option>
+    </select>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
 
 <script>
 const CSV_URLS = {
@@ -67,177 +288,108 @@ const CSV_URLS = {
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
-function parseCSV(text){
+function parseCSV(text) {
   const rows = [];
-  const lines = text.split(/\r?\n/);
-
-  for(const line of lines){
-    if(!line.trim()) continue;
-
-    const result = [];
-    let current = "";
-    let inside = false;
-
-    for(let i=0;i<line.length;i++){
-      const char = line[i];
-
-      if(char === '"'){
-        inside = !inside;
-      }
-      else if(char === "," && !inside){
-        result.push(current);
-        current = "";
-      }
-      else{
-        current += char;
-      }
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const result = []; let cur = '', inside = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inside = !inside; }
+      else if (c === ',' && !inside) { result.push(cur); cur = ''; }
+      else { cur += c; }
     }
-
-    result.push(current);
-
-    rows.push(
-      result.map(x => x.replace(/^"|"$/g,"").trim())
-    );
+    result.push(cur);
+    rows.push(result.map(x => x.replace(/^"|"$/g, '').trim()));
   }
-
   return rows;
 }
 
-async function loadCoupons(month){
-
+async function loadCoupons(month) {
   const url = CSV_URLS[month];
-  if(!url) return;
+  if (!url) return;
+  const loader = document.getElementById('loader');
+  const content = document.getElementById('content');
+  loader.classList.remove('hidden');
+  content.innerHTML = '';
 
-  document.getElementById("loader").classList.remove("hidden");
-
-  try{
-
+  try {
     const res = await fetch(url);
-
-    if(!res.ok){
-      throw new Error("Błąd fetch");
-    }
-
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const txt = await res.text();
-
-    if(txt.startsWith("<")){
-      throw new Error("To nie CSV");
-    }
+    if (txt.startsWith('<')) throw new Error('Nie CSV');
 
     const rows = parseCSV(txt);
-
     const head = rows[0].map(h => h.toLowerCase());
-
-    const iNick = head.findIndex(h => h.includes("nick"));
-    const iPts  = head.findIndex(h => h.includes("punk"));
-    const iDate = head.findIndex(h => h.includes("data"));
-    const iLink = head.findIndex(h => h.includes("link"));
-
-    if(iNick===-1 || iPts===-1 || iDate===-1 || iLink===-1){
-      console.log(head);
-      throw new Error("Brak wymaganych kolumn");
-    }
+    const iNick = head.findIndex(h => h.includes('nick'));
+    const iPts  = head.findIndex(h => h.includes('punk'));
+    const iDate = head.findIndex(h => h.includes('data'));
+    const iLink = head.findIndex(h => h.includes('link'));
+    if ([iNick,iPts,iDate,iLink].includes(-1)) throw new Error('Brak kolumn');
 
     const byDate = {};
-
     rows.slice(1).forEach(r => {
-
-      const date = (r[iDate] || "—").trim();
-
-      if(!byDate[date]){
-        byDate[date] = [];
-      }
-
+      const date = (r[iDate] || '—').trim();
+      if (!byDate[date]) byDate[date] = [];
       byDate[date].push({
-        nick: (r[iNick] || "").trim(),
-        points: parseFloat((r[iPts] || "0").replace(",", ".")) || 0,
-        link: (r[iLink] || "#").trim()
+        nick:   (r[iNick] || '').trim(),
+        points: parseFloat((r[iPts] || '0').replace(',', '.')) || 0,
+        link:   (r[iLink] || '#').trim()
       });
-
     });
 
-    const dates = Object.keys(byDate).sort((a,b)=>{
-
-      const [da,ma,ya] = a.split(".");
-      const [db,mb,yb] = b.split(".");
-
-      return new Date(`${yb}-${mb}-${db}`) - new Date(`${ya}-${ma}-${da}`);
+    const dates = Object.keys(byDate).sort((a, b) => {
+      const parse = s => { const [d,m,y] = s.split('.'); return new Date(`${y}-${m}-${d}`); };
+      return parse(b) - parse(a);
     });
 
-    const container = document.getElementById("coupons-container");
+    if (!dates.length) {
+      content.innerHTML = '<div class="state-box"><div class="icon">📭</div><div>Brak kuponów w tym miesiącu</div></div>';
+      return;
+    }
 
-    container.innerHTML = "";
+    dates.forEach((date, gi) => {
+      const entries = byDate[date];
+      const group = document.createElement('div');
+      group.className = 'date-group';
+      group.style.animationDelay = `${gi * 0.07}s`;
 
-    dates.forEach(d => {
+      const rows_html = entries.map(c => {
+        const initials = c.nick.slice(0,2).toUpperCase();
+        const safeLink = c.link.replace(/'/g, "\\'");
+        return `<tr>
+          <td><div class="td-nick"><span class="nick-avatar">${initials}</span>${c.nick}</div></td>
+          <td class="td-points">${Math.round(c.points)} pkt</td>
+          <td class="td-link"><button class="open-btn" onclick="window.open('${safeLink}','_blank')">Otwórz</button></td>
+        </tr>`;
+      }).join('');
 
-      const box = document.createElement("div");
+      group.innerHTML = `
+        <div class="date-header">
+          <span>📅</span>
+          <span class="date-label">${date}</span>
+          <span class="date-count">${entries.length} kupon${entries.length === 1 ? '' : entries.length < 5 ? 'y' : 'ów'}</span>
+        </div>
+        <table class="coupon-table">
+          <thead><tr><th>Gracz</th><th>Punkty</th><th style="text-align:right">Kupon</th></tr></thead>
+          <tbody>${rows_html}</tbody>
+        </table>`;
 
-      box.className = "container";
-
-      box.innerHTML = `
-        <h2>📅 ${d}</h2>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Nick</th>
-              <th>Punkty</th>
-              <th>Kupon</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      `;
-
-      const tbody = box.querySelector("tbody");
-
-      byDate[d].forEach(c => {
-
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td class="nick">${c.nick}</td>
-          <td class="points">${c.points.toFixed(0)}</td>
-          <td class="link">
-            <button onclick="window.open('${c.link}','_blank')">
-              Otwórz
-            </button>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-
-      });
-
-      container.appendChild(box);
-
+      content.appendChild(group);
     });
 
-  }
-  catch(err){
-
+  } catch (err) {
     console.error(err);
-
-    document.getElementById("coupons-container").innerHTML = `
-      <div class="container">
-        ❌ Błąd ładowania danych
-      </div>
-    `;
+    content.innerHTML = `<div class="state-box"><div class="icon">⚠️</div><div>Błąd ładowania danych</div><div style="font-size:0.8rem;margin-top:4px;color:var(--muted)">${err.message}</div></div>`;
+  } finally {
+    loader.classList.add('hidden');
   }
-
-  document.getElementById("loader").classList.add("hidden");
 }
 
-window.addEventListener("load", () => {
-
-  const select = document.getElementById("month-select");
-
-  loadCoupons(select.value);
-
-  select.addEventListener("change", e => {
-    loadCoupons(e.target.value);
-  });
-
+window.addEventListener('load', () => {
+  const sel = document.getElementById('month-select');
+  loadCoupons(sel.value);
+  sel.addEventListener('change', e => loadCoupons(e.target.value));
 });
 </script>
 </body>
