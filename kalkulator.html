@@ -1,188 +1,517 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8HRSFSGF0F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-8HRSFSGF0F');
+</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>📊 Kalkulator punktów</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background:linear-gradient(180deg,#000,#111);
-  color:#FFD700;
-  text-align:center;
-}
-nav{
-  background:linear-gradient(90deg,#000,#222);
-  padding:14px 0;
-}
-nav a{
-  color:#FFD700;
-  text-decoration:none;
-  margin:0 18px;
-  font-weight:600;
-}
-h1{margin:20px 0}
-
-.box{
-  width:90%;
-  max-width:420px;
-  margin:30px auto;
-  background:#1a1a1a;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+:root {
+  --bg:        #0A0A0F;
+  --surface:   #13131D;
+  --surface2:  #1C1C2E;
+  --border:    rgba(255,214,10,0.12);
+  --gold:      #FFD60A;
+  --gold-dim:  rgba(255,214,10,0.15);
+  --gold-glow: rgba(255,214,10,0.35);
+  --green:     #00E676;
+  --text:      #E8E8F0;
+  --muted:     #6B6B80;
+  --radius:    12px;
+  --radius-lg: 20px;
 }
 
-label{
-  display:block;
-  margin-top:14px;
-  font-weight:600;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-input{
-  width:48%;
-  padding:8px;
-  margin-top:6px;
-  border-radius:8px;
-  border:2px solid #FFD700;
-  background:#000;
-  color:#FFD700;
-  font-size:1rem;
-  display:inline-block;
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse at center, rgba(255,214,10,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.buttons{
-  display:flex;
-  gap:10px;
-  margin-top:14px;
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 16px;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+nav a:hover { color: var(--gold); background: var(--gold-dim); }
+nav a.active { color: var(--gold); background: var(--gold-dim); }
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 40px 20px 28px;
+  position: relative;
+  z-index: 1;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-dim);
+  border: 1px solid var(--border);
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.hero-eyebrow .dot {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.hero h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  color: #fff;
+}
+.hero h1 span { color: var(--gold); }
+
+/* CARD */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  max-width: 440px;
+  margin: 0 auto 60px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px 32px;
 }
 
-.buttons button{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  font-weight:700;
-  cursor:pointer;
-  background:#111;
-  color:#FFD700;
-  border:2px solid #FFD700;
-  transition:0.2s;
+/* TYPE TOGGLE */
+.type-toggle {
+  display: flex;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 28px;
+}
+.type-btn {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.type-btn.active {
+  background: var(--gold);
+  color: #000;
+  box-shadow: 0 2px 10px rgba(255,214,10,0.3);
 }
 
-.buttons button.active{
-  background:#FFD700;
-  color:#000;
+/* FIELDS */
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.field input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+.field input::-webkit-outer-spin-button,
+.field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.field input::placeholder { color: var(--muted); }
+.field input:focus {
+  border-color: rgba(255,214,10,0.5);
+  box-shadow: 0 0 0 3px rgba(255,214,10,0.08);
 }
 
-.result{
-  margin-top:20px;
-  padding-top:14px;
-  border-top:1px solid rgba(255,255,255,0.15);
-  font-size:1.3rem;
-  color:#00FF88; /* zielony wynik */
-  font-weight:700;
+/* MULTIPLIER HINT */
+.mult-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 4px 0 20px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  min-height: 38px;
+  transition: all 0.2s;
+}
+.mult-hint .mult-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.mult-hint.active {
+  border-color: rgba(255,214,10,0.3);
+  background: rgba(255,214,10,0.06);
+}
+
+/* DIVIDER */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+/* RESULT */
+.result-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.result-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+  transition: color 0.2s;
+}
+.result-value.empty { color: var(--muted); font-size: 2rem; }
+.result-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* BREAKDOWNS */
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.breakdown-row .bd-label { color: var(--muted); }
+.breakdown-row .bd-val { font-weight: 600; color: var(--text); }
+
+/* MULTIPLIER TABLE */
+.mult-table-wrap {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+.mult-table-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.mult-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.mult-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+.mult-table td {
+  padding: 8px 8px;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.mult-table td:not(:first-child) { text-align: center; }
+.mult-table th:not(:first-child) { text-align: center; }
+.mult-table tr.highlight td { color: var(--gold); font-weight: 600; }
+.mult-table .tag {
+  display: inline-block;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(255,214,10,0.25);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.mult-table .tag.green {
+  background: rgba(0,230,118,0.1);
+  color: var(--green);
+  border-color: rgba(0,230,118,0.25);
 }
 </style>
 </head>
-
 <body>
 
 <nav>
   <a href="index.html">🏆 Ranking</a>
-  <a href="kalkulator.html">📊 Kalkulator</a>
-  <a href="kupony.html">🧾 Lista Kuponów</a>
+  <a href="kalkulator.html" class="active">📊 Kalkulator</a>
+  <a href="kupony.html">🧾 Kupony</a>
   <a href="zasady.html">📖 Zasady</a>
 </nav>
 
-<h1>📊 Kalkulator punktów</h1>
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Narzędzia
+  </div>
+  <h1>Kalkulator<br><span>Punktów</span></h1>
+</div>
 
-<div class="box">
+<div class="card">
 
-  <label>Kurs kuponu</label>
-  <input type="number" id="odds" step="0.01" placeholder="Kurs">
-
-  <label>Stawka (zł)</label>
-  <input type="number" id="stake" step="0.01" placeholder="Stawka">
-
-  <div class="buttons">
-    <button id="solo" class="active">SOLO</button>
-    <button id="ako">AKO</button>
+  <!-- Toggle SOLO / AKO -->
+  <div class="type-toggle">
+    <button class="type-btn active" id="btn-solo" onclick="setType('SOLO')">SOLO</button>
+    <button class="type-btn" id="btn-ako" onclick="setType('AKO')">AKO</button>
   </div>
 
-  <div class="result" id="result">—</div>
+  <!-- Kurs -->
+  <div class="field">
+    <label>Kurs kuponu</label>
+    <input type="number" id="odds" step="0.01" min="1" placeholder="np. 2.50" inputmode="decimal" />
+  </div>
+
+  <!-- Mnożnik hint -->
+  <div class="mult-hint" id="mult-hint">
+    <span>Wpisz kurs, aby zobaczyć mnożnik</span>
+  </div>
+
+  <!-- Stawka -->
+  <div class="field">
+    <label>Stawka (zł)</label>
+    <input type="number" id="stake" step="0.01" min="0.01" placeholder="np. 10.00" inputmode="decimal" />
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Wynik -->
+  <div class="result-label">Szacowane punkty</div>
+  <div class="result-value empty" id="result">—</div>
+  <div class="result-sub" id="result-sub"></div>
+
+  <!-- Breakdown -->
+  <div class="breakdown" id="breakdown" style="display:none">
+    <div class="breakdown-row">
+      <span class="bd-label">Wygrana brutto</span>
+      <span class="bd-val" id="bd-brutto">—</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="bd-label">Po podatku (88%)</span>
+      <span class="bd-val" id="bd-netto">—</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="bd-label">Mnożnik</span>
+      <span class="bd-val" id="bd-mult">—</span>
+    </div>
+  </div>
+
+  <!-- Tabela mnożników -->
+  <div class="mult-table-wrap">
+    <div class="mult-table-title">Tabela mnożników</div>
+    <table class="mult-table">
+      <thead>
+        <tr>
+          <th>Kurs</th>
+          <th>SOLO</th>
+          <th>AKO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>poniżej 1.5</td>
+          <td><span class="tag">0×</span></td>
+          <td><span class="tag">0×</span></td>
+        </tr>
+        <tr>
+          <td>1.50 – 4.99</td>
+          <td><span class="tag green">3×</span></td>
+          <td><span class="tag green">2.5×</span></td>
+        </tr>
+        <tr>
+          <td>5.00 – 9.99</td>
+          <td><span class="tag green">7.5×</span></td>
+          <td><span class="tag green">5×</span></td>
+        </tr>
+        <tr>
+          <td>10.00+</td>
+          <td><span class="tag green">7.5×</span></td>
+          <td><span class="tag green">8×</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
 </div>
 
 <script>
-let type="SOLO";
+let betType = 'SOLO';
 
-const soloBtn = document.getElementById("solo");
-const akoBtn = document.getElementById("ako");
-const odds = document.getElementById("odds");
-const stake = document.getElementById("stake");
-const result = document.getElementById("result");
-
-soloBtn.onclick=()=>{
-  type="SOLO";
-  soloBtn.classList.add("active");
-  akoBtn.classList.remove("active");
+function setType(t) {
+  betType = t;
+  document.getElementById('btn-solo').classList.toggle('active', t === 'SOLO');
+  document.getElementById('btn-ako').classList.toggle('active', t === 'AKO');
   calculate();
-};
-akoBtn.onclick=()=>{
-  type="AKO";
-  akoBtn.classList.add("active");
-  soloBtn.classList.remove("active");
-  calculate();
-};
+}
 
-odds.addEventListener("input",calculate);
-stake.addEventListener("input",calculate);
+function getMultiplier(odds, type) {
+  if (odds < 1.5) return 0;
+  if (type === 'SOLO') {
+    return odds >= 5 ? 7.5 : 3;
+  } else {
+    if (odds > 10) return 8;
+    if (odds >= 5) return 5;
+    return 2.5;
+  }
+}
 
-function calculate(){
-  const oddsVal=parseFloat(odds.value);
-  const stakeVal=parseFloat(stake.value);
-  if(!oddsVal || !stakeVal || oddsVal<=0 || stakeVal<=0){
-    result.textContent="—";
+function calculate() {
+  const oddsVal  = parseFloat(document.getElementById('odds').value);
+  const stakeVal = parseFloat(document.getElementById('stake').value);
+  const hint     = document.getElementById('mult-hint');
+  const resultEl = document.getElementById('result');
+  const subEl    = document.getElementById('result-sub');
+  const breakdown = document.getElementById('breakdown');
+
+  // Update multiplier hint whenever odds is filled
+  if (oddsVal && oddsVal > 0) {
+    const m = getMultiplier(oddsVal, betType);
+    if (m === 0) {
+      hint.innerHTML = '<span>Kurs poniżej 1.5 — brak punktów</span>';
+      hint.classList.remove('active');
+    } else {
+      hint.innerHTML = `<span>Mnożnik dla tego kursu:</span><span class="mult-value">×${m}</span>`;
+      hint.classList.add('active');
+    }
+  } else {
+    hint.innerHTML = '<span>Wpisz kurs, aby zobaczyć mnożnik</span>';
+    hint.classList.remove('active');
+  }
+
+  if (!oddsVal || !stakeVal || oddsVal <= 0 || stakeVal <= 0) {
+    resultEl.textContent = '—';
+    resultEl.className = 'result-value empty';
+    subEl.textContent = '';
+    breakdown.style.display = 'none';
     return;
   }
 
-  const winBrutto = oddsVal * stakeVal;
-  const winNetto = winBrutto * 0.88;
+  const mult     = getMultiplier(oddsVal, betType);
+  const brutto   = oddsVal * stakeVal;
+  const netto    = brutto * 0.88;
+  const points   = Math.round(netto * mult);
 
-  let mult = 1;
-  if(oddsVal >= 1.5){
-    if(type==="SOLO"){
-      mult = oddsVal >= 5 ? 7.5 : 3;
-    }else{
-      if(oddsVal > 10) mult = 8;
-      else if(oddsVal >= 5) mult = 5;
-      else mult = 2.5;
-    }
+  // Update breakdown
+  document.getElementById('bd-brutto').textContent = brutto.toFixed(2) + ' zł';
+  document.getElementById('bd-netto').textContent  = netto.toFixed(2) + ' zł';
+  document.getElementById('bd-mult').textContent   = mult > 0 ? '×' + mult : 'brak';
+  breakdown.style.display = 'flex';
+
+  if (mult === 0) {
+    resultEl.textContent = '0';
+    resultEl.className = 'result-value empty';
+    subEl.textContent = 'Kurs za niski — brak punktów';
+    return;
   }
 
-  const targetPoints = Math.round(winNetto * mult);
-  animatePoints(targetPoints);
+  subEl.textContent = `${betType} · kurs ${oddsVal} · stawka ${stakeVal} zł`;
+  animatePoints(points, resultEl);
 }
 
-// animacja szybka i płynna niezależnie od liczby
-function animatePoints(target){
-  let current = 0;
-  const duration = 700; // ms
+let animFrame;
+function animatePoints(target, el) {
+  cancelAnimationFrame(animFrame);
+  el.className = 'result-value';
+  const duration = 600;
   const start = performance.now();
-
-  function step(timestamp){
-    const progress = Math.min((timestamp - start) / duration, 1);
-    current = Math.round(target * progress);
-    result.textContent = `🏆 Punkty: ${current}`;
-    if(progress < 1) requestAnimationFrame(step);
+  function step(ts) {
+    const p = Math.min((ts - start) / duration, 1);
+    el.textContent = Math.round(target * p);
+    if (p < 1) animFrame = requestAnimationFrame(step);
   }
-  requestAnimationFrame(step);
+  animFrame = requestAnimationFrame(step);
 }
-</script>
 
+document.getElementById('odds').addEventListener('input', calculate);
+document.getElementById('stake').addEventListener('input', calculate);
+</script>
 </body>
 </html>
