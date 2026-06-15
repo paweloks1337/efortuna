@@ -398,8 +398,8 @@ nav a.active { color: var(--gold); background: var(--gold-dim); }
       <tbody>
         <tr>
           <td>poniżej 1.5</td>
-          <td><span class="tag">0×</span></td>
-          <td><span class="tag">0×</span></td>
+          <td><span class="tag green">1×</span></td>
+          <td><span class="tag green">1×</span></td>
         </tr>
         <tr>
           <td>1.50 – 4.99</td>
@@ -433,7 +433,7 @@ function setType(t) {
 }
 
 function getMultiplier(odds, type) {
-  if (odds < 1.5) return 0;
+  if (odds < 1.5) return 1;
   if (type === 'SOLO') {
     return odds >= 5 ? 7.5 : 3;
   } else {
@@ -455,8 +455,8 @@ function calculate() {
   if (oddsVal && oddsVal > 0) {
     const m = getMultiplier(oddsVal, betType);
     if (m === 0) {
-      hint.innerHTML = '<span>Kurs poniżej 1.5 — brak punktów</span>';
-      hint.classList.remove('active');
+      hint.innerHTML = `<span>Mnożnik dla tego kursu:</span><span class="mult-value">×1</span>`;
+      hint.classList.add('active');
     } else {
       hint.innerHTML = `<span>Mnożnik dla tego kursu:</span><span class="mult-value">×${m}</span>`;
       hint.classList.add('active');
@@ -484,13 +484,6 @@ function calculate() {
   document.getElementById('bd-netto').textContent  = netto.toFixed(2) + ' zł';
   document.getElementById('bd-mult').textContent   = mult > 0 ? '×' + mult : 'brak';
   breakdown.style.display = 'flex';
-
-  if (mult === 0) {
-    resultEl.textContent = '0';
-    resultEl.className = 'result-value empty';
-    subEl.textContent = 'Kurs za niski — brak punktów';
-    return;
-  }
 
   subEl.textContent = `${betType} · kurs ${oddsVal} · stawka ${stakeVal} zł`;
   animatePoints(points, resultEl);
