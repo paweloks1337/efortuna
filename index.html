@@ -265,10 +265,58 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 .ranking-table th:nth-child(3) { text-align: center; }
 .ranking-table th:nth-child(4) { text-align: right; }
 
+.th-with-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+.tip-icon {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  font-family: 'Inter', sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.tip-icon .tip-bubble {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0A0A0F;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, transform 0.15s;
+  pointer-events: none;
+  z-index: 20;
+}
+.th-with-tip:hover .tip-bubble,
+.th-with-tip:focus-within .tip-bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* ── ROWS ── */
 .ranking-table tbody tr {
   border-bottom: 1px solid rgba(255,255,255,0.04);
-  transition: background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
   cursor: default;
 }
 
@@ -361,18 +409,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   white-space: nowrap;
 }
 
-.coupon-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
 .ranking-table td.points {
   text-align: right;
   font-family: 'Rajdhani', sans-serif;
@@ -383,6 +419,53 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 }
 
 .rank-1 td.points { color: var(--gold); }
+
+/* row dimmed = gracz jeszcze niesklasyfikowany (mniej niż MIN_COUPONS kuponów) */
+.row-unqualified { opacity: 0.55; }
+.row-unqualified:hover { opacity: 0.8; }
+.row-unqualified td.points { color: #4d9a6e; }
+
+/* ── KWALIFIKACJA (pierścień postępu) ── */
+.qual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 34px;
+  height: 34px;
+}
+.qual svg { width: 34px; height: 34px; transform: rotate(-90deg); }
+.qual .ring-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 3;
+}
+.qual .ring-fill {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+.qual.is-complete .ring-fill {
+  filter: drop-shadow(0 0 4px rgba(0,230,118,0.6));
+}
+.qual-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.qual.is-complete .qual-center {
+  color: var(--gold);
+  font-size: 0.8rem;
+}
+.qual.is-zero .ring-track { stroke: rgba(255,92,92,0.18); }
 
 /* ── LOADER ── */
 #loader {
@@ -753,7 +836,14 @@ select:focus { border-color: rgba(255,214,10,0.5); }
       <tr>
         <th>#</th>
         <th>Gracz</th>
-        <th style="text-align:center">Kupony</th>
+        <th style="text-align:center">
+          <span class="th-with-tip" tabindex="0">
+            Kupony
+            <span class="tip-icon">i
+              <span class="tip-bubble">Min. 3 wygrane kupony, aby zostać sklasyfikowanym</span>
+            </span>
+          </span>
+        </th>
         <th style="text-align:right">Punkty</th>
       </tr>
     </thead>
@@ -797,6 +887,11 @@ const CSV_URLS = {
   styczen:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
   grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
+
+/* ── PRÓG KWALIFIKACJI ── */
+const MIN_COUPONS = 3;
+const RING_RADIUS = 14;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 let playersData = {};
 let list = [];
@@ -899,6 +994,30 @@ async function loadRankingForMonth(month) {
   }
 }
 
+/* ── PIERŚCIEŃ KWALIFIKACJI KUPONÓW ── */
+function renderQualRing(coupons) {
+  const ratio = Math.min(coupons / MIN_COUPONS, 1);
+  const offset = RING_CIRCUMFERENCE * (1 - ratio);
+  const qualified = coupons >= MIN_COUPONS;
+  const zero = coupons === 0;
+
+  const stateClass = qualified ? 'is-complete' : (zero ? 'is-zero' : '');
+  const statusText = qualified
+    ? 'zakwalifikowany'
+    : `brakuje ${MIN_COUPONS - coupons} do kwalifikacji`;
+
+  return `
+    <span class="qual ${stateClass}" title="${coupons} kupon(y) — ${statusText}">
+      <svg viewBox="0 0 34 34">
+        <circle class="ring-track" cx="17" cy="17" r="${RING_RADIUS}" />
+        <circle class="ring-fill" cx="17" cy="17" r="${RING_RADIUS}"
+          stroke-dasharray="${RING_CIRCUMFERENCE}"
+          stroke-dashoffset="${offset}" />
+      </svg>
+      <span class="qual-center">${coupons}</span>
+    </span>`;
+}
+
 /* ── RENDER TABLE ── */
 function renderTable(data) {
   const tbody = document.getElementById('ranking-body');
@@ -919,13 +1038,15 @@ function renderTable(data) {
   tbody.innerHTML = data.map((p, i) => {
     const rank = list.indexOf(p) + 1; // prawdziwa pozycja w rankingu
     const rankClass = rank <= 3 ? `rank-${rank}` : '';
+    const unqualified = p.kupony < MIN_COUPONS;
+    const rowClasses = [rankClass, unqualified ? 'row-unqualified' : ''].filter(Boolean).join(' ');
     const initials = p.nick.substring(0, 2).toUpperCase();
     const badge = rank <= 3
       ? `<span class="rank-badge">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span>`
       : `<span class="rank-badge" style="color:var(--muted);font-size:0.8rem">${rank}</span>`;
 
     return `
-      <tr class="${rankClass}">
+      <tr class="${rowClasses}">
         <td class="rank">${badge}</td>
         <td class="nick" onclick="openPopup('${escapeHtml(p.nick)}')">
           <span class="nick-inner">
@@ -933,9 +1054,7 @@ function renderTable(data) {
             ${escapeHtml(p.nick)}
           </span>
         </td>
-        <td class="coupons">
-          <span class="coupon-chip">🧾 ${p.kupony}</span>
-        </td>
+        <td class="coupons">${renderQualRing(p.kupony)}</td>
         <td class="points">${p.punkty} pkt</td>
       </tr>`;
   }).join('');
@@ -1067,4 +1186,4 @@ function escapeJs(str) {
 loadRankingForMonth('ms');
 </script>
 </body>
-  </html>
+</html>
