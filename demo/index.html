@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Typer Bot — Panel Kuponów</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+
+:root{
+  --bg:#050505;
+  --bg2:#000000;
+  --panel:#0c0d10;
+  --panel-2:#101216;
+  --border:rgba(30,110,200,0.22);
+  --border-soft:rgba(255,255,255,0.06);
+  --blue-deep:#06488F;
+  --blue:#1E6EC8;
+  --blue-glow:rgba(30,110,200,0.35);
+  --text:#E9EDF5;
+  --text-dim:#8A93A6;
+  --text-faint:#565D6D;
+  --yellow:#F5A623;
+  --yellow-bg:rgba(245,166,35,0.12);
+  --green:#27C285;
+  --green-bg:rgba(39,194,133,0.12);
+  --red:#FF4B5C;
+  --red-bg:rgba(255,75,92,0.12);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(6,72,143,0.20), transparent 60%),
+    radial-gradient(900px 600px at 100% 10%, rgba(30,110,200,0.10), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  padding:32px 20px 80px;
+}
+
+.wrap{max-width:1180px;margin:0 auto;}
+
+/* ===== HEADER ===== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:26px;margin-bottom:28px;
+  border-bottom:1px solid var(--border-soft);
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-icon{
+  width:46px;height:46px;border-radius:12px;
+  background:linear-gradient(145deg,var(--blue),var(--blue-deep));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;
+  box-shadow:0 0 0 1px var(--border), 0 8px 24px -8px var(--blue-glow);
+}
+.brand h1{
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;letter-spacing:0.3px;
+}
+.brand p{font-size:12px;color:var(--text-dim);margin-top:2px;letter-spacing:0.2px;}
+.status-pill{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text-dim);
+  background:var(--panel);border:1px solid var(--border-soft);
+  padding:8px 14px;border-radius:100px;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ===== LAYOUT ===== */
+.grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:22px;}
+@media(max-width:920px){.grid{grid-template-columns:1fr;}}
+
+.col-title{
+  font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:1.6px;text-transform:uppercase;color:var(--text-dim);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.col-title .n{
+  background:var(--panel-2);border:1px solid var(--border-soft);
+  color:var(--text-faint);font-size:11px;padding:1px 7px;border-radius:6px;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ===== COMMAND BAR ===== */
+.cmdbar{
+  background:var(--panel);border:1px solid var(--border-soft);
+  border-radius:14px;padding:16px;margin-bottom:22px;
+}
+.cmdbar-label{font-size:11px;color:var(--text-faint);margin-bottom:10px;letter-spacing:0.4px;text-transform:uppercase;font-family:'Rajdhani',sans-serif;font-weight:600;}
+.cmd-input-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:11px 14px;
+}
+.cmd-slash{color:var(--blue);font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px;}
+.cmd-input-row input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13.5px;
+}
+.cmd-input-row input::placeholder{color:var(--text-faint);}
+.send-btn{
+  background:linear-gradient(145deg,var(--blue),var(--blue-deep));
+  border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-weight:700;
+  font-size:13px;letter-spacing:0.4px;padding:9px 18px;border-radius:8px;
+  cursor:pointer;transition:filter .15s, transform .15s;
+  box-shadow:0 4px 16px -6px var(--blue-glow);
+}
+.send-btn:hover{filter:brightness(1.15);transform:translateY(-1px);}
+.cmdbar-hint{font-size:11px;color:var(--text-faint);margin-top:8px;font-family:'JetBrains Mono',monospace;}
+
+/* ===== FEED ===== */
+.feed{display:flex;flex-direction:column;gap:14px;}
+
+.ticket{
+  position:relative;
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--border-soft);
+  border-radius:14px;
+  overflow:hidden;
+  animation:cardIn .45s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+.ticket::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--status-color, var(--yellow));
+  transition:background .3s;
+}
+
+.ticket-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px 18px;
+}
+.ticket-id{
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-faint);
+  letter-spacing:0.4px;
+}
+.ticket-id b{color:var(--text-dim);}
+.badge{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:0.5px;
+  padding:4px 10px;border-radius:100px;text-transform:uppercase;
+  transition:all .25s;
+}
+.badge .b-dot{width:6px;height:6px;border-radius:50%;}
+.badge.pending{background:var(--yellow-bg);color:var(--yellow);}
+.badge.pending .b-dot{background:var(--yellow);}
+.badge.approved{background:var(--green-bg);color:var(--green);}
+.badge.approved .b-dot{background:var(--green);}
+.badge.rejected{background:var(--red-bg);color:var(--red);}
+.badge.rejected .b-dot{background:var(--red);}
+
+.ticket-body{padding:0 18px 6px;}
+.dashed{border-top:1px dashed var(--border-soft);margin:0 18px;}
+
+.field-row{display:flex;gap:24px;padding:12px 0;}
+.field{flex:1;min-width:0;}
+.field-label{
+  font-size:10.5px;color:var(--text-faint);text-transform:uppercase;
+  letter-spacing:0.6px;margin-bottom:4px;font-family:'Rajdhani',sans-serif;font-weight:600;
+}
+.field-val{font-size:14px;color:var(--text);word-break:break-all;}
+.field-val.link{color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:12px;}
+.field-val.pts{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:19px;}
+.field-val.pts .corr-old{
+  font-size:12px;color:var(--text-faint);text-decoration:line-through;
+  font-weight:500;margin-right:6px;font-family:'Inter',sans-serif;
+}
+.field-val .date{color:var(--text-dim);font-size:13px;}
+
+.reject-reason{
+  margin:0 18px 12px;padding:9px 12px;background:var(--red-bg);
+  border:1px solid rgba(255,75,92,0.25);border-radius:8px;
+  font-size:12.5px;color:#ff8b96;display:flex;gap:8px;align-items:flex-start;
+}
+
+.ticket-actions{
+  display:flex;gap:8px;padding:12px 18px 16px;
+}
+.act-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 10px;border-radius:9px;border:1px solid var(--border-soft);
+  background:var(--bg2);color:var(--text-dim);
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:0.3px;
+  cursor:pointer;transition:all .15s;
+}
+.act-btn:hover{transform:translateY(-1px);}
+.act-btn.approve:hover{background:var(--green-bg);border-color:rgba(39,194,133,0.35);color:var(--green);}
+.act-btn.reject:hover{background:var(--red-bg);border-color:rgba(255,75,92,0.35);color:var(--red);}
+.act-btn.correct:hover{background:var(--yellow-bg);border-color:rgba(245,166,35,0.35);color:var(--yellow);}
+.act-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none;}
+
+/* ===== ADMIN PANEL ===== */
+.panel{
+  background:var(--panel);border:1px solid var(--border-soft);
+  border-radius:14px;overflow:hidden;
+}
+.panel-head{
+  padding:16px 18px;border-bottom:1px solid var(--border-soft);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.panel-head h3{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.3px;}
+.stat-mini{display:flex;gap:16px;}
+.stat-mini div{text-align:right;}
+.stat-mini .num{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:17px;}
+.stat-mini .lbl{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.5px;}
+
+.queue-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 18px;border-bottom:1px solid var(--border-soft);
+  font-size:13px;transition:background .15s;
+}
+.queue-row:hover{background:rgba(255,255,255,0.02);}
+.queue-row:last-child{border-bottom:none;}
+.queue-id{font-family:'JetBrains Mono',monospace;color:var(--text-faint);font-size:11.5px;width:56px;flex-shrink:0;}
+.queue-user{flex:1;color:var(--text);font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.queue-pts{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--text-dim);width:52px;text-align:right;}
+.queue-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.queue-dot.pending{background:var(--yellow);}
+.queue-dot.approved{background:var(--green);}
+.queue-dot.rejected{background:var(--red);}
+.empty-row{padding:24px 18px;text-align:center;color:var(--text-faint);font-size:12.5px;}
+
+/* ===== SHEETS PANEL ===== */
+.sheet{
+  margin-top:18px;
+  background:var(--panel);border:1px solid var(--border-soft);
+  border-radius:14px;overflow:hidden;
+}
+.sheet-head{
+  padding:14px 18px;border-bottom:1px solid var(--border-soft);
+  display:flex;align-items:center;gap:10px;
+}
+.sheet-icon{
+  width:22px;height:22px;border-radius:5px;background:linear-gradient(145deg,#1E8E5A,#166B45);
+  display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;
+}
+.sheet-head h3{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;}
+.sheet-head span{font-size:11px;color:var(--text-faint);margin-left:auto;font-family:'JetBrains Mono',monospace;}
+.sheet-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sheet-table th{
+  text-align:left;padding:9px 14px;color:var(--text-faint);
+  font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:1px solid var(--border-soft);background:rgba(255,255,255,0.015);
+}
+.sheet-table td{padding:9px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-dim);}
+.sheet-table tr:last-child td{border-bottom:none;}
+.sheet-table td.nick{color:var(--text);font-weight:600;}
+.sheet-table td.pts{color:var(--green);font-weight:700;font-family:'JetBrains Mono',monospace;}
+.sheet-table tr.new-row{animation:rowIn .5s ease;}
+@keyframes rowIn{from{background:var(--green-bg);}to{background:transparent;}}
+.sheet-empty{padding:20px 18px;text-align:center;color:var(--text-faint);font-size:12px;}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;z-index:100;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.show{opacity:1;pointer-events:auto;}
+.modal{
+  width:380px;max-width:90vw;background:var(--panel-2);
+  border:1px solid var(--border);border-radius:16px;padding:22px;
+  transform:scale(0.94) translateY(8px);transition:transform .2s;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,0.6);
+}
+.modal-overlay.show .modal{transform:scale(1) translateY(0);}
+.modal h4{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px;}
+.modal .sub{font-size:12.5px;color:var(--text-dim);margin-bottom:16px;}
+.reason-opt{
+  display:block;width:100%;text-align:left;
+  background:var(--bg2);border:1px solid var(--border-soft);
+  color:var(--text);padding:11px 14px;border-radius:9px;
+  font-size:13px;margin-bottom:8px;cursor:pointer;transition:all .15s;
+  font-family:'Inter',sans-serif;
+}
+.reason-opt:hover{border-color:var(--red);background:var(--red-bg);color:#ff8b96;}
+.pts-input-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.pts-old{font-size:13px;color:var(--text-faint);}
+.pts-old s{color:var(--text-faint);}
+.pts-arrow{color:var(--text-faint);}
+.modal input[type=number]{
+  width:100px;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);padding:10px 12px;border-radius:9px;font-size:16px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;outline:none;
+}
+.modal input[type=number]:focus{border-color:var(--blue);}
+.modal-actions{display:flex;gap:8px;margin-top:4px;}
+.modal-actions button{
+  flex:1;padding:10px;border-radius:9px;border:none;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.3px;
+  transition:filter .15s;
+}
+.modal-btn-cancel{background:var(--bg2);color:var(--text-dim);border:1px solid var(--border-soft) !important;}
+.modal-btn-confirm{background:linear-gradient(145deg,var(--blue),var(--blue-deep));color:#fff;}
+.modal-btn-confirm:hover, .modal-btn-cancel:hover{filter:brightness(1.15);}
+
+/* ===== TOAST ===== */
+.toast-stack{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:200;}
+.toast{
+  display:flex;align-items:center;gap:10px;
+  background:var(--panel-2);border:1px solid var(--border);
+  padding:13px 16px;border-radius:11px;min-width:260px;max-width:340px;
+  box-shadow:0 12px 30px -10px rgba(0,0,0,0.5);
+  animation:toastIn .35s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+.toast.leaving{animation:toastOut .3s forwards;}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px);}}
+.toast-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.toast.ok .toast-ic{background:var(--green-bg);}
+.toast.no .toast-ic{background:var(--red-bg);}
+.toast.info .toast-ic{background:rgba(30,110,200,0.15);}
+.toast-txt b{font-size:13px;display:block;}
+.toast-txt span{font-size:11.5px;color:var(--text-dim);}
+
+/* ===== CONFETTI ===== */
+.confetti-piece{
+  position:fixed;top:-10px;width:7px;height:11px;z-index:150;pointer-events:none;
+  animation:confettiFall 1.3s ease-in forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(540deg);opacity:0;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">MT</div>
+      <div>
+        <h1>Mistrzostwa Typerów — Bot</h1>
+        <p>Weryfikacja kuponów · kanał #zgłoszenia-kuponów</p>
+      </div>
+    </div>
+    <div class="status-pill"><span class="dot"></span> Bot online</div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: discord feed -->
+    <div>
+      <div class="cmdbar">
+        <div class="cmdbar-label">Wyślij komendę na kanale Discord</div>
+        <div class="cmd-input-row">
+          <span class="cmd-slash">/dodajkupon</span>
+          <input id="linkInput" type="text" placeholder="link  https://applink.efortuna.pl/ticketdetail?id=..." />
+          <input id="ptsInput" type="number" placeholder="pkt" style="max-width:70px;text-align:right;" />
+          <button class="send-btn" onclick="submitTicket()">Wyślij</button>
+        </div>
+        <div class="cmdbar-hint">Przykład: /dodajkupon https://applink.efortuna.pl/ticketdetail?id=xxxxx 38</div>
+      </div>
+
+      <div class="col-title">Kanał zgłoszeń <span class="n" id="feedCount">0</span></div>
+      <div class="feed" id="feed"></div>
+    </div>
+
+    <!-- RIGHT: admin + sheets -->
+    <div>
+      <div class="col-title">Panel administratora</div>
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Kolejka kuponów</h3>
+          <div class="stat-mini">
+            <div><div class="num" id="pendingCount" style="color:var(--yellow)">0</div><div class="lbl">Oczekuje</div></div>
+            <div><div class="num" id="approvedCount" style="color:var(--green)">0</div><div class="lbl">Zaakcept.</div></div>
+          </div>
+        </div>
+        <div id="queueList"></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head">
+          <div class="sheet-icon">📊</div>
+          <h3>Google Sheets — Ranking</h3>
+          <span>auto-sync</span>
+        </div>
+        <table class="sheet-table">
+          <thead><tr><th>Nick</th><th>Link</th><th>Punkty</th><th>Data</th></tr></thead>
+          <tbody id="sheetBody"></tbody>
+        </table>
+        <div class="sheet-empty" id="sheetEmpty">Brak zaakceptowanych kuponów — tabela zapełni się automatycznie po weryfikacji.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+let tickets = [
+  { id: 1842, user: "hero122", link: "https://applink.efortuna.pl/ticketdetail?id=a91k2", points: 38, origPoints: 38, status: "pending", date: "04.08.2026", reason: null },
+  { id: 1843, user: "shadowek", link: "https://applink.efortuna.pl/ticketdetail?id=v03pd", points: 20, origPoints: 20, status: "pending", date: "04.08.2026", reason: null },
+  { id: 1844, user: "macias", link: "https://applink.efortuna.pl/ticketdetail?id=z71qq", points: 55, origPoints: 55, status: "pending", date: "04.08.2026", reason: null },
+];
+let nextId = 1845;
+let sheetRows = [];
+
+const REJECT_REASONS = ["Błędny kupon", "Zły link", "Nieprawidłowe punkty", "Złamanie regulaminu"];
+const nickPool = ["paweloks","Wiktor","Tomek22","Ola.K","Grzesiek","Nati","dawid_typer","MaciejB"];
+
+function todayStr(){
+  const d = new Date(2026,7,4);
+  return String(d.getDate()).padStart(2,'0') + "." + String(d.getMonth()+1).padStart(2,'0') + "." + d.getFullYear();
+}
+
+function statusLabel(s){
+  return s === "pending" ? "Oczekuje na weryfikację" : s === "approved" ? "Zaakceptowany" : "Odrzucony";
+}
+function statusColorVar(s){
+  return s === "pending" ? "var(--yellow)" : s === "approved" ? "var(--green)" : "var(--red)";
+}
+
+function submitTicket(){
+  const link = document.getElementById('linkInput').value.trim();
+  const pts = parseInt(document.getElementById('ptsInput').value, 10);
+  if(!link || isNaN(pts)){
+    showToast('no', 'Błąd komendy', 'Podaj link do kuponu oraz liczbę punktów.');
+    return;
+  }
+  const nick = nickPool[Math.floor(Math.random()*nickPool.length)];
+  const t = { id: nextId++, user: nick, link, points: pts, origPoints: pts, status: "pending", date: todayStr(), reason: null };
+  tickets.unshift(t);
+  document.getElementById('linkInput').value = '';
+  document.getElementById('ptsInput').value = '';
+  render();
+  showToast('info', 'Nowe zgłoszenie #' + t.id, nick + ' zgłosił(a) kupon na ' + pts + ' pkt');
+}
+
+function render(){
+  const feed = document.getElementById('feed');
+  feed.innerHTML = tickets.map(ticketCardHTML).join('');
+  document.getElementById('feedCount').textContent = tickets.length;
+
+  const queue = document.getElementById('queueList');
+  const pending = tickets;
+  if(pending.length === 0){
+    queue.innerHTML = '<div class="empty-row">Brak zgłoszeń.</div>';
+  } else {
+    queue.innerHTML = pending.map(t => `
+      <div class="queue-row">
+        <span class="queue-id">#${t.id}</span>
+        <span class="queue-user">${t.user}</span>
+        <span class="queue-pts">${t.points}p</span>
+        <span class="queue-dot ${t.status}" title="${statusLabel(t.status)}"></span>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('pendingCount').textContent = tickets.filter(t=>t.status==='pending').length;
+  document.getElementById('approvedCount').textContent = tickets.filter(t=>t.status==='approved').length;
+
+  const sheetBody = document.getElementById('sheetBody');
+  const sheetEmpty = document.getElementById('sheetEmpty');
+  if(sheetRows.length === 0){
+    sheetBody.innerHTML = '';
+    sheetEmpty.style.display = 'block';
+  } else {
+    sheetEmpty.style.display = 'none';
+    sheetBody.innerHTML = sheetRows.map(r => `
+      <tr class="${r.isNew ? 'new-row' : ''}">
+        <td class="nick">${r.nick}</td>
+        <td style="color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:11px;">${shortLink(r.link)}</td>
+        <td class="pts">${r.points}</td>
+        <td>${r.date}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function shortLink(link){
+  return link.length > 34 ? link.slice(0, 31) + '…' : link;
+}
+
+function ticketCardHTML(t){
+  const disabled = t.status !== 'pending';
+  return `
+  <div class="ticket" style="--status-color:${statusColorVar(t.status)}">
+    <div class="ticket-top">
+      <div class="ticket-id">🎫 KUPON <b>#${t.id}</b></div>
+      <div class="badge ${t.status}"><span class="b-dot"></span>${statusLabel(t.status)}</div>
+    </div>
+    <div class="ticket-body">
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Gracz</div>
+          <div class="field-val">👤 ${t.user}</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Data</div>
+          <div class="field-val date">${t.date}</div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Link do kuponu</div>
+        <div class="field-val link">${t.link}</div>
+      </div>
+    </div>
+    <div class="dashed"></div>
+    <div class="ticket-body">
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Zadeklarowane punkty</div>
+          <div class="field-val pts">${t.points !== t.origPoints ? `<span class="corr-old">${t.origPoints} pkt</span>` : ''}⭐ ${t.points} pkt</div>
+        </div>
+      </div>
+    </div>
+    ${t.status === 'rejected' && t.reason ? `<div class="reject-reason">🚫 <span><b>Powód odrzucenia:</b> ${t.reason}</span></div>` : ''}
+    <div class="ticket-actions">
+      <button class="act-btn approve" ${disabled?'disabled':''} onclick="approveTicket(${t.id})">✅ Zatwierdź</button>
+      <button class="act-btn reject" ${disabled?'disabled':''} onclick="openRejectModal(${t.id})">❌ Odrzuć</button>
+      <button class="act-btn correct" ${disabled?'disabled':''} onclick="openCorrectModal(${t.id})">✏️ Korekta</button>
+    </div>
+  </div>`;
+}
+
+function approveTicket(id){
+  const t = tickets.find(x => x.id === id);
+  if(!t) return;
+  t.status = 'approved';
+  sheetRows.unshift({ nick: t.user, link: t.link, points: t.points, date: t.date, isNew: true });
+  setTimeout(() => { sheetRows.forEach(r => r.isNew = false); }, 900);
+  render();
+  fireConfetti();
+  showToast('ok', 'Kupon #' + t.id + ' zaakceptowany', t.user + ' otrzymuje +' + t.points + ' pkt do rankingu · DM wysłany');
+}
+
+function openRejectModal(id){
+  const t = tickets.find(x => x.id === id);
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <h4>Odrzuć kupon #${t.id}</h4>
+    <div class="sub">Wybierz powód odrzucenia — zostanie wysłany do ${t.user}</div>
+    ${REJECT_REASONS.map(r => `<button class="reason-opt" onclick="rejectTicket(${t.id}, '${r}')">${r}</button>`).join('')}
+    <div class="modal-actions" style="margin-top:10px;">
+      <button class="modal-btn-cancel" onclick="closeModal()">Anuluj</button>
+    </div>
+  `;
+  openModal();
+}
+
+function rejectTicket(id, reason){
+  const t = tickets.find(x => x.id === id);
+  t.status = 'rejected';
+  t.reason = reason;
+  closeModal();
+  render();
+  showToast('no', 'Kupon #' + t.id + ' odrzucony', 'Powód: ' + reason + ' · DM wysłany do ' + t.user);
+}
+
+function openCorrectModal(id){
+  const t = tickets.find(x => x.id === id);
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <h4>Korekta punktów #${t.id}</h4>
+    <div class="sub">Zmień liczbę punktów przyznanych za kupon gracza ${t.user}</div>
+    <div class="pts-input-row">
+      <span class="pts-old">Było: <s>${t.points} pkt</s></span>
+      <span class="pts-arrow">→</span>
+      <input type="number" id="correctInput" value="${t.points}" autofocus />
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeModal()">Anuluj</button>
+      <button class="modal-btn-confirm" onclick="correctTicket(${t.id})">Zapisz korektę</button>
+    </div>
+  `;
+  openModal();
+}
+
+function correctTicket(id){
+  const t = tickets.find(x => x.id === id);
+  const newVal = parseInt(document.getElementById('correctInput').value, 10);
+  if(isNaN(newVal) || newVal < 0){ return; }
+  const old = t.points;
+  t.points = newVal;
+  closeModal();
+  render();
+  showToast('info', 'Korekta #' + t.id, 'Punkty zmienione: ' + old + ' → ' + newVal + ' pkt');
+}
+
+function openModal(){
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'modalOverlay') closeModal();
+});
+
+function showToast(type, title, msg){
+  const stack = document.getElementById('toastStack');
+  const icon = type === 'ok' ? '✅' : type === 'no' ? '❌' : '📌';
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<div class="toast-ic">${icon}</div><div class="toast-txt"><b>${title}</b><span>${msg}</span></div>`;
+  stack.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('leaving');
+    setTimeout(() => el.remove(), 300);
+  }, 3600);
+}
+
+function fireConfetti(){
+  const colors = ['#1E6EC8','#F5A623','#27C285','#06488F'];
+  for(let i=0;i<26;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = (45 + Math.random()*30) + 'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = (Math.random()*0.2) + 's';
+    p.style.animationDuration = (1 + Math.random()*0.6) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1800);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
