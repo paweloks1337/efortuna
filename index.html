@@ -203,6 +203,70 @@ select {
 
 select:focus { border-color: rgba(255,214,10,0.5); }
 
+/* ── PRZEŁĄCZNIK: TYLKO ZAKWALIFIKOWANI ── */
+.qual-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  transition: border-color 0.2s;
+}
+
+.qual-toggle:hover {
+  border-color: rgba(0,230,118,0.3);
+}
+
+.qual-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+
+.qual-toggle-track {
+  position: relative;
+  width: 34px; height: 19px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.qual-toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.qual-toggle input:checked + .qual-toggle-track {
+  background: var(--green-dim);
+  border-color: rgba(0,230,118,0.4);
+}
+
+.qual-toggle input:checked + .qual-toggle-track .qual-toggle-thumb {
+  transform: translateX(15px);
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(0,230,118,0.6);
+}
+
+.qual-toggle-text {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.qual-toggle input:checked ~ .qual-toggle-text { color: var(--text); }
+
 /* ── STATS BAR ── */
 .stats-bar {
   display: flex;
@@ -821,6 +885,13 @@ select:focus { border-color: rgba(255,214,10,0.5); }
       <path d="m6 9 6 6 6-6"/>
     </svg>
   </div>
+
+  <label class="qual-toggle" id="qual-toggle-label">
+    <input type="checkbox" id="qual-only" />
+    <span class="qual-toggle-track"><span class="qual-toggle-thumb"></span></span>
+    <span class="qual-toggle-text">Tylko zakwalifikowani</span>
+  </label>
+
 </div>
 
 <!-- Stats bar -->
@@ -970,7 +1041,7 @@ async function loadRankingForMonth(month) {
     list = Object.entries(data).map(([nick, v]) => ({ nick, ...v }));
     list.sort((a, b) => b.punkty - a.punkty);
 
-    renderTable(list);
+    applyFilters();
 
     const sum = list.reduce((a, b) => a + b.punkty, 0);
     document.getElementById('count').textContent = list.length;
@@ -1062,16 +1133,20 @@ function renderTable(data) {
   }).join('');
 }
 
-/* ── SEARCH ── */
-document.getElementById('search').addEventListener('input', function () {
-  const q = this.value.toLowerCase().trim();
-  if (!q) {
-    renderTable(list);
-    return;
-  }
-  const filtered = list.filter(p => p.nick.toLowerCase().includes(q));
+/* ── FILTROWANIE (search + tylko zakwalifikowani) ── */
+function applyFilters() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const onlyQualified = document.getElementById('qual-only').checked;
+
+  let filtered = list;
+  if (onlyQualified) filtered = filtered.filter(p => p.kupony >= MIN_COUPONS);
+  if (q) filtered = filtered.filter(p => p.nick.toLowerCase().includes(q));
+
   renderTable(filtered);
-});
+}
+
+document.getElementById('search').addEventListener('input', applyFilters);
+document.getElementById('qual-only').addEventListener('change', applyFilters);
 
 /* ── MONTH SELECT ── */
 document.getElementById('month-select').addEventListener('change', function () {
