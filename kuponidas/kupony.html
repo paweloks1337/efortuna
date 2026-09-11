@@ -215,6 +215,14 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.05rem; font-weight: 700; color: var(--green);
 }
+.td-id {
+  display: block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
 .td-status { text-align: center; }
 .status-badge {
   display: inline-flex; align-items: center; gap: 5px;
@@ -357,6 +365,7 @@ async function loadCoupons(month) {
     const iDate   = head.indexOf('data');
     const iLink   = head.indexOf('link');
     const iStatus = head.indexOf('status');
+    const iId     = head.indexOf('id');
 
     if (iNick === -1) throw new Error('Nie znaleziono kolumny "Nick" w arkuszu');
     if (iPts === -1) throw new Error('Nie znaleziono kolumny "PunktyKoncowe" w arkuszu');
@@ -375,6 +384,7 @@ async function loadCoupons(month) {
         nick:   (r[iNick] || '').trim(),
         points: parseFloat((r[iPts] || '0').replace(',', '.')) || 0,
         link:   (r[iLink] || '#').trim(),
+        id:     iId !== -1 ? (r[iId] || '').trim() : '',
         status,
       });
     });
@@ -400,7 +410,7 @@ async function loadCoupons(month) {
         const safeLink = c.link.replace(/'/g, "\\'");
         return `<tr>
           <td><div class="td-nick"><span class="nick-avatar">${initials}</span>${c.nick}</div></td>
-          <td class="td-points">${Math.round(c.points)} pkt</td>
+          <td class="td-points">${Math.round(c.points)} pkt${c.id ? `<span class="td-id">#${c.id}</span>` : ''}</td>
           <td class="td-link"><button class="open-btn" onclick="window.open('${safeLink}','_blank')">Otwórz</button></td>
         </tr>`;
       }).join('');
