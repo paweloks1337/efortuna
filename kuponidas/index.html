@@ -52,173 +52,6 @@ body::before {
   z-index: 0;
 }
 
-/* ══════════════ ARCHIWUM — EKRAN WYBORU MIESIĄCA ══════════════ */
-#archive-view {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.archive-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gold);
-  background: var(--gold-dim);
-  border: 1px solid var(--border);
-  padding: 5px 14px;
-  border-radius: 999px;
-  margin-bottom: 16px;
-  opacity: 0;
-  animation: archIn 0.5s ease forwards;
-}
-
-.archive-eyebrow .dot {
-  width: 6px; height: 6px;
-  background: var(--gold);
-  border-radius: 50%;
-  animation: blink 2s ease-in-out infinite;
-}
-
-.archive-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(1.9rem, 6vw, 3.2rem);
-  font-weight: 700;
-  text-align: center;
-  color: #fff;
-  line-height: 1.1;
-  margin-bottom: 10px;
-  opacity: 0;
-  animation: archIn 0.5s ease 0.05s forwards;
-}
-.archive-title span { color: var(--gold); }
-
-.archive-sub {
-  color: var(--muted);
-  font-size: 0.9rem;
-  text-align: center;
-  margin-bottom: 40px;
-  opacity: 0;
-  animation: archIn 0.5s ease 0.1s forwards;
-}
-
-@keyframes archIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.tile-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  width: 100%;
-  max-width: 720px;
-}
-
-@media (min-width: 640px) {
-  .tile-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
-}
-
-.month-tile {
-  position: relative;
-  border: none;
-  border-radius: 18px;
-  padding: 22px 16px;
-  min-height: 130px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  cursor: pointer;
-  overflow: hidden;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  text-align: left;
-  opacity: 0;
-  transform: translateY(18px) scale(0.96);
-  animation: tileIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5);
-}
-
-@keyframes tileIn {
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.month-tile:hover, .month-tile:active {
-  transform: translateY(-4px) scale(1.02);
-}
-
-.month-tile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 85% 15%, rgba(255,255,255,0.22), transparent 55%);
-  pointer-events: none;
-}
-
-.month-tile .tile-icon {
-  font-size: 1.8rem;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
-}
-
-.month-tile .tile-name {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.month-tile .tile-arrow {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  font-size: 0.95rem;
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.month-tile:hover .tile-arrow { opacity: 0.9; transform: translateX(0); }
-
-/* Kolory kafelków — każdy miesiąc inny */
-.tile-sierpien { background: linear-gradient(135deg, #FF9A00, #C96C00); }
-.tile-ms       { background: linear-gradient(135deg, #FFD60A, #B88900); }
-.tile-maj      { background: linear-gradient(135deg, #FF6FA5, #B8305C); }
-.tile-kwiecien { background: linear-gradient(135deg, #8BC34A, #4E7A22); }
-.tile-marzec   { background: linear-gradient(135deg, #27C285, #0F8A57); }
-.tile-luty     { background: linear-gradient(135deg, #B15CFF, #6A21B0); }
-.tile-styczen  { background: linear-gradient(135deg, #3B9DFF, #06488F); }
-.tile-grudzien { background: linear-gradient(135deg, #FF4B5C, #8A1626); }
-
-.archive-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  margin: 14px auto 0;
-  transition: color 0.2s, border-color 0.2s;
-  max-width: fit-content;
-}
-.archive-back:hover { color: var(--gold); border-color: rgba(255,214,10,0.35); }
-
 /* ── NAV ── */
 nav {
   position: sticky;
@@ -1007,21 +840,10 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 <body>
 
 <!-- Loader -->
-<div id="loader" class="hidden">
+<div id="loader">
   <div class="loader-ring"></div>
   <div class="loader-label">Ładowanie rankingu…</div>
 </div>
-
-<!-- ══════════════ ARCHIWUM ══════════════ -->
-<div id="archive-view">
-  <div class="archive-eyebrow"><span class="dot"></span> Discord Fortuna</div>
-  <div class="archive-title">Archiwum <span>Mistrzostw Typerów</span></div>
-  <div class="archive-sub">Wybierz miesiąc, aby zobaczyć ranking</div>
-  <div class="tile-grid" id="tile-grid"></div>
-</div>
-
-<!-- ══════════════ WIDOK RANKINGU (miesiąc) ══════════════ -->
-<div id="ranking-view" style="display:none">
 
 <!-- Nav -->
 <nav>
@@ -1029,6 +851,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   <a href="kalkulator.html">📊 Kalkulator</a>
   <a href="kupony.html">🧾 Kupony</a>
   <a href="zasady.html">📖 Zasady</a>
+  <a href="archiwum.html">📅 Archiwum</a>
 </nav>
 
 <!-- Hero -->
@@ -1038,10 +861,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
     Discord Fortuna
   </div>
   <h1>Mistrzostwa<br><span>Typerów</span></h1>
-  <button class="archive-back" onclick="showArchive()">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-    Wróć do archiwum
-  </button>
 </div>
 
 <!-- Controls -->
@@ -1130,8 +949,6 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   </div>
 </div>
 
-</div><!-- /#ranking-view -->
-
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1157,48 +974,6 @@ let list = [];
 let currentPopupNick = '';
 let currentSortType = 'date';
 let currentMonth = 'test';
-
-/* ── ARCHIWUM: kafelki miesięcy ── */
-// "test" celowo pominięty w kafelkach (dane testowe) — nadal dostępny w select#month-select w widoku rankingu.
-const MONTHS = [
-  { key: 'sierpien', label: 'Sierpień',  icon: '☀️', cls: 'tile-sierpien' },
-  { key: 'ms',       label: 'MŚ 2026',   icon: '🌍', cls: 'tile-ms' },
-  { key: 'maj',      label: 'Maj',       icon: '🌸', cls: 'tile-maj' },
-  { key: 'kwiecien', label: 'Kwiecień',  icon: '🌷', cls: 'tile-kwiecien' },
-  { key: 'marzec',   label: 'Marzec',    icon: '🍀', cls: 'tile-marzec' },
-  { key: 'luty',     label: 'Luty',      icon: '❤️', cls: 'tile-luty' },
-  { key: 'styczen',  label: 'Styczeń',   icon: '❄️', cls: 'tile-styczen' },
-  { key: 'grudzien', label: 'Grudzień',  icon: '🎄', cls: 'tile-grudzien' },
-];
-
-function renderTiles() {
-  const grid = document.getElementById('tile-grid');
-  grid.innerHTML = MONTHS.map((m, i) => `
-    <button class="month-tile ${m.cls}" style="animation-delay:${i * 60}ms" onclick="selectMonth('${m.key}')">
-      <span class="tile-icon">${m.icon}</span>
-      <span class="tile-name">${m.label}</span>
-      <span class="tile-arrow">Zobacz →</span>
-    </button>
-  `).join('');
-}
-
-function selectMonth(key) {
-  document.getElementById('archive-view').style.display = 'none';
-  document.getElementById('ranking-view').style.display = 'block';
-  document.getElementById('search').value = '';
-  const sel = document.getElementById('month-select');
-  if (sel) sel.value = key;
-  loadRankingForMonth(key);
-  window.scrollTo(0, 0);
-}
-
-function showArchive() {
-  document.getElementById('ranking-view').style.display = 'none';
-  document.getElementById('archive-view').style.display = 'flex';
-  window.scrollTo(0, 0);
-}
-
-renderTiles();
 
 /* ── CSV PARSER ── */
 function parseCSV(text) {
@@ -1500,8 +1275,7 @@ function escapeJs(str) {
 }
 
 /* ── INIT ── */
-// Strona startuje na ekranie archiwum (#archive-view) — ranking ładuje się
-// dopiero po kliknięciu w konkretny miesiąc, patrz selectMonth().
+loadRankingForMonth('test');
 
 </script>
 </body>
