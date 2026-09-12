@@ -25,6 +25,8 @@
   --gold-glow: rgba(255,214,10,0.35);
   --green:     #00E676;
   --green-dim: rgba(0,230,118,0.12);
+  --red:       #FF4B5C;
+  --red-dim:   rgba(255,75,92,0.12);
   --text:      #E8E8F0;
   --muted:     #6B6B80;
   --radius:    12px;
@@ -127,6 +129,26 @@ nav a.active { color: var(--gold); background: var(--gold-dim); }
 
 .hero h1 span { color: var(--gold); }
 
+.hero-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 9px 18px;
+  background: rgba(255,75,92,0.12);
+  border: 1px solid rgba(255,75,92,0.35);
+  border-radius: 999px;
+  color: var(--red);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  animation: alertPulse 2.2s ease-in-out infinite;
+}
+@keyframes alertPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,75,92,0.35); }
+  50%      { box-shadow: 0 0 0 6px rgba(255,75,92,0); }
+}
+
 /* ── CONTROLS ── */
 .controls {
   display: flex;
@@ -218,7 +240,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 }
 
 .qual-toggle:hover {
-  border-color: rgba(0,230,118,0.3);
+  border-color: rgba(255,75,92,0.3);
 }
 
 .qual-toggle input {
@@ -247,14 +269,14 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 }
 
 .qual-toggle input:checked + .qual-toggle-track {
-  background: var(--green-dim);
-  border-color: rgba(0,230,118,0.4);
+  background: var(--red-dim);
+  border-color: rgba(255,75,92,0.4);
 }
 
 .qual-toggle input:checked + .qual-toggle-track .qual-toggle-thumb {
   transform: translateX(15px);
-  background: var(--green);
-  box-shadow: 0 0 6px rgba(0,230,118,0.6);
+  background: var(--red);
+  box-shadow: 0 0 6px rgba(255,75,92,0.6);
 }
 
 .qual-toggle-text {
@@ -263,6 +285,10 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   color: var(--muted);
   white-space: nowrap;
   transition: color 0.2s;
+}
+
+.qual-toggle:has(input:checked) {
+  animation: alertPulse 2.2s ease-in-out infinite;
 }
 
 .qual-toggle input:checked ~ .qual-toggle-text { color: var(--text); }
@@ -847,10 +873,11 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 
 <!-- Nav -->
 <nav>
-<a href="/" class="active">🏆 Ranking</a>
-<a href="/kalkulator/">📊 Kalkulator</a>
-<a href="/kupony/">🧾 Kupony</a>
-<a href="/archiwum/">📅 Archiwum</a>
+  <a href="index.html" class="active">🏆 Ranking</a>
+  <a href="kalkulator.html">📊 Kalkulator</a>
+  <a href="kupony.html">🧾 Kupony</a>
+  <a href="zasady.html">📖 Zasady</a>
+  <a href="archiwum.html">📅 Archiwum</a>
 </nav>
 
 <!-- Hero -->
@@ -860,6 +887,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
     Discord Fortuna
   </div>
   <h1>Mistrzostwa<br><span>Typerów</span></h1>
+  <div class="hero-alert">🎟️ Minimum 3 kupony = udział w walce o FREEBETY</div>
 </div>
 
 <!-- Controls -->
@@ -872,8 +900,15 @@ select:focus { border-color: rgba(255,214,10,0.5); }
   </div>
   <div class="select-wrap">
     <select id="month-select">
-      <option value="wrzesien">Wrzesień</option>
-    
+      <option value="test">TEST</option>
+      <option value="sierpien">Sierpień</option>
+      <option value="ms">MŚ 2026</option>
+      <option value="maj">Maj</option>
+      <option value="kwiecien">Kwiecień</option>
+      <option value="marzec">Marzec</option>
+      <option value="luty">Luty</option>
+      <option value="styczen">Styczeń</option>
+      <option value="grudzien">Grudzień</option>
     </select>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <path d="m6 9 6 6 6-6"/>
@@ -945,8 +980,15 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 
 <script>
 const CSV_URLS = {
-  wrzesien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSto-c8__lGgMDMn-Cwwp1Kpjloo4DzujF-0gTd8bHtsoTBiEh-HkpRUrHcHzZ8fnLrzB_znHTA6mwr/pub?gid=1557254303&single=true&output=csv",
-  
+  test: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSto-c8__lGgMDMn-Cwwp1Kpjloo4DzujF-0gTd8bHtsoTBiEh-HkpRUrHcHzZ8fnLrzB_znHTA6mwr/pub?gid=1557254303&single=true&output=csv",
+  sierpien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQI5JLrHuFtVYE-3VS9zon6pxuO3KwIHo12i3rE6snJuQI4qgrgB8usKcrR8QPpf2Rqkw3Qe6kNQbR9/pub?output=csv",
+  ms: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9dHJky9wnH-oCvpbDKn1VsagTZG1vcSPw42a0VsMzqso-aTnxjZzQTHQ3obqxVUR6LhDhbS97B9FS/pub?output=csv",
+  maj:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg5KetOj1gI-RwW7c8jForGl7QHTA2EFBjar_7usr594aCldQIiNqzglkItznWYJBBX8lISZ_RK4yL/pub?output=csv",
+  kwiecien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSH66B29eSQCx3n4azrAONb4DnOv80o0OLpyb3u2d8oRKATfJp6kOe7ONb3n0MEwjLoQobdaEQKbuQ5/pub?output=csv",
+  marzec:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsopL8OBdIkFkCdGLo-_n8YewObXzEvVHQ9K0PXy3ANcxxJ2B6krxvxPPpHex66ut4Ut8hvARMzmh1/pub?output=csv",
+  luty:     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQodqUqlWT0Ddd8ch_t3Jm7NzRmkrp_qyoP3KTz5gMw3exgx41WL7zcVrDvtQop7niDpeuyM57vaO9n/pub?output=csv",
+  styczen:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQqEDjk5U_Kmb9OWYXxvh5w-r3zFzSeruPQEHNOtvhlUFNb7y3bs9LH5doyNSQ3VIADACqs3pkSxLsO/pub?output=csv",
+  grudzien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Zon74G75eqPkoElWkzBQuOTkG0zSL9bPzic_hdBZT3e0dMXnMBWAwCyu-tRpHxct203uZqQAoww0/pub?output=csv"
 };
 
 /* ── PRÓG KWALIFIKACJI ── */
@@ -1260,7 +1302,7 @@ function escapeJs(str) {
 }
 
 /* ── INIT ── */
-loadRankingForMonth('wrzesien');
+loadRankingForMonth('test');
 
 </script>
 </body>
