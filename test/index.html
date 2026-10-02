@@ -1364,13 +1364,8 @@ loadRankingForMonth('test');
       <button id="btnIos" onclick="showTab('Ios')">🍎 iPhone (iOS)</button>
     </div>
     <div class="tab" id="tabAndroid">
-      <button class="now" id="installNow" hidden>⬇️ Zainstaluj teraz</button>
-      <ol>
-        <li>Otwórz stronę w <b>Chrome</b></li>
-        <li>Kliknij menu <b>⋮</b> (prawy górny róg)</li>
-        <li>Wybierz <b>„Zainstaluj aplikację”</b> lub <b>„Dodaj do ekranu głównego”</b></li>
-        <li>Potwierdź <b>„Zainstaluj”</b></li>
-      </ol>
+      <button class="now" id="installNow">⬇️ Zainstaluj</button>
+      <p id="installHint" hidden style="font-size:.85rem;line-height:1.5;color:var(--muted)">Kliknij menu <b>⋮</b> w Chrome i wybierz <b>„Zainstaluj aplikację”</b>.</p>
     </div>
     <div class="tab" id="tabIos">
       <ol>
@@ -1405,7 +1400,6 @@ function showTab(name){
 }
 function openInstall(){
   showTab(isIos ? 'Ios' : 'Android');
-  installNow.hidden = !deferredPrompt;
   document.getElementById('installModal').classList.add('open');
 }
 function closeInstall(){ document.getElementById('installModal').classList.remove('open'); }
@@ -1420,13 +1414,13 @@ if (!isStandalone) {
   document.getElementById('installGo').onclick = () => { bar.classList.remove('show'); openInstall(); };
   document.getElementById('installX').onclick = () => { bar.classList.remove('show'); dismiss(); };
   installNow.onclick = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) { document.getElementById('installHint').hidden = false; return; }
     deferredPrompt.prompt();
     await deferredPrompt.userChoice;
-    deferredPrompt = null; installNow.hidden = true; closeInstall();
+    deferredPrompt = null; closeInstall();
   };
   window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); deferredPrompt = e; installNow.hidden = false;
+    e.preventDefault(); deferredPrompt = e;
   });
   window.addEventListener('appinstalled', () => { installBtn.hidden = true; bar.classList.remove('show'); });
   if (!dismissed()) setTimeout(() => bar.classList.add('show'), 1500);
