@@ -888,6 +888,11 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 #installBar .t b{display:block;color:var(--gold)}
 #installBar .go{background:var(--gold);color:#0A0A0F;border:0;border-radius:999px;padding:9px 16px;font-weight:700;cursor:pointer}
 #installBar .x{background:none;border:0;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px}
+#installModal .tabs{display:flex;gap:8px;margin-bottom:14px}
+#installModal .tabs button{flex:1;padding:10px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-weight:600;cursor:pointer}
+#installModal .tabs button.on{background:var(--gold);color:#0A0A0F;border-color:var(--gold)}
+#installModal .now{display:block;width:100%;margin-bottom:12px;padding:12px;background:var(--green);color:#0A0A0F;border:0;border-radius:var(--radius);font-weight:700;cursor:pointer}
+#installModal .now[hidden]{display:none}
 #installModal{position:fixed;inset:0;z-index:300;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);padding:16px}
 #installModal.open{display:flex}
 #installModal .box{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:env(safe-area-inset-bottom,0)}
@@ -1353,21 +1358,26 @@ loadRankingForMonth('test');
 
 <div id="installModal" onclick="if(event.target===this)closeInstall()">
   <div class="box">
-    <h3>📲 Dodaj aplikację</h3>
+    <h3>📲 Pobierz aplikację</h3>
+    <div class="tabs">
+      <button id="btnAndroid" onclick="showTab('Android')">🤖 Android</button>
+      <button id="btnIos" onclick="showTab('Ios')">🍎 iPhone (iOS)</button>
+    </div>
+    <div class="tab" id="tabAndroid">
+      <button class="now" id="installNow" hidden>⬇️ Zainstaluj teraz</button>
+      <ol>
+        <li>Otwórz stronę w <b>Chrome</b></li>
+        <li>Kliknij menu <b>⋮</b> (prawy górny róg)</li>
+        <li>Wybierz <b>„Zainstaluj aplikację”</b> lub <b>„Dodaj do ekranu głównego”</b></li>
+        <li>Potwierdź <b>„Zainstaluj”</b></li>
+      </ol>
+    </div>
     <div class="tab" id="tabIos">
       <ol>
         <li>Otwórz stronę w <b>Safari</b></li>
         <li>Kliknij ikonę <b>Udostępnij</b> (kwadrat ze strzałką, na dole)</li>
         <li>Wybierz <b>„Do ekranu początkowego”</b></li>
         <li>Kliknij <b>„Dodaj”</b></li>
-      </ol>
-    </div>
-    <div class="tab" id="tabAndroid">
-      <ol>
-        <li>Otwórz stronę w <b>Chrome</b></li>
-        <li>Kliknij menu <b>⋮</b> (prawy górny róg)</li>
-        <li>Wybierz <b>„Zainstaluj aplikację”</b> lub <b>„Dodaj do ekranu głównego”</b></li>
-        <li>Potwierdź <b>„Zainstaluj”</b></li>
       </ol>
     </div>
     <button class="close" onclick="closeInstall()">Zamknij</button>
@@ -1381,41 +1391,45 @@ if ('serviceWorker' in navigator) {
 }
 let deferredPrompt = null;
 const installBtn = document.getElementById('installBtn');
+const installNow = document.getElementById('installNow');
+const bar = document.getElementById('installBar');
 const isStandalone = matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+function showTab(name){
+  ['Android','Ios'].forEach(n => {
+    document.getElementById('tab'+n).classList.toggle('show', n === name);
+    document.getElementById('btn'+n).classList.toggle('on', n === name);
+  });
+}
 function openInstall(){
-  document.getElementById('tabIos').classList.toggle('show', isIos);
-  document.getElementById('tabAndroid').classList.toggle('show', !isIos);
+  showTab(isIos ? 'Ios' : 'Android');
+  installNow.hidden = !deferredPrompt;
   document.getElementById('installModal').classList.add('open');
 }
 function closeInstall(){ document.getElementById('installModal').classList.remove('open'); }
 
+const DKEY = 'pwaDismissed';
+const dismissed = () => { try { return Date.now() - Number(localStorage.getItem(DKEY) || 0) < 3*864e5; } catch(e){ return false; } };
+const dismiss = () => { try { localStorage.setItem(DKEY, Date.now()); } catch(e){} };
+
 if (!isStandalone) {
   installBtn.hidden = false;
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {                 // Android / Chrome: natywne okno
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    } else {                              // iOS i reszta: instrukcja
-      openInstall();
-    }
-  });
-  const DKEY = 'pwaDismissed';
-  const dismissed = () => { try { return Date.now() - Number(localStorage.getItem(DKEY) || 0) < 3*864e5; } catch(e){ return false; } };
-  const dismiss = () => { try { localStorage.setItem(DKEY, Date.now()); } catch(e){} };
-  const bar = document.getElementById('installBar');
-  document.getElementById('installGo').onclick = () => { bar.classList.remove('show'); installBtn.click(); };
+  installBtn.addEventListener('click', openInstall);
+  document.getElementById('installGo').onclick = () => { bar.classList.remove('show'); openInstall(); };
   document.getElementById('installX').onclick = () => { bar.classList.remove('show'); dismiss(); };
-
+  installNow.onclick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null; installNow.hidden = true; closeInstall();
+  };
   window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); deferredPrompt = e;
-    if (!dismissed()) setTimeout(() => bar.classList.add('show'), 1500);   // Android: baner od razu
+    e.preventDefault(); deferredPrompt = e; installNow.hidden = false;
   });
-  if (isIos && !dismissed()) setTimeout(() => { openInstall(); dismiss(); }, 2000);  // iOS: instrukcja od razu
-  window.addEventListener('appinstalled', () => { installBtn.hidden = true; });
+  window.addEventListener('appinstalled', () => { installBtn.hidden = true; bar.classList.remove('show'); });
+  if (!dismissed()) setTimeout(() => bar.classList.add('show'), 1500);
 }
 </script>
 </body>
