@@ -1,6 +1,6 @@
 {
   "name": "Mistrzostwa Typerów",
-  "short_name": "Typerzy",
+  "short_name": "DcRanking",
   "description": "Ranking, kalkulator i kupony Mistrzostw Typerów",
   "start_url": "./",
   "scope": "./",
