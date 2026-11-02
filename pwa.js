@@ -10,11 +10,20 @@
     });
   }
 
+  // --- Statystyki w Google Analytics (zdarzenia widać w GA4)
+  function track(name, params) {
+    try { if (typeof window.gtag === 'function') window.gtag('event', name, params || {}); } catch (e) {}
+  }
+
   // --- Już zainstalowana? Wtedy nic nie pokazujemy.
   var isStandalone =
     (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
     window.navigator.standalone === true;
-  if (isStandalone) return;
+  if (isStandalone) {
+    // Strona otwarta z ikony na ekranie głównym = osoba, która ma aplikację
+    window.addEventListener('load', function () { track('pwa_otwarcie_aplikacji'); });
+    return;
+  }
 
   var ua = navigator.userAgent || '';
   var isIOS = /iphone|ipad|ipod/i.test(ua) ||
@@ -36,7 +45,7 @@
   }
 
   var deferredPrompt = null;
-  var banner = null, overlay = null;
+  var banner = null, overlay = null, shownTracked = false;
 
   // --- Style
   var css = '\
@@ -176,6 +185,7 @@ display:flex;align-items:center;justify-content:center}\
     selectOS(isIOS ? 'ios' : 'android');
     updateHint();
     overlay.hidden = false;
+    track('pwa_okno_otwarte', { system: isIOS ? 'ios' : 'android' });
     document.documentElement.style.overflow = 'hidden';
     overlay.querySelector('.pwa-close').focus();
   }
@@ -187,6 +197,7 @@ display:flex;align-items:center;justify-content:center}\
 
   function doInstall() {
     var hint = overlay.querySelector('.pwa-hint');
+    track('pwa_klik_pobierz');
     if (!deferredPrompt) { hint.hidden = false; return; }
     var p = deferredPrompt;
     deferredPrompt = null;
@@ -206,7 +217,9 @@ display:flex;align-items:center;justify-content:center}\
     setTimeout(function () {
       if (!document.body) return;
       build();
+      var firstShow = banner.hidden !== false;
       banner.hidden = false;
+      if (firstShow && !shownTracked) { shownTracked = true; track('pwa_baner_pokazany'); }
     }, delay);
   }
 
@@ -220,6 +233,7 @@ display:flex;align-items:center;justify-content:center}\
 
   window.addEventListener('appinstalled', function () {
     deferredPrompt = null;
+    track('pwa_zainstalowano');
     rememberDismiss();
     if (overlay) closeModal();
     if (banner) banner.hidden = true;
