@@ -967,6 +967,8 @@ select:focus { border-color: rgba(255,214,10,0.5); }
     <select id="month-select">
       <option value="pazdziernik">Październik</option>
       <option value="test">Wrzesień</option>
+      <option value="test">Listopad</option>
+      
 
     </select>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -1039,6 +1041,7 @@ select:focus { border-color: rgba(255,214,10,0.5); }
 
 <script>
 const CSV_URLS = {
+  listpad: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGxVrpJvzDW8Ik25wFiJv7l_n8z8-ykQo3aoO7wuzDJr-JL9GKJel06KSEFpFiS66aMfFu_tSxmDTL/pub?gid=1685992768&single=true&output=csv" ,
   pazdziernik: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTxsqKtPzZxvL31JMt0uFZ20vae127sIaEnDfRJHxNZpgPQa9tOsjWT2Fl2UfbRK7T2Jd6fSzfEtFMO/pub?gid=206253994&single=true&output=csv" ,
   test: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSto-c8__lGgMDMn-Cwwp1Kpjloo4DzujF-0gTd8bHtsoTBiEh-HkpRUrHcHzZ8fnLrzB_znHTA6mwr/pub?gid=1557254303&single=true&output=csv",
   sierpien: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQI5JLrHuFtVYE-3VS9zon6pxuO3KwIHo12i3rE6snJuQI4qgrgB8usKcrR8QPpf2Rqkw3Qe6kNQbR9/pub?output=csv",
@@ -1371,7 +1374,7 @@ function escapeJs(str) {
 }
 
 /* ── INIT ── */
-loadRankingForMonth('pazdziernik');
+loadRankingForMonth('listopad');
 
 </script>
 <script src="/pwa.js" defer></script>
