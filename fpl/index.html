@@ -39,7 +39,7 @@ td.r,th.r{text-align:right}.bar{display:flex;align-items:center;gap:8px;margin:5
 // ===== KONFIGURACJA =====
 // proxy: adres Twojego Cloudflare Workera (np. https://fpl-proxy.twoja-nazwa.workers.dev). FPL API nie wysyła nagłówków CORS,
 // więc przeglądarka bez proxy zablokuje zapytania.
-const CONFIG={proxy:"https://efortuna.paweloxbieniek1.workers.dev",leagues:[931431]};
+const CONFIG={proxy:"https://fpl.paweloxbieniek1.workers.dev",leagues:[931431]};
 // =========================
 const $=s=>document.querySelector(s),app=$("#app"),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},lset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
