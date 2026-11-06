@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FPL – Kto wygrywał kolejki?</title>
+<style>
+:root{--bg:#07110c;--c:#0f1d16;--c2:#14291e;--b:#1f3a2b;--g:#00ff85;--t:#e8f5ee;--m:#8aa898;--r:#ff4d6d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 500px at 50% -10%,#0d3a24,var(--bg));color:var(--t);font:15px/1.45 system-ui,Segoe UI,Roboto,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:#07110ccc;backdrop-filter:blur(8px);border-bottom:1px solid var(--b);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+h1{font-size:18px;margin:0 auto 0 0;color:var(--g)}h2{font-size:17px;margin:0 0 10px}
+main{max-width:1100px;margin:0 auto;padding:14px}
+button,select,input{background:var(--c2);color:var(--t);border:1px solid var(--b);border-radius:8px;padding:8px 11px;font:inherit}
+button{cursor:pointer;transition:.15s}button:hover:not(:disabled){border-color:var(--g);box-shadow:0 0 0 2px #00ff8533}button:disabled{opacity:.5}
+input{min-width:0;flex:1 1 150px}.muted{color:var(--m);font-size:13px}.err{background:#3a1520;border:1px solid var(--r);padding:10px;border-radius:10px;margin:10px 0}
+.card{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:14px;margin-bottom:14px;animation:in .4s both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.st{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:12px;transition:.2s}.st:hover{transform:translateY(-3px);border-color:var(--g)}
+.st b{display:block;font-size:24px;color:var(--g)}.st span{font-size:12px;color:var(--m)}
+.win{display:flex;flex-wrap:wrap;gap:10px}.w{flex:1 1 220px;background:linear-gradient(135deg,#0b5a35,#0f2a1d);border:1px solid var(--g);border-radius:12px;padding:12px}
+.w .n{font-size:19px;font-weight:700}.w .p{font-size:30px;color:var(--g);font-weight:800}
+.wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th{color:var(--m);font-weight:600;text-align:left;font-size:12px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--b);white-space:nowrap}tr[data-e],tr[data-g]{cursor:pointer}tbody tr:hover{background:var(--c2)}
+td.r,th.r{text-align:right}.bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}.bar i{display:block;height:14px;border-radius:4px;background:linear-gradient(90deg,#00b35e,var(--g));transition:width .6s}
+.bar span:first-child{flex:0 0 38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ch{width:100%;height:auto}.tag{background:#00ff8522;color:var(--g);border-radius:6px;padding:1px 7px;font-size:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.two{grid-template-columns:1fr}h1{width:100%}}
+</style></head><body>
+<header>
+<h1>⚽ FPL · Kto wygrywał kolejki?</h1>
+<select id="lg" title="Liga"></select><button id="add" title="Dodaj ligę">＋</button>
+<button id="net"></button><button id="ref">↻ Odśwież</button>
+</header>
+<main>
+<div class="muted" id="st">Start…</div>
+<div class="row"><input id="q" type="search" placeholder="🔎 Szukaj uczestnika lub drużyny…"></div>
+<div id="app"></div>
+</main>
+<script>
+// ===== KONFIGURACJA =====
+// proxy: adres Twojego Cloudflare Workera (np. https://fpl-proxy.twoja-nazwa.workers.dev). FPL API nie wysyła nagłówków CORS,
+// więc przeglądarka bez proxy zablokuje zapytania.
+const CONFIG={proxy:"",leagues:[931431]};
+// =========================
+const $=s=>document.querySelector(s),app=$("#app"),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},lset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const S={lid:0,events:[],entries:[],H:{},R:[],sel:null,q:"",pe:null,net:true,fail:0,upd:null,league:null};
+
+async function api(path,{ttl=3e5,force=false,pick=x=>x}={}){
+  const k="fpl1:"+path;
+  if(!force){const c=ls(k);if(c&&Date.now()-c.t<ttl)return c.d}
+  const url=(CONFIG.proxy||"https://fantasy.premierleague.com").replace(/\/$/,"")+"/api"+path;
+  let err;
+  for(let i=0;i<5;i++){
+    try{
+      const r=await fetch(url);
+      if(r.ok){const d=pick(await r.json());lset(k,{t:Date.now(),d});return d}
+      if(r.status===429||r.status>=500){err=new Error("HTTP "+r.status);await sleep(Math.max((+r.headers.get("Retry-After")||0)*1e3,800*2**i));continue}
+      throw Object.assign(new Error("HTTP "+r.status),{fatal:1,status:r.status});
+    }catch(e){if(e.fatal)throw e;err=e;await sleep(800*2**i)}
+  }
+  throw err;
+}
+const hist=(id,force)=>api(`/entry/${id}/history/`,{ttl:18e5,force,pick:d=>Object.fromEntries((d.current||[]).map(x=>[x.event,[x.event,x.points,x.event_transfers_cost]]))});
+
+async function load(force){
+  const lid=S.lid;$("#ref").disabled=true;let err="";
+  try{
+    $("#st").textContent="Pobieram kolejki…";
+    S.events=await api("/bootstrap-static/",{force,pick:d=>d.events.map(e=>({id:e.id,f:e.finished&&e.data_checked,fin:e.finished,cur:e.is_current}))});
+    let page=1,entries=[],league;
+    for(;;){
+      $("#st").textContent=`Pobieram tabelę ligi (strona ${page})…`;
+      const d=await api(`/leagues-classic/${lid}/standings/?page_standings=${page}`,{force,pick:d=>({league:{id:d.league.id,name:d.league.name},standings:{has_next:d.standings.has_next,results:d.standings.results.map(r=>({entry:r.entry,entry_name:r.entry_name,player_name:r.player_name,total:r.total,event_total:r.event_total}))}})});
+      league=d.league;entries.push(...d.standings.results);
+      if(!d.standings.has_next||page>=500)break;page++;
+    }
+    S.entries=entries;S.league=league;const nm=ls("fpl-ln",{});nm[lid]=league.name;lset("fpl-ln",nm);
+    const q=[...entries],H={};let done=0,fail=0;
+    await Promise.all(Array.from({length:6},async()=>{
+      while(q.length){const e=q.shift();
+        try{H[e.entry]=await hist(e.entry,force)}catch{fail++}
+        $("#st").textContent=`Pobieram historię uczestników: ${++done}/${entries.length}`}
+    }));
+    if(lid!==S.lid)return;
+    S.H=H;S.fail=fail;S.upd=new Date();
+    const cu=S.events.find(e=>e.cur);
+    if(cu){let n=0,g=0;entries.forEach(e=>{const h=H[e.entry]?.[cu.id];if(h){if(h[1]-h[2]===e.event_total)n++;if(h[1]===e.event_total)g++}});S.net=n>=g}
+    compute();
+    $("#st").textContent="Ostatnia aktualizacja: "+S.upd.toLocaleString("pl-PL");
+  }catch(e){
+    err=e.status===404?`Nie znaleziono ligi ${lid} (HTTP 404).`:(!CONFIG.proxy&&e instanceof TypeError)?"Przeglądarka zablokowała zapytanie (CORS). Wdróż worker.js na Cloudflare i wpisz jego adres w CONFIG.proxy w pliku index.html.":"Błąd pobierania danych: "+e.message+". Spróbuj ponownie za chwilę (możliwy limit zapytań lub aktualizacja FPL).";
+    $("#st").textContent="";
+  }
+  $("#ref").disabled=false;render(err);
+}
+function compute(){
+  S.R=S.events.filter(e=>e.fin||e.cur).map(ev=>{
+    const rows=S.entries.map(e=>{const h=S.H[e.entry]?.[ev.id];return h?{e,pts:S.net?h[1]-h[2]:h[1],cost:h[2]}:null}).filter(Boolean).sort((a,b)=>b.pts-a.pts);
+    const max=rows[0]?.pts;return{id:ev.id,final:ev.f,rows,max,winners:rows.filter(r=>r.pts===max)};
+  }).filter(g=>g.rows.length);
+  const fin=S.R.filter(g=>g.final);
+  if(!S.R.some(g=>g.id===S.sel))S.sel=(fin[fin.length-1]||S.R[S.R.length-1])?.id;
+}
+const nm=e=>`<b>${esc(e.player_name)}</b>`,m=(e,q=S.q.trim().toLowerCase())=>!q||(e.player_name+" "+e.entry_name).toLowerCase().includes(q);
+function chart(e){
+  const gs=S.R.filter(g=>g.final),W=560,Hh=180,p=22,bw=(W-p*2)/gs.length;
+  const pts=gs.map(g=>g.rows.find(r=>r.e.entry===e.entry)?.pts??0),mx=Math.max(10,...gs.map(g=>g.max),...pts),y=v=>Hh-p-v/mx*(Hh-p*2);
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" class="ch">`;
+  gs.forEach((g,i)=>{const x=p+i*bw,won=g.winners.some(w=>w.e.entry===e.entry);
+    s+=`<rect x="${x+1}" y="${y(pts[i])}" width="${Math.max(bw-2,1)}" height="${Hh-p-y(pts[i])}" rx="2" fill="${won?"#00ff85":"#2f6f4d"}"><title>GW${g.id}: ${pts[i]} pkt (zwycięzca: ${g.max})</title></rect>`;
+    if(gs.length<=20||i%5===0)s+=`<text x="${x+bw/2}" y="${Hh-6}" text-anchor="middle" font-size="9" fill="#8aa898">${g.id}</text>`});
+  return s+`<polyline fill="none" stroke="#ff4d6d" stroke-width="1.5" points="${gs.map((g,i)=>`${p+i*bw+bw/2},${y(g.max)}`).join(" ")}"/></svg>`;
+}
+function render(err=""){
+  let h="";
+  if(err)h+=`<div class="err">${esc(err)}</div>`;
+  if(S.fail)h+=`<div class="err">Nie udało się pobrać historii ${S.fail} uczestników – wyniki mogą być niepełne. Kliknij „Odśwież”.</div>`;
+  const R=S.R,fin=R.filter(g=>g.final);
+  if(!R.length){app.innerHTML=h+(err?"":'<p class="muted">Brak rozegranych kolejek.</p>');return}
+  const g=R.find(x=>x.id===S.sel)||R[R.length-1],i=R.indexOf(g);
+  // ranking
+  const wins={};fin.forEach(x=>x.winners.forEach(w=>(wins[w.e.entry]??=[]).push(x.id)));
+  const rk=S.entries.map(e=>({e,w:wins[e.entry]||[]})).sort((a,b)=>b.w.length-a.w.length||b.e.total-a.e.total);
+  let last=-1,rank=0;rk.forEach((r,j)=>{if(r.w.length!==last){rank=j+1;last=r.w.length}r.rank=rank});
+  const top=rk.filter(r=>r.rank===1&&r.w.length>0),mxg=fin.length?fin.reduce((a,b)=>b.max>a.max?b:a):null;
+  // wybrana kolejka
+  h+=`<div class="card"><div class="row"><button data-g="${R[i-1]?.id}" ${i?"":"disabled"}>◀</button><select id="gsel">${R.map(x=>`<option value="${x.id}" ${x.id===g.id?"selected":""}>GW${x.id}${x.final?"":" (trwa / niezatwierdzona)"}</option>`).join("")}</select><button data-g="${R[i+1]?.id}" ${R[i+1]?"":"disabled"}>▶</button></div>`;
+  h+=`<h2>${g.final?`🏆 Zwycięzca GW${g.id}${g.winners.length>1?` (remis: ${g.winners.length})`:""}`:`⏳ GW${g.id} – kolejka nierozstrzygnięta`}</h2>`;
+  if(!g.final)h+=`<p class="muted">Punkty (w tym bonusy) nie są jeszcze zatwierdzone. Poniżej tymczasowy lider – nie wlicza się do statystyk.</p>`;
+  h+=`<div class="win">${g.winners.map(w=>`<div class="w"><div class="n">${esc(w.e.player_name)}</div><div class="muted">${esc(w.e.entry_name)}</div><div class="p">${w.pts} pkt</div></div>`).join("")}</div></div>`;
+  // statystyki
+  const st=[[S.entries.length,"uczestników"],[fin.length,"rozegranych kolejek"],[mxg?mxg.max:"–",mxg?`max punktów w kolejce (GW${mxg.id}, ${mxg.winners.map(w=>esc(w.e.player_name)).join(", ")})`:"max punktów"],[fin.length?(fin.reduce((a,b)=>a+b.max,0)/fin.length).toFixed(1):"–","średnia pkt zwycięzcy"],[top.length?top[0].w.length:"–",top.length?"najwięcej wygranych: "+top.map(r=>esc(r.e.player_name)).join(", "):"najwięcej wygranych"],[fin.filter(x=>x.winners.length>1).length,"remisów na 1. miejscu"]];
+  h+=`<div class="grid">${st.map(s=>`<div class="st"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}</div>`;
+  // wszystkie kolejki
+  h+=`<div class="card"><h2>Zwycięzcy wszystkich kolejek</h2><div class="wrap"><table><thead><tr><th>GW</th><th>Zwycięzca</th><th>Drużyna</th><th class="r">Pkt</th></tr></thead><tbody>${[...R].reverse().map(x=>`<tr data-g="${x.id}"><td>${x.id}${x.final?"":" ⏳"}</td><td>${x.winners.map(w=>nm(w.e)).join(", ")}</td><td class="muted">${x.winners.map(w=>esc(w.e.entry_name)).join(", ")}</td><td class="r">${x.max}</td></tr>`).join("")}</tbody></table></div></div>`;
+  // ranking + wykres
+  const top15=rk.filter(r=>r.w.length).slice(0,15),mw=top15[0]?.w.length||1;
+  h+=`<div class="two"><div class="card"><h2>Ranking wygranych kolejek</h2><div class="wrap"><table><thead><tr><th>#</th><th>Menedżer</th><th>Drużyna</th><th class="r">Wygrane</th><th class="r">%</th></tr></thead><tbody>${rk.filter(r=>m(r.e)).map(r=>`<tr data-e="${r.e.entry}"><td>${r.rank}</td><td>${nm(r.e)}</td><td class="muted">${esc(r.e.entry_name)}</td><td class="r">${r.w.length}</td><td class="r">${fin.length?(r.w.length/fin.length*100).toFixed(0):0}%</td></tr>`).join("")}</tbody></table></div><p class="muted">Remis = wygrana dla każdego z remisujących.</p></div>`;
+  h+=`<div class="card"><h2>Wygrane kolejki – wykres</h2>${top15.length?top15.map(r=>`<div class="bar" data-e="${r.e.entry}"><span>${esc(r.e.player_name)}</span><i style="width:${r.w.length/mw*50}%"></i><span>${r.w.length}</span></div>`).join(""):'<p class="muted">Brak zatwierdzonych kolejek.</p>'}</div></div>`;
+  // uczestnik
+  const pe=S.entries.find(e=>e.entry===S.pe);
+  h+=`<div class="card"><h2>Historia uczestnika</h2>`;
+  if(pe&&fin.length){const w=wins[pe.entry]||[];h+=`<p><b>${esc(pe.player_name)}</b> · ${esc(pe.entry_name)} · wygrane: <b>${w.length}</b> ${w.map(x=>`<span class="tag">GW${x}</span>`).join(" ")}</p>${chart(pe)}<p class="muted">Zielone słupki = wygrane kolejki, czerwona linia = punkty zwycięzcy kolejki.</p><div class="wrap"><table><thead><tr><th>GW</th><th class="r">Pkt</th><th class="r">Hit</th><th class="r">Miejsce w lidze</th><th class="r">Strata do zw.</th></tr></thead><tbody>${fin.map(x=>{const j=x.rows.findIndex(r=>r.e.entry===pe.entry),r=x.rows[j];return r?`<tr><td>${x.id}</td><td class="r">${r.pts}</td><td class="r">${r.cost?-r.cost:0}</td><td class="r">${x.rows.findIndex(z=>z.pts===r.pts)+1}.</td><td class="r">${x.max-r.pts}</td></tr>`:""}).join("")}</tbody></table></div>`}
+  else h+=`<p class="muted">Kliknij uczestnika w rankingu lub w tabeli kolejki, aby zobaczyć jego historię.</p>`;
+  h+=`</div>`;
+  // pełna tabela wybranej kolejki
+  h+=`<div class="card"><h2>Wyniki GW${g.id}${S.q?` · filtr: „${esc(S.q)}”`:""}</h2><div class="wrap"><table><thead><tr><th>#</th><th>Menedżer</th><th>Drużyna</th><th class="r">Pkt</th><th class="r">Hit</th><th class="r">Do zw.</th></tr></thead><tbody>${g.rows.map((r,j)=>({r,pos:g.rows.findIndex(z=>z.pts===r.pts)+1})).filter(o=>m(o.r.e)).map(o=>`<tr data-e="${o.r.e.entry}"><td>${o.pos}</td><td>${nm(o.r.e)}</td><td class="muted">${esc(o.r.e.entry_name)}</td><td class="r">${o.r.pts}</td><td class="r">${o.r.cost?-o.r.cost:0}</td><td class="r">${g.max-o.r.pts}</td></tr>`).join("")}</tbody></table></div></div>`;
+  app.innerHTML=h;
+}
+// zdarzenia
+app.addEventListener("click",ev=>{
+  const t=ev.target.closest("[data-e]");if(t){S.pe=+t.dataset.e;render();return}
+  const b=ev.target.closest("[data-g]");if(b&&b.dataset.g!=="undefined"){S.sel=+b.dataset.g;render();scrollTo({top:0,behavior:"smooth"})}
+});
+app.addEventListener("change",ev=>{if(ev.target.id==="gsel"){S.sel=+ev.target.value;render()}});
+$("#q").addEventListener("input",e=>{S.q=e.target.value;render()});
+$("#ref").onclick=()=>load(true);
+const nb=()=>$("#net").textContent=S.net?"Punkty: po hitach":"Punkty: przed hitami";
+$("#net").onclick=()=>{S.net=!S.net;nb();compute();render()};
+function lgs(){const l=ls("fpl-lg",CONFIG.leagues),n=ls("fpl-ln",{});$("#lg").innerHTML=l.map(id=>`<option value="${id}" ${id===S.lid?"selected":""}>${esc(n[id]||"Liga "+id)}</option>`).join("")}
+$("#lg").onchange=e=>{S.lid=+e.target.value;S.H={};S.R=[];history.replaceState(0,"","?liga="+S.lid);app.innerHTML="";load(false)};
+$("#add").onclick=()=>{const v=+prompt("Podaj ID ligi FPL (liczba z adresu strony ligi):");if(!v)return;const l=ls("fpl-lg",CONFIG.leagues);if(!l.includes(v))l.push(v);lset("fpl-lg",l);S.lid=v;lgs();$("#lg").onchange({target:{value:v}})};
+S.lid=+new URLSearchParams(location.search).get("liga")||ls("fpl-lg",CONFIG.leagues)[0];lgs();nb();load(false);
+</script></body></html>
