@@ -52,11 +52,11 @@ async function api(path,{ttl=3e5,force=false,pick=x=>x}={}){
   let err;
   for(let i=0;i<5;i++){
     try{
-      const r=await fetch(url);
+      const ac=new AbortController(),to=setTimeout(()=>ac.abort(),25000);let r;try{r=await fetch(url,{signal:ac.signal})}finally{clearTimeout(to)}
       if(r.ok){const d=pick(await r.json());lset(k,{t:Date.now(),d});return d}
       if(r.status===429||r.status>=500){err=new Error("HTTP "+r.status);await sleep(Math.max((+r.headers.get("Retry-After")||0)*1e3,800*2**i));continue}
       throw Object.assign(new Error("HTTP "+r.status),{fatal:1,status:r.status});
-    }catch(e){if(e.fatal)throw e;err=e;await sleep(800*2**i)}
+    }catch(e){if(e.fatal)throw e;err=e;$("#st").textContent=`Ponawiam (${i+1}/5): ${e.name==="AbortError"?"przekroczono czas":e.message}`;await sleep(800*2**i)}
   }
   throw err;
 }
